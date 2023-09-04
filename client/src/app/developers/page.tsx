@@ -8,7 +8,10 @@ export default async function Developers() {
       Developers
       <ul>
         {developers.map(({ name, studentNr, initials }, key) => (
-          <li className="text-center" key={key}>
+          <li
+            className="mb-3 cursor-pointer rounded-xl bg-[#fffaf5] p-4 text-center drop-shadow-xl last:mb-0"
+            key={key}
+          >
             {name}, {initials} <br /> {studentNr}
           </li>
         ))}
