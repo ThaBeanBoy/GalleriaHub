@@ -1,18 +1,36 @@
-# GalleriaHub
+# Table of Content
 
-## Table of Content
+- [Table of Content](#table-of-content)
+- [Introduction](#introduction)
+- [Project Setup](#project-setup)
+  - [Frontend](#frontend)
+  - [Backend](#backend)
 
-## Project Setup
+# Introduction
+
+<!--
+    Add group introdcution
+    ----------------------
+
+    - Group Name
+    - Group Number
+    - Group Members
+    - Project Name
+    - Brief description of the problem we trying to solve
+
+-->
+
+# Project Setup
 
 To build GalleriaHub, we needed 2 main things, a front end application (that operates in the browser) & a backend web api that communicates with the database.
 
 To accomplish this, we chose a specific tech-stack.
 
-### Frontend
+## Frontend
 
 For the front end, we decided that we going to start with a web application. We wanted to use a modern tool that would make development easier. We chose [NextJs](https://nextjs.org/) as our framwework. There are a few other libraries in use too, but all details pertaining to the web application can be found [here](./client/README.md).
 
-### Backend
+## Backend
 
 For the backend, we decided to use the language that is being taught in school. We'll be using C# and the obvious framework is the [.Net](https://dotnet.microsoft.com/) framework. This is a pure REST web api, not an MVC, webforms or anything else. The reason why we wanted a REST API is because:
 
