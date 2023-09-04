@@ -3,9 +3,12 @@
 - [Table of Content](#table-of-content)
 - [Introduction](#introduction)
 - [Resources](#resources)
-- [Project Setup](#project-setup)
+  - [General](#general)
   - [Frontend](#frontend)
   - [Backend](#backend)
+- [Project Setup](#project-setup)
+  - [Frontend](#frontend-1)
+  - [Backend](#backend-1)
 
 # Introduction
 
@@ -26,17 +29,24 @@
 
 # Resources
 
-| Title                              | Resource                                                                                    |
-| ---------------------------------- | ------------------------------------------------------------------------------------------- |
-| **General**                        |                                                                                             |
-| VSCode                             | https://code.visualstudio.com/                                                              |
-| Git                                | https://git-scm.com/downloads                                                               |
-| GitHub                             |                                                                                             |
-| **Frontend**                       |                                                                                             |
-| [Nextjs](https://nextjs.org/) docs | https://nextjs.org/                                                                         |
-| **Backend**                        |                                                                                             |
-| dotnet CLI download                | https://dotnet.microsoft.com/en-us/download                                                 |
-| .Net web api tutorial              | https://learn.microsoft.com/en-us/training/modules/build-web-api-minimal-api/1-introduction |
+## General
+
+- [VSCode](https://code.visualstudio.com/)
+- [Git](https://git-scm.com/downloads)
+- [GitHub](https://github.com/)
+- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+- [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
+
+## Frontend
+
+- [Nextjs docs](https://nextjs.org/)
+- [Tailwind Css](https://tailwindcss.com/)
+- [Nodejs](https://nodejs.org/en)
+
+## Backend
+
+- [dotnet CLI](https://dotnet.microsoft.com/en-us/download)
+- [.Net web api tutorial](https://learn.microsoft.com/en-us/training/modules/build-web-api-minimal-api/1-introduction)
 
 # Project Setup
 
@@ -55,4 +65,4 @@ For the backend, we decided to use the language that is being taught in school. 
 - No matter how we decide to make the front end, it will be able to consume the API. Whether we decided to use a javascript framework or whether we raw dogged it with HTML, CSS & Javascript, we had the freedom of choice to build with whatever we were comfortable with.
 - There's bonus marks for making a mobile application. Should we have enough time to make the mobile application, the mobile application will be able to consume the same API the web application consumes.
 
-You can read [this]() if you want more information on how the backend was made.
+You can read [this](./server/README.md) if you want more information on how the backend was made.

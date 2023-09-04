@@ -1,3 +1,3 @@
 # GalleriaHub Backend
 
-## Table of Content
+# Table of Content
