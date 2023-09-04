@@ -4,11 +4,10 @@ var app = builder.Build();
 app.MapGet("/", () => "Hello World!");
 
 List<TeamMember> Team = new List<TeamMember>(){
-    // Member 1: new TeamMember(Name: "Tiney", Initials: "TG", StudentNr: "220150124"),
-    // Member 2: new TeamMember(Name: "Tiney", Initials: "TG", StudentNr: "220150124"),
-    // Member 3: new TeamMember(Name: "Tiney", Initials: "TG", StudentNr: "220150124"),
+    new TeamMember(Name: "Trevor", Initials: "N/A", StudentNr: "000000000"),
+    new TeamMember(Name: "Michelle", Initials: "N/A", StudentNr: "000000000"),
+    new TeamMember(Name: "Morena", Initials: "N/A", StudentNr: "000000000"),
     new TeamMember(Name: "Tiney", Initials: "TG", StudentNr: "220150124"),
-    new TeamMember(Name: "Johny", Initials: "DG", StudentNr: "200000000"),
 };
 
 app.MapGet("/developers", ()=> Team);
