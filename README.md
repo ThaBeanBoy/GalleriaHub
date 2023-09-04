@@ -2,6 +2,7 @@
 
 - [Table of Content](#table-of-content)
 - [Introduction](#introduction)
+- [Resources](#resources)
 - [Project Setup](#project-setup)
   - [Frontend](#frontend)
   - [Backend](#backend)
@@ -22,6 +23,17 @@
     - Brief description of the problem we trying to solve
 
 -->
+
+# Resources
+
+| Title                              | Resource                                                                                    |
+| ---------------------------------- | ------------------------------------------------------------------------------------------- |
+| **General**                        |                                                                                             |
+| VSCode                             | https://code.visualstudio.com/                                                              |
+| **Frontend**                       |                                                                                             |
+| [Nextjs](https://nextjs.org/) docs | https://nextjs.org/                                                                         |
+| **Backend**                        |                                                                                             |
+| .Net web api tutorial              | https://learn.microsoft.com/en-us/training/modules/build-web-api-minimal-api/1-introduction |
 
 # Project Setup
 
