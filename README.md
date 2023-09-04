@@ -35,12 +35,12 @@
 - [Git](https://git-scm.com/downloads)
 - [GitHub](https://github.com/)
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-- [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
 
 ## Frontend
 
 - [Nextjs docs](https://nextjs.org/)
 - [Tailwind Css](https://tailwindcss.com/)
+- [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
 - [Nodejs](https://nodejs.org/en)
 
 ## Backend
