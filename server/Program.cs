@@ -8,6 +8,7 @@ List<TeamMember> Team = new List<TeamMember>(){
     // Member 2: new TeamMember(Name: "Tiney", Initials: "TG", StudentNr: "220150124"),
     // Member 3: new TeamMember(Name: "Tiney", Initials: "TG", StudentNr: "220150124"),
     new TeamMember(Name: "Tiney", Initials: "TG", StudentNr: "220150124"),
+    new TeamMember(Name: "Johny", Initials: "DG", StudentNr: "200000000"),
 };
 
 app.MapGet("/developers", ()=> Team);
