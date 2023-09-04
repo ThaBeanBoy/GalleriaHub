@@ -12,9 +12,12 @@
     Add group introdcution
     ----------------------
 
+    Michelle's task
     - Group Name
     - Group Number
     - Group Members
+
+    Morena's task
     - Project Name
     - Brief description of the problem we trying to solve
 
