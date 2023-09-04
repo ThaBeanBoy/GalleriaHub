@@ -29,6 +29,8 @@
 
 # Resources
 
+These are the resources used to develop GalleriaHub.
+
 ## General
 
 - [VSCode](https://code.visualstudio.com/)
@@ -47,6 +49,7 @@
 
 - [dotnet CLI](https://dotnet.microsoft.com/en-us/download)
 - [.Net web api tutorial](https://learn.microsoft.com/en-us/training/modules/build-web-api-minimal-api/1-introduction)
+- [Postman](https://www.postman.com/)
 
 # Project Setup
 
