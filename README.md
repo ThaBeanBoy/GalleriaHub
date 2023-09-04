@@ -30,9 +30,12 @@
 | ---------------------------------- | ------------------------------------------------------------------------------------------- |
 | **General**                        |                                                                                             |
 | VSCode                             | https://code.visualstudio.com/                                                              |
+| Git                                | https://git-scm.com/downloads                                                               |
+| GitHub                             |                                                                                             |
 | **Frontend**                       |                                                                                             |
 | [Nextjs](https://nextjs.org/) docs | https://nextjs.org/                                                                         |
 | **Backend**                        |                                                                                             |
+| dotnet CLI download                | https://dotnet.microsoft.com/en-us/download                                                 |
 | .Net web api tutorial              | https://learn.microsoft.com/en-us/training/modules/build-web-api-minimal-api/1-introduction |
 
 # Project Setup
