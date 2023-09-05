@@ -22,8 +22,8 @@
     - Group Members
 
     Morena's task
-    - Project Name
-    - Brief description of the problem we trying to solve
+    - GalleriaHub
+    - Our Paint Gallery E-Commerce platform is a hub that connects art enthusiasts from different parts of the world. It serves as an online marketplace where painters can showcase and sell their original artworks directly to customers. The platform will cater to both emerging artists and established painters, offering a diverse collection of paintings that cater to various tastes and preferences. By fostering a creative and supportive community, we aim to make art accessible to a broader audience while providing artists with an avenue to reach a global market.
 
 -->
 
