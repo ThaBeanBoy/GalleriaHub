@@ -17,9 +17,12 @@
     ----------------------
 
     Michelle's task
-    - Group Name
-    - Group Number
-    - Group Members
+    - Group Name : GalleriaHub
+    - Group Number : 6
+    - Group Members : TG Chipoyera 220150124
+                     MS Makola 221018369
+                    AM Ramaili 221000696
+                    T Damoyi 220002492
 
     Morena's task
     - GalleriaHub
