@@ -17,7 +17,7 @@ p {
   font-size: 16;
   line-height: 28px;
 
-  @apply max-w-lg;
+  @apply mb-4 max-w-lg;
 }
 
 .md-viewer p {
