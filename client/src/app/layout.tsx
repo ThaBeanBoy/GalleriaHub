@@ -15,7 +15,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={poppins.className}>{children}</body>
+      <body className={`${poppins.className} `}>
+        <nav className="max-width">Global Navigation</nav>
+
+        <div id="page-container" className="max-width">
+          {children}
+        </div>
+
+        <div id="footer-container" className="bg-grey-light py-8">
+          <footer className="max-width ">
+            <h1>Footer</h1>
+          </footer>
+        </div>
+      </body>
     </html>
   );
 }
