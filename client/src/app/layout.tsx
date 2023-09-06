@@ -21,7 +21,7 @@ export default function RootLayout({
       <body className={`${poppins.className} `}>
         <nav className="max-width">Global Navigation</nav>
 
-        <div id="page-container" className="max-width min-h-screen">
+        <div id="page-container" className="max-width min-h-screen py-8">
           {children}
         </div>
 

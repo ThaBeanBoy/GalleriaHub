@@ -9,18 +9,27 @@ const documentedComponents: ComponentDocumentationProps[] = [
     render: <h1>Home Page</h1>,
     description: "Should be used sparingly",
   },
+  {
+    name: "Header 2",
+    code: "<h2>h2</h2>",
+    render: <h2>h2</h2>,
+  },
 ];
 
 export default function Home() {
   return (
     <main className="flex flex-col">
-      <h1>Typography</h1>
+      <h1 className="mb-8">Typography</h1>
 
       {documentedComponents.map((props, key) => (
-        <ComponentDocumentation key={key} {...props} />
+        <ComponentDocumentation
+          key={key}
+          {...props}
+          className="border-grey mb-8 border-b-2 pb-8 last:mb-0"
+        />
       ))}
 
-      <ComponentDocumentation
+      {/* <ComponentDocumentation
         name="Header 2"
         code={`<h1>h2</h1>`}
         render={<h2>h2</h2>}
@@ -55,7 +64,7 @@ export default function Home() {
         <li>list item 3</li>
       </ol>
 
-      <h1>Buttons</h1>
+      <h1>Buttons</h1> */}
     </main>
   );
 }

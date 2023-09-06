@@ -2,7 +2,7 @@
 
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { a11yLight } from "react-syntax-highlighter/dist/esm/styles/hljs";
-
+import { twMerge } from "tailwind-merge";
 import { useState } from "react";
 import { BsClipboard } from "react-icons/bs";
 
@@ -12,6 +12,7 @@ export type ComponentDocumentationProps = {
   language?: string;
   render: React.ReactNode | string;
   description?: React.ReactNode | string;
+  className?: string;
 };
 
 export default function ComponentDocumentation({
@@ -20,6 +21,7 @@ export default function ComponentDocumentation({
   language = "typescript",
   render,
   description,
+  className,
 }: ComponentDocumentationProps) {
   const [formatedCode, setformatedCode] = useState(code);
   // prettier.format(code).then((res) => setformatedCode(res));
@@ -29,7 +31,7 @@ export default function ComponentDocumentation({
     alert("Copied To Clipboard");
   };
   return (
-    <div className="max-w-[730px] rounded-2xl">
+    <div className={twMerge("max-w-[730px]", className)}>
       <h4 className="font-bold">{name}</h4>
 
       {/* render container */}
@@ -52,7 +54,7 @@ export default function ComponentDocumentation({
 
         <button
           onClick={copyHandler}
-          className="bg-active absolute right-2 top-2 rounded-2xl p-[13px] text-white"
+          className="bg-active absolute right-2 top-2 rounded-2xl p-[13px] text-white drop-shadow-xl"
         >
           <BsClipboard />
         </button>

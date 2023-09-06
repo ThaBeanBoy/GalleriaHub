@@ -9,12 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mdx-js/loader": "^2.3.0",
+    "@mdx-js/react": "^2.3.0",
+    "@next/mdx": "^13.4.19",
     "@radix-ui/themes": "^1.1.2",
+    "@types/mdx": "^2.0.7",
     "@types/node": "20.5.9",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.15",
     "axios": "^1.5.0",
+    "clsx": "^2.0.0",
     "eslint": "8.48.0",
     "eslint-config-next": "13.4.19",
     "next": "13.4.19",
@@ -23,6 +28,7 @@
     "react-dom": "18.2.0",
     "react-icons": "^4.10.1",
     "react-syntax-highlighter": "^15.5.0",
+    "tailwind-merge": "^1.14.0",
     "tailwindcss": "3.3.3",
     "typescript": "5.2.2"
   },
