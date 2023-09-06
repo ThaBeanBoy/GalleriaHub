@@ -25,6 +25,7 @@ const config: Config = {
           DEFAULT: "#B1B1B1",
           light: "#E2E8F0",
           control: "#DEE3E9",
+          code: "rgba(1,61,228,.224)",
         },
 
         active: {

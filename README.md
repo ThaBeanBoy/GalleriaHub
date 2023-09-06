@@ -47,6 +47,7 @@ These are the resources used to develop GalleriaHub.
 - [Tailwind Css](https://tailwindcss.com/)
 - [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
 - [Nodejs](https://nodejs.org/en)
+- [React Icons](https://react-icons.github.io/react-icons/)
 
 ## Backend
 
