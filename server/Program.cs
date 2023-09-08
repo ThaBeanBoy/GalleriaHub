@@ -1,5 +1,12 @@
+using Microsoft.OpenApi.Models;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 var app = builder.Build();
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.MapGet("/", () => "Hello World!");
 
@@ -13,6 +20,8 @@ List<TeamMember> Team = new List<TeamMember>(){
 app.MapGet("/developers", ()=> Team);
 
 app.MapGet("/developers/{studentNr}", (string studentNr) => Team.SingleOrDefault(Member => Member.StudentNr == studentNr));
+
+
 
 app.Run();
 
