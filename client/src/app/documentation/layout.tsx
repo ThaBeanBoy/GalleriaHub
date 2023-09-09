@@ -1,8 +1,11 @@
 import DocLink from "@/components/doc-link";
-
+import { FaFigma } from "react-icons/fa";
+import { VscTable } from "react-icons/vsc";
+import { CiBoxes } from "react-icons/ci";
 export type DocLink = {
   title: string;
   href: string;
+  icon?: React.ReactNode;
 };
 
 export type LinkGroup = {
@@ -21,6 +24,7 @@ const DocsNavigations: LinkGroup[] = [
       {
         title: "resources",
         href: "resources",
+        icon: <CiBoxes />,
       },
     ],
   },
@@ -30,10 +34,12 @@ const DocsNavigations: LinkGroup[] = [
       {
         title: "UI Design",
         href: "ui-design",
+        icon: <FaFigma />,
       },
       {
         title: "Database Design",
         href: "db-design",
+        icon: <VscTable />,
       },
     ],
   },
