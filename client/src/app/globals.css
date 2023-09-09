@@ -13,7 +13,14 @@
 }
 
 /* Typography */
-p {
+a {
+  @apply text-active;
+}
+
+.sidebar {
+  @apply sticky top-8 h-min max-h-[calc(100vh-72.8px)] w-[240px] overflow-y-scroll;
+}
+/* p {
   font-size: 16;
   line-height: 28px;
 
@@ -32,9 +39,6 @@ ol {
   list-style-type: decimal;
 }
 
-a {
-  @apply text-active;
-}
 
 h1 {
   font-weight: 800;
@@ -139,4 +143,4 @@ li ul {
   margin-left: 24px;
   margin-top: 8px;
   margin-bottom: 8px;
-}
+} */

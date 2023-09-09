@@ -54,14 +54,7 @@ export default function DocumentationLayout({
   return (
     // Container
     <div className="relative flex gap-4">
-      <aside className="sticky top-8 mr-2 h-[calc(100vh-72.8px)] w-[284px] border-r pr-2">
-        {/* <p className="text-black-x2 font-bold">Design</p> */}
-        {/* <Link href="documentation/" className="text-active">
-          Typgraphy
-        </Link>
-        <h4>Frontend</h4>
-        <Link href="documentation/">Typgraphy</Link>
-        <h4>Backend</h4> */}
+      <aside className="sidebar mr-2 border-r pr-2">
         {DocsNavigations.map(({ goupName, links }, key) => (
           <>
             <p className="text-black-x2 mb-2 pl-3 font-bold capitalize">
@@ -77,7 +70,17 @@ export default function DocumentationLayout({
         ))}
       </aside>
 
-      <main className="md-viewer max-w-[730px]">{children}</main>
+      <main className="md-viewer prose prose-a:text-active prose-a:no-underline max-w-[730px]">
+        {children}
+      </main>
+
+      <aside className="prose sidebar ml-2 border-l pl-2">
+        <h4 className="capitalize">Table of Content</h4>
+        <ul className="pl-0">
+          <li>section 1</li>
+          <li>section 2</li>
+        </ul>
+      </aside>
     </div>
   );
 }
