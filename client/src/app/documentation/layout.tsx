@@ -75,7 +75,7 @@ export default function DocumentationLayout({
       </main>
 
       <aside className="prose sidebar ml-2 border-l pl-2">
-        <h4 className="capitalize">Table of Content</h4>
+        <h4 className="prose: capitalize">Table of Content</h4>
         <ul className="pl-0">
           <li>section 1</li>
           <li>section 2</li>
