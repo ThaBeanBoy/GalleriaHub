@@ -6,7 +6,6 @@ import createMDX from "@next/mdx";
 const nextConfig = {
   experimental: {
     mdxRs: true,
-    appDir: true,
   },
 };
 
