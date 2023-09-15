@@ -13,7 +13,7 @@ echo 2. Client
 
 choice /c 12 /n /m "Choice: "
 
-set /p packageName=Package Name:
+set /p packageName="Package Name: "
 
 rem Capture the user's choice
 set userChoice=%errorlevel%
@@ -21,7 +21,7 @@ set userChoice=%errorlevel%
 if %userChoice% equ 1 (
     cd ../server
 
-    dotnet add %packageName%
+    dotnet add package %packageName%
 ) else if %userChoice% equ 2 (
     cd ../client
 
