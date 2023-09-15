@@ -13,6 +13,7 @@ public class GalleriaHubDBContext : DbContext
         this.Configuration = Configuration;
     }
 
+    // public UsersSet Users { get; set; } = null!;
     public UsersSet Users { get; set; } = null!;
     public DbSet<Verifier> Verifiers { get; set; } = null!;
     public DbSet<Artist> Artists { get; set; } = null!;
@@ -50,6 +51,24 @@ public class GalleriaHubDBContext : DbContext
             .HasOne(U => U.WishList)
             .WithMany()
             .HasForeignKey(U => U.ListID);
+
+        // Making Artist.UserID both a foreign key & primary key
+        builder.Entity<Artist>()
+            .HasKey(A => A.UserID);
+
+        builder.Entity<Artist>()
+            .HasOne(A => A.User)
+            .WithOne()
+            .HasForeignKey<Artist>(A => A.UserID);
+
+        // Making Verifier.UserID both a foreign key & primary key
+        builder.Entity<Verifier>()
+            .HasKey(V => V.UserID);
+
+        builder.Entity<Verifier>()
+            .HasOne(V => V.User)
+            .WithOne()
+            .HasForeignKey<Verifier>(V => V.UserID);
     }
 
     public class UsersSet : DbSet<User>

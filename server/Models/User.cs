@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Models;
@@ -8,7 +9,7 @@ namespace Models;
 https://weblogs.asp.net/manavi/inheritance-mapping-strategies-with-entity-framework-code-first-ctp5-part-1-table-per-hierarchy-tph
 */
 
-public abstract class User : IDateTime 
+public class User : IDateTime 
 {
     public int UserID {get; set;}
 
@@ -42,9 +43,11 @@ public abstract class User : IDateTime
     public List WishList { get; set; } = null!;
 }
 
-[Table("Verifiers")]
-public class Verifier : User
+public class Verifier
 {
+    public int UserID { get; set; }
+    public User User { get; set; } = null!;
+
     public int GalleryID { get; set; }
     public Gallery Gallery { get; set; } = null!;
 
@@ -52,9 +55,11 @@ public class Verifier : User
     public ICollection<Artist> VerifiedArtist { get; } = new List<Artist>();
 }
 
-[Table("Artists")]
-public class Artist : User
+public class Artist
 {
+    public int UserID {get; set;}
+    public User User { get; set; } = null!;
+
     public int VerifierID { get; set; }
 
     public ICollection<Product> Artworks { get; } = new List<Product>();

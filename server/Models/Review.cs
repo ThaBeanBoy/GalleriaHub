@@ -17,8 +17,6 @@ public class Review : IDateTime
 
     [Required]
     public required string ReviewContent { get; set; }
-
-    public ICollection<Review>? Comments { get; set; }
     
     public DateTime CreatedOn { get; set; }
     

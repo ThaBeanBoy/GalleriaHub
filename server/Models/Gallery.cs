@@ -10,4 +10,6 @@ public class Gallery
     public string Location {get; set;} = null!;
 
     public byte[]? CoverImage { get; set; } 
+
+    public string Description { get; set; } = null!;
 }
