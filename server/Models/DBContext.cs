@@ -9,8 +9,6 @@ public class GalleriaHubDBContext : DbContext
 
     public GalleriaHubDBContext(DbContextOptions options) : base(options) { }
 
-    // public UsersSet Users { get; set; } = null!;
-    // public UsersSet Users { get; set; } = null!;
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<UserList> UserLists { get; set; } = null!;
     public DbSet<Verifier> Verifiers { get; set; } = null!;
@@ -24,6 +22,7 @@ public class GalleriaHubDBContext : DbContext
     public DbSet<Discount> Discounts { get; set; } = null!;
     public DbSet<OrderItem> OrderItems { get; set; } = null!;
     public DbSet<Gallery> Galleries { get; set; } = null!;
+    public DbSet<GalleryFile> GalleryFiles { get; set; } = null!;
     public DbSet<List> Lists { get; set; } = null!;
     public DbSet<ListItem> ListItems { get; set; } = null!;
     public DbSet<File> Files { get; set; } = null!;

@@ -17,17 +17,22 @@ public class Order : IList<OrderItem>
     public int? DiscountID { get; set; }
     public Discount? Discount { get; set; }
 
-    public void AddItem(OrderItem NewItem)
+    public void AddItem(DbSet<OrderItem> ListItemSet, OrderItem NewItem)
     {
         throw new NotImplementedException();
     }
 
-    public OrderItem[] GetItems()
+    public OrderItem[] GetItems(DbSet<OrderItem> ListItemSet)
     {
         throw new NotImplementedException();
     }
 
-    public void RemoveItem(OrderItem NewItem)
+    public void RemoveItem(DbSet<OrderItem> ListItemSet, OrderItem NewItem)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void UpdateOrderItem(DbSet<OrderItem> ListItemSet, OrderItem NewItem)
     {
         throw new NotImplementedException();
     }

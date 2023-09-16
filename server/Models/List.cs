@@ -2,13 +2,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Models;
 
-public interface IList<IListItem>
+public interface IList<IListItem> where IListItem : class
 {
-    void AddItem(IListItem NewItem);
+    // Create
+    void AddItem(DbSet<IListItem> ListItemSet, IListItem NewItem);
 
-    void RemoveItem(IListItem NewItem);
+    // Retrieve
+    public IListItem[] GetItems(DbSet<IListItem> ListItemSet);
 
-    public IListItem[] GetItems();
+    // Delete
+    void RemoveItem(DbSet<IListItem> ListItemSet, IListItem NewItem);
 }
 
 public class List : IDateTime, IList<ListItem>
@@ -19,17 +22,17 @@ public class List : IDateTime, IList<ListItem>
     
     public DateTime LastUpdate { get; set; }
 
-    public void AddItem(ListItem NewItem)
+    public void AddItem(DbSet<ListItem> ListItemSet, ListItem NewItem)
     {
         throw new NotImplementedException();
     }
 
-    public ListItem[] GetItems()
+    public ListItem[] GetItems(DbSet<ListItem> ListItemSet)
     {
         throw new NotImplementedException();
     }
 
-    public void RemoveItem(ListItem NewItem)
+    public void RemoveItem(DbSet<ListItem> ListItemSet, ListItem NewItem)
     {
         throw new NotImplementedException();
     }

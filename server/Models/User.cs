@@ -51,7 +51,17 @@ public class User : IDateTime
     public File? CoverPicture { get; set; }
 
     // Utility methods
-    public void AddToWishList(Product NewProduct)
+    public void NewList(DbSet<UserList> UserListSet, UserList NewList)
+    {
+        throw new NotImplementedException();
+    }
+
+    public UserList[] GetLists(DbSet<UserList> UserListSet)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void DeleteList(DbSet<UserList> UserListSet, UserList NewList)
     {
         throw new NotImplementedException();
     }
