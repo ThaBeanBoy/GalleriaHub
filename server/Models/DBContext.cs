@@ -5,16 +5,13 @@ namespace Models;
 
 public class GalleriaHubDBContext : DbContext 
 {
-    private readonly IConfiguration Configuration;
     // private readonly bool ProductionEnv;
 
-    public GalleriaHubDBContext(IConfiguration Configuration)
-    {
-        this.Configuration = Configuration;
-    }
+    public GalleriaHubDBContext(DbContextOptions options) : base(options) { }
 
     // public UsersSet Users { get; set; } = null!;
-    public UsersSet Users { get; set; } = null!;
+    // public UsersSet Users { get; set; } = null!;
+    public DbSet<User> Users { get; set; } = null!;
     public DbSet<Verifier> Verifiers { get; set; } = null!;
     public DbSet<Artist> Artists { get; set; } = null!;
     public DbSet<Product> Products { get; set; } = null!;
@@ -25,15 +22,6 @@ public class GalleriaHubDBContext : DbContext
     public DbSet<ProductImage> ProductImages { get; set; } = null!;
     public DbSet<List> Lists { get; set; } = null!;
     public DbSet<ListItem> ListItems { get; set; } = null!;
-
-    protected override void OnConfiguring(DbContextOptionsBuilder options){
-        // options.UseSqlServer(Configuration.GetConnectionString(
-        //     ProductionEnv ? 
-        //     "AZURE_SQL_DB" : 
-        //     "Local"
-        // ));
-        options.UseSqlite(Configuration.GetConnectionString("Lite"));
-    }
 
     protected override void OnModelCreating(ModelBuilder builder){
         // Making user emails unique
@@ -71,20 +59,20 @@ public class GalleriaHubDBContext : DbContext
             .HasForeignKey<Verifier>(V => V.UserID);
     }
 
-    public class UsersSet : DbSet<User>
-    {
-        public override IEntityType EntityType => this.EntityType;
+    // public class UsersSet : DbSet<User>
+    // {
+    //     public override IEntityType EntityType => this.EntityType;
 
-        public bool EmailIsRegistered(string Email)
-        {
-            User U = this.Single(U => U.Email == Email);
-            return U != null;
-        }
+    //     public bool EmailIsRegistered(string Email)
+    //     {
+    //         User U = this.Single(U => U.Email == Email);
+    //         return U != null;
+    //     }
 
-        public bool UsernameAvailable(string Username)
-        {
-            User U = this.Single(U => U.Username == Username);
-            return U == null;
-        }
-    }
+    //     public bool UsernameAvailable(string Username)
+    //     {
+    //         User U = this.Single(U => U.Username == Username);
+    //         return U == null;
+    //     }
+    // }
 }

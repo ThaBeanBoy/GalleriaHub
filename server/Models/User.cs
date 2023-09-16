@@ -17,7 +17,7 @@ public class User : IDateTime
 
     public string Password {get; set;} = null!;
 
-    public string Public { get; set; } = null!;
+    public bool Public { get; set; }
 
     public byte[]? ProfilePicture { get; set; } = null!;
 
@@ -41,6 +41,12 @@ public class User : IDateTime
 
     public int ListID { get; set; }
     public List WishList { get; set; } = null!;
+
+    // Utility methods
+    public void AddToWishList(Product NewProduct)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public class Verifier
