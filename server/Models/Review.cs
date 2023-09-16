@@ -8,15 +8,12 @@ public class Review : IDateTime
     [Key]
     public int ReviewID { get; set; }
 
-    [Required]
-    [ForeignKey("User")]
-    public required User Reviewer { get; set; }
+    public User User { get; set; } = null!;
+    public int UserID { get; set; } 
 
-    [Required]
-    public required string ReviewHeader { get; set; }
+    public string ReviewHeader { get; set; } = null!;
 
-    [Required]
-    public required string ReviewContent { get; set; }
+    public string ReviewContent { get; set; } = null!;
     
     public DateTime CreatedOn { get; set; }
     

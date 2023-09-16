@@ -14,6 +14,9 @@ public class Order : IList<OrderItem>
     [Required, ForeignKey("User")]
     public required User Customer {get; set;}
 
+    public int? DiscountID { get; set; }
+    public Discount? Discount { get; set; }
+
     public void AddItem(OrderItem NewItem)
     {
         throw new NotImplementedException();

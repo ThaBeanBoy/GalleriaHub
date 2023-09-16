@@ -1,14 +1,17 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Models;
 
 public class Product : IDateTime
 {
-    public int ProductID {get; set;}
+    public int ProductID { get; set; }
 
-    [Required]
-    public required string ProductName {get; set;} 
+    public int ArtistID { get; set; }
+    public Artist Artist { get; set; } = null!;
+
+    public string ProductName {get; set;} = null!; 
 
     // ! Product typename is still under review
     [Required]
@@ -32,8 +35,26 @@ public class Product : IDateTime
 
     // Can be null
     // Should reference file in file storage
-    public string? Description {get; set;}
+    public File? File {get; set;} = null!;
+    public int? FileID { get; set; }
+}
 
-    // references to files in file storage
-    public ICollection<ProductImage>? Media {get; set;}
+[PrimaryKey(nameof(ProductID), nameof(FileID))]
+public class ProductFile
+{
+    public Product Product { get; set; } = null!;
+    public int ProductID { get; set; }
+    public File File { get; set; } = null!;
+    public int FileID { get; set; }
+    public bool Public { get; set; }
+}
+
+[PrimaryKey(nameof(ProductID), nameof(VerifierID))]
+public class ProductVerification
+{
+    public int ProductID { get; set; }
+    public Product Product { get; set; } = null!;
+
+    public int VerifierID { get; set; }
+    public Verifier Verifier { get; set; } = null!;
 }

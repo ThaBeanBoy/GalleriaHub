@@ -21,11 +21,11 @@ public class GalleriaHubDBContext : DbContext
     public DbSet<ProductVerification> ProductVerifications { get; set; } = null!;
     public DbSet<Review> Reviews { get; set; } = null!;
     public DbSet<Order> Orders { get; set; } = null!;
+    public DbSet<Discount> Discounts { get; set; } = null!;
     public DbSet<OrderItem> OrderItems { get; set; } = null!;
     public DbSet<Gallery> Galleries { get; set; } = null!;
     public DbSet<List> Lists { get; set; } = null!;
     public DbSet<ListItem> ListItems { get; set; } = null!;
-
     public DbSet<File> Files { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder){
