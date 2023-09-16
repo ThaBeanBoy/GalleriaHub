@@ -24,13 +24,15 @@ public class User : IDateTime
     public string? Username {get; set;} = null!;
 
     // Can be null
-    public string? Name {get; set;} = null!;
+    public string? Name {get; set;}
+    public string? Surname { get; set; }
+    public string? PhoneNumber { get; set; }
 
     public DateTime CreatedOn {get; set;}
 
     public DateTime LastUpdate { get; set; }
     
-    public string? Description {get; set;} = null!;
+    public int DescriptionFileID {get; set;}
 
     // Can be null
     public string? Location {get; set;} = null!;

@@ -12,7 +12,7 @@ public static class User
         group.MapPost("/sign-up", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
-            Console.WriteLine($"DB Null: ${DB == null}");
+            
             try
             {
                 // Getting the form content
@@ -21,11 +21,9 @@ public static class User
                 string? Password = Convert.ToString(Request.Form["password"]).Trim();
                 string? ConfirmPassword = Convert.ToString(Request.Form["confirm-password"]).Trim();
 
-
                 // Checking for any nulls in form
-                string?[] inputs = {"Email", "UserName", "Password", "ConfirmPassword"};
-                Console.WriteLine($"Nulls & empties : {inputs.Any(value => string.IsNullOrEmpty(value))}");
-                if(inputs.Any(value => string.IsNullOrEmpty(value)))
+                string?[] inputs = {Email, UserName, Password, ConfirmPassword};
+                if(inputs.Any(string.IsNullOrEmpty))
                     throw new NullReferenceException();
 
                 // Checking password matching
@@ -58,8 +56,10 @@ public static class User
                 DB.SaveChanges();
 
                 // Send Response & JWT Token
+
+                // Sending response
                 Response.StatusCode = StatusCodes.Status201Created;
-                return Response.WriteAsJsonAsync(Request.Form);
+                return Response.WriteAsync("Successful login");
             }
             catch (NullReferenceException e)
             {

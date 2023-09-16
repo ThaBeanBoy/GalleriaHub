@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Models;
 
@@ -10,9 +11,11 @@ using Models;
 namespace backend.Migrations
 {
     [DbContext(typeof(GalleriaHubDBContext))]
-    partial class GalleriaHubDBContextModelSnapshot : ModelSnapshot
+    [Migration("20230916172459_UserDescriptionFileID")]
+    partial class UserDescriptionFileID
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.11");
@@ -322,17 +325,11 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("TEXT");
-
                     b.Property<int?>("ProfilePictureFileID")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("Public")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("Surname")
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Username")
                         .HasColumnType("TEXT");
@@ -343,9 +340,6 @@ namespace backend.Migrations
                         .IsUnique();
 
                     b.HasIndex("ListID");
-
-                    b.HasIndex("PhoneNumber")
-                        .IsUnique();
 
                     b.HasIndex("ProfilePictureFileID");
 

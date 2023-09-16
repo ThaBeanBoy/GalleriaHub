@@ -35,6 +35,7 @@ public class GalleriaHubDBContext : DbContext
         Making user emails unique
         Making usernames unique
         Making the WishList a foreign key to List
+        Phone number is unique
         */
         builder.Entity<User>()
             .HasIndex(U => U.Email)
@@ -48,6 +49,10 @@ public class GalleriaHubDBContext : DbContext
             .HasOne(U => U.WishList)
             .WithMany()
             .HasForeignKey(U => U.ListID);
+
+        builder.Entity<User>()
+            .HasIndex(U => U.PhoneNumber)
+            .IsUnique();
 
         /*
         Artist Table
