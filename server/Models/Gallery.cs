@@ -9,7 +9,8 @@ public class Gallery
     [Required]
     public string Location {get; set;} = null!;
 
-    public byte[]? CoverImage { get; set; } 
+    public File CoverImage { get; set; } = null!;
+    public int FileID { get; set; } 
 
     public string Description { get; set; } = null!;
 }
