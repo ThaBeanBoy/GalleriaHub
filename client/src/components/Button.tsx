@@ -1,7 +1,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
-type ButtonProps = {
+export type ButtonProps = {
   label?: string;
   icon?: React.ReactElement;
   variant?: "fill" | "hollow";
