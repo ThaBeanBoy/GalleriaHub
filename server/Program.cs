@@ -1,27 +1,36 @@
+using System.Text.RegularExpressions;
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Models;
+using Routes;
+using GalleriaMiddleware;
 
 var builder = WebApplication.CreateBuilder(args);
+// builder.Services.AddDbContext<GalleriaHubDBContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("Lite")));
+builder.Services.AddSqlite<GalleriaHubDBContext>(builder.Configuration.GetConnectionString("Lite"));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+app.UseDatabaseConnectionTest();
 
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", ()=> "Hello World");
 
-List<TeamMember> Team = new List<TeamMember>(){
-    new TeamMember(Name: "Trevor", Initials: "N/A", StudentNr: "000000000"),
-    new TeamMember(Name: "Michelle", Initials: "N/A", StudentNr: "000000000"),
-    new TeamMember(Name: "Morena", Initials: "N/A", StudentNr: "000000000"),
-    new TeamMember(Name: "Tiney", Initials: "TG", StudentNr: "220150124"),
-};
+app.MapGet("/db-connected", (HttpContext context) => {
+    var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+    return Results.Ok(DB != null);
+});
 
-app.MapGet("/developers", ()=> Team);
+app.MapGroup(Developers.RouterPrefix)
+    .DeveloperRoutes();
 
-app.MapGet("/developers/{studentNr}", (string studentNr) => Team.SingleOrDefault(Member => Member.StudentNr == studentNr));
-
-
+app.MapGroup(Routes.User.RouterPrefix)
+    .UserEndpoints();
+    // .RequireAuthorization();
 
 app.Run();
 
