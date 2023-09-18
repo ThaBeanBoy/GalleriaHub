@@ -1,2 +1,2 @@
 cd %~dp0
-dotnet run
+dotnet watch --no-hot-reload

@@ -1,8 +1,11 @@
 import "./globals.css";
+import Input from "../components/Input";
+
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import Button from "@/components/Button";
 import { LuSearch } from "react-icons/lu";
+import Link from "next/link";
 const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],
@@ -21,16 +24,45 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className} `}>
-        <div id="header-container">
-          <header className="max-width py-6">
-            <p>logo</p>
-            Global Navigation
-            <Button
-              // label="hello"
-              icon={<LuSearch />}
-              // variant="hollow"
-              /* className="rounded-l-none" */ /* variant="hollow" */
-            />
+        <div id="header-container" className="sticky top-0 bg-white">
+          <header className="max-width flex items-center justify-between border-b py-5">
+            <div id="header-left" className="flex items-center gap-4">
+              <p>logo</p>
+              <div id="search-button" className="flex">
+                <Input className="max-w-[292px] rounded-r-none" />
+                <Button className="rounded-l-none" icon={<LuSearch />} />
+              </div>
+            </div>
+
+            <nav>
+              <ul className="flex items-center gap-4">
+                <li>
+                  <Link href="/" className="hover:text-active">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/" className="hover:text-active">
+                    Shop
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/" className="hover:text-active">
+                    Categories
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/" className="hover:text-active">
+                    Login
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/" className="hover:text-active">
+                    <Button label="sign up" />
+                  </Link>
+                </li>
+              </ul>
+            </nav>
           </header>
         </div>
 
