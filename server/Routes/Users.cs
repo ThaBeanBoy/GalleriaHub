@@ -92,9 +92,50 @@ public static class User
 
         group.MapPost("/login", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
+            var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
 
-            Response.StatusCode = StatusCodes.Status501NotImplemented;
-            return Response.WriteAsync("Endpoint not implemented");
+            try
+            {
+                string? UserName = Convert.ToString(Request.Form["username"]).Trim();
+                string? Password = Convert.ToString(Request.Form["password"]).Trim();
+
+                string?[] info = {UserName,Password};
+
+                //Checking if the received Username and Password is not empty
+                if((UserName == null) || (Password == null))
+                {
+                    throw new NullReferenceException();
+                }
+
+                //Getting the user based on the username
+                Models.User? userEntity = DB.Users.FirstOrDefault(user => user.Username == UserName);
+
+                if(userEntity == null)
+                {
+                    throw new UsernameNotFoundException(UserName);
+                }
+
+                if(userEntity.Password != Password)
+                {
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Response.WriteAsync("Incorrect Password");
+                }
+
+                Response.StatusCode = StatusCodes.Status200OK;
+                return Response.WriteAsync("Access Granted");
+
+            }
+            catch(NullReferenceException)
+            {
+                Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                return Response.WriteAsync("Can not accept empty field. Provide username and password");
+            }
+            catch(Exception)
+            {
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                return Response.WriteAsync("Login Fail");
+            }
+
         });
 
         return group;
@@ -115,5 +156,13 @@ public static class User
     public class UsernameAlreadyTakenException : Exception
     {
         public UsernameAlreadyTakenException(string Username) : base($"{Username} already taken"){}
+    }
+
+    public class UsernameNotFoundException : Exception
+    {
+        public UsernameNotFoundException(string UserName) : base($"Could not log in {UserName}")
+        {
+
+        }
     }
 }
