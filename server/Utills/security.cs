@@ -9,7 +9,7 @@ namespace Utility{
 
         using(SHA256 sha = SHA256.Create()){
 
-            byte[] value =sha.ComputeHash(Enconding.UTF8.GetBytes(input));
+            byte[] value =sha.ComputeHash(Encoding.UTF8.GetBytes(input));
 
             foreach(byte b in value){
                 hashauth +=b;

@@ -1,5 +1,6 @@
 using Microsoft.IdentityModel.Tokens;
 using Models;
+using Utility;
 
 namespace Routes;
 
@@ -44,7 +45,7 @@ public static class User
 
                 Models.User NewUser = new Models.User(){
                     Email = Email,
-                    Password = Password, // Supposed to encrypt
+                    Password = Security.hashauth(Password), // Encrypting
                     Username = UserName,
                     Public = true,
                     CreatedOn = DateTime.Now,
