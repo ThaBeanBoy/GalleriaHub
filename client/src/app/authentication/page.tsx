@@ -45,14 +45,19 @@ export default function SignUpPage() {
           </label>
         </div>
 
-        <Link href="authentication/login" className="block no-underline">
-          <Button
-            label="go to login page"
-            variant="hollow"
-            className="w-full flex-1"
-          />
-        </Link>
-        <Button label="sign up" className="flex-1" />
+        <div className="col-span-2 flex flex-col-reverse gap-4 lg:flex-row">
+          <Link
+            href="authentication/login"
+            className="block flex-1 no-underline"
+          >
+            <Button
+              label="go to login page"
+              variant="hollow"
+              className="w-full"
+            />
+          </Link>
+          <Button label="sign up" className="flex-1" />
+        </div>
       </form>
 
       <div id="auth-providers" className="flex flex-col items-center gap-3">
