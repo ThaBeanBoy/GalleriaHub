@@ -130,6 +130,11 @@ public static class User
                 Response.StatusCode = StatusCodes.Status406NotAcceptable;
                 return Response.WriteAsync("Can not accept empty field. Provide username and password");
             }
+            catch(UsernameNotFoundException e)
+            {
+                Response.StatusCode = StatusCodes.Status404NotFound;
+                return Response.WriteAsync(e.Message);
+            }
             catch(Exception)
             {
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
