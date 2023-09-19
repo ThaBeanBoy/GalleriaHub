@@ -116,7 +116,7 @@ public static class User
                     throw new UsernameNotFoundException(UserName);
                 }
 
-                if(userEntity.Password != Password)
+                if(userEntity.Password != Security.hashauth(Password))
                 {
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return Response.WriteAsync("Incorrect Password");
