@@ -10,7 +10,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, label, icon, id, readOnly, ...props }, ref) => (
     <div className="flex flex-col gap-1">
       {label && (
-        <label htmlFor={id} className="flex items-center gap-1 pl-4 text-sm">
+        <label htmlFor={id} className="flex items-center gap-1 pl-4 text-xs">
           {icon} {label}
         </label>
       )}

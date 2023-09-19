@@ -11,7 +11,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ label, icon, variant = "fill", className, ...props }, ref) => (
     <button
       className={cn(
-        "bg-active border-active flex items-center justify-center gap-2 rounded-3xl border px-4 py-2 text-base font-semibold capitalize text-white",
+        "bg-active border-active flex items-center justify-center gap-2 rounded-3xl border px-4 py-2 text-base font-semibold capitalize text-white shadow-md",
         {
           // hollow variant
           "text-active bg-white ": variant === "hollow",
