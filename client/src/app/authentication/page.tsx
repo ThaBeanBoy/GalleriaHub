@@ -54,6 +54,7 @@ export default function SignUpPage() {
               label="go to login page"
               variant="hollow"
               className="w-full"
+              disabled
             />
           </Link>
           <Button label="sign up" className="flex-1" />

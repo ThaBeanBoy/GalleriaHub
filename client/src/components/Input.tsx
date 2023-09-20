@@ -16,7 +16,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       )}
       <input
         className={cn(
-          "border-grey-control rounded-3xl border bg-white px-4 py-2",
+          "border-grey-control focus:border-active rounded-3xl border bg-white px-4 py-2 outline-none",
           "bg-red" && readOnly,
           className,
         )}
