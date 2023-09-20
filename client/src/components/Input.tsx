@@ -1,5 +1,8 @@
-import React from "react";
+import React, {useState} from "react";
 import { cn } from "@/lib/utils";
+
+import Button from "./Button";
+import { EyeIcon, EyeOff } from "lucide-react";
 
 export type InputProps = {
   label?: string;
@@ -7,13 +10,22 @@ export type InputProps = {
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, icon, id, readOnly, ...props }, ref) => (
-    <div className="flex flex-col gap-1">
+  ({ className, label, icon, id,type, readOnly, ...props }, ref) => {
+    const [passwordRevealed, setPasswordRevealed] = useState(false);
+    const switchPasswordReveal = (e?: any/* React.MouseEventHandler<HTMLButtonElement> */) => {
+      e.preventDefault();
+      setPasswordRevealed(!passwordRevealed);
+    }
+    
+    return (
+    <div className="flex flex-col gap-1 relative">
+      
       {label && (
         <label htmlFor={id} className="flex items-center gap-1 pl-4 text-xs">
           {icon} {label}
         </label>
       )}
+
       <input
         className={cn(
           "border-grey-control focus:border-active rounded-3xl border bg-white px-4 py-2 outline-none",
@@ -24,9 +36,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {...props}
         ref={ref}
         readOnly={readOnly}
+        type={type === "password" ? (passwordRevealed ? "text" : "password") : type}
       />
+
+      {type === 'password' && <Button icon={passwordRevealed ? <EyeIcon />: <EyeOff />} onClick={switchPasswordReveal} variant="hollow" className="absolute bottom-1 right-1 border-0 shadow-none rounded-l-none"/>}
     </div>
-  ),
+  )}
 );
 
 Input.displayName = "Input";

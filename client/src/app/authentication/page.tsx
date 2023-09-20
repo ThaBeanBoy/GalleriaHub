@@ -5,6 +5,9 @@ import Image from "next/image";
 
 import { Checkbox } from "@/components/ui/checkbox";
 
+import {BiLockAlt} from 'react-icons/bi';
+import {FiMail, FiUserPlus} from 'react-icons/fi';
+
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 
@@ -13,13 +16,14 @@ export default function SignUpPage() {
     <main className="prose flex flex-col items-center pt-6 lg:pt-0">
       <h1 className="pl-4">Sign Up</h1>
       <form className="mb-4 flex max-w-[500px] grid-cols-2 flex-col gap-4 lg:grid">
-        <Input label="email" name="email" id="email" />
-        <Input label="username" name="username" id="username" />
+        <Input label="email" icon={<FiMail/>} name="email" id="email" />
+        <Input label="username" icon={<FiUserPlus />}name="username" id="username" />
         <div className="col-span-2">
           <Input
             label="password"
             type="password"
             name="password"
+            icon={<BiLockAlt/>}
             id="password"
             className="col-span-2"
           />
@@ -27,6 +31,7 @@ export default function SignUpPage() {
         <div className="col-span-2">
           <Input
             label="confirm password"
+            icon={<BiLockAlt/>}
             type="password"
             name="confirm-password"
             id="confirm password"
