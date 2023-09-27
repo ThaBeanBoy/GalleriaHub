@@ -1,29 +1,24 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 
-import { Checkbox } from "@/components/ui/checkbox";
-
 import { BiLockAlt } from "react-icons/bi";
-import { FiMail, FiUserPlus } from "react-icons/fi";
+import { FiUserPlus } from "react-icons/fi";
 
 import Form from "@/components/Form";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 
-export default function SignUpPage() {
+export default function Login() {
   return (
-    <main className="prose flex flex-col items-center pt-6 lg:pt-0">
-      <h1 className="pl-4">Sign Up</h1>
+    <main className="prose flex w-full max-w-[500px] flex-col items-center pt-6 lg:pt-0">
+      <h1 className="pl-4">Login</h1>
 
-      <Form>
-        <Input label="email" icon={<FiMail />} name="email" id="email" />
+      <Form className="flex">
         <Input
-          label="username"
+          label="username or password"
+          wrapperClassName="col-span-2"
           icon={<FiUserPlus />}
-          name="username"
-          id="username"
         />
 
         <Input
@@ -32,42 +27,16 @@ export default function SignUpPage() {
           name="password"
           icon={<BiLockAlt />}
           id="password"
+          className="col-span-2"
           wrapperClassName="col-span-2"
         />
-
-        <Input
-          label="confirm password"
-          icon={<BiLockAlt />}
-          type="password"
-          name="confirm-password"
-          id="confirm password"
-          wrapperClassName="col-span-2"
-        />
-
-        <div className="col-span-2 flex items-center space-x-2">
-          <Checkbox
-            id="accept-ts-cs"
-            className="rounded-md border border-black"
-            name="accept-ts-cs"
-          />
-          <label className="text-xs">
-            You have read our <Link href="/">privacy policy</Link> and agree to
-            our <Link href="/">terms & conditions</Link>
-          </label>
-        </div>
 
         <div className="col-span-2 flex flex-col-reverse gap-4 lg:flex-row">
-          <Link
-            href="/authentication/login"
-            className="block flex-1 no-underline"
-          >
-            <Button
-              label="go to login page"
-              variant="hollow"
-              className="w-full"
-              disabled
-            />
-          </Link>
+          <Button
+            label="go to sign up page"
+            variant="hollow"
+            className="flex-1"
+          />
           <Button label="sign up" className="flex-1" />
         </div>
       </Form>

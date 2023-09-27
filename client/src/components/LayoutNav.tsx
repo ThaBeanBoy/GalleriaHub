@@ -85,7 +85,7 @@ function NavItem({ title, href, children }: navLinkProps) {
     >
       {children && (
         <FiChevronDown
-          className="text-violet10 relative top-[1px] transition-transform duration-[250] ease-in group-data-[state=open]:-rotate-180"
+          className="text-violet10 relative top-[1px] transition-transform ease-in group-data-[state=open]:-rotate-180"
           aria-hidden
         />
       )}
