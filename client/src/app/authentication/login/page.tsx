@@ -41,7 +41,7 @@ export default function Login() {
 
       <Form className="flex" onSubmit={handleLogin}>
         <Input
-          label="username or password"
+          label="username or email"
           wrapperClassName="col-span-2"
           icon={<FiUserPlus />}
           ref={EmailUsernameRef}
@@ -63,7 +63,7 @@ export default function Login() {
             variant="hollow"
             className="flex-1"
           />
-          <Button label="sign up" className="flex-1" />
+          <Button label="login" className="flex-1" />
         </div>
       </Form>
 
