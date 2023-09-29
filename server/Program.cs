@@ -32,6 +32,8 @@ app.MapGroup(Routes.User.RouterPrefix)
     .UserEndpoints();
     // .RequireAuthorization();
 
+app.MapGroup(Routes.Product.RouterPrefix);
+
 app.Run();
 
 public class TeamMember {
