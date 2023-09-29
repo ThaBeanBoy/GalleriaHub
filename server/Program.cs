@@ -24,6 +24,19 @@ builder.Services.AddCors(options =>{
         });
 });
 
+string DevelopmentCORS = "_DevModeCors";
+builder.Services.AddCors(options => {
+    options.AddPolicy(
+        name: DevelopmentCORS ,
+        policy => {
+            policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+        }
+    );
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -31,7 +44,7 @@ var app = builder.Build();
 
 app.UseDatabaseConnectionTest();
 
-app.UseCors(ClientOrigins);
+app.UseCors(app.Environment.IsProduction() ? ClientOrigins : DevelopmentCORS);
 
 app.UseSwagger();
 app.UseSwaggerUI();
