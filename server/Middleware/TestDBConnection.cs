@@ -18,8 +18,12 @@ public class DatabaseConnectionTestMiddleware
         try
         {
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
-            if(DB == null || !DB.Database.CanConnect())
-            throw new Exception();
+            
+            if(DB == null || !DB.Database.CanConnect()){
+                throw new Exception();
+            }
+
+            Console.WriteLine("Connected");
 
             await _next(context);
         }

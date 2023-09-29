@@ -11,9 +11,12 @@ public static class User
     public static RouteGroupBuilder UserEndpoints(this RouteGroupBuilder group)
     {
         group.MapPost("/sign-up", (HttpContext context) => {
+            Console.WriteLine("handling sign up");
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
             
+            Response.StatusCode = StatusCodes.Status501NotImplemented;
+
             try
             {
                 // Getting the form content
@@ -24,6 +27,9 @@ public static class User
 
                 // Checking for any nulls in form
                 string?[] inputs = {Email, UserName, Password, ConfirmPassword};
+
+                Console.WriteLine(inputs);
+
                 if(inputs.Any(string.IsNullOrEmpty))
                     throw new NullReferenceException();
 
@@ -92,6 +98,7 @@ public static class User
         });
 
         group.MapPost("/login", (HttpContext context) => {
+            Console.WriteLine("handling login");
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
 
@@ -109,14 +116,15 @@ public static class User
                 }
 
                 //Getting the user based on the username
-                Models.User? userEntity = DB.Users.FirstOrDefault(user => user.Username == UserName);
+                Models.User? userEntity = DB.Users.FirstOrDefault(user => user.Username == UserName || user.Email == UserName);
 
                 if(userEntity == null)
                 {
                     throw new UsernameNotFoundException(UserName);
                 }
 
-                if(userEntity.Password != Security.hashauth(Password))
+                // Console.WriteLine($"{userEntity.Password}\n{Security.hashauth(Password)}");
+                if(Security.Match(userEntity.Password, Password))
                 {
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return Response.WriteAsync("Incorrect Password");
@@ -166,9 +174,6 @@ public static class User
 
     public class UsernameNotFoundException : Exception
     {
-        public UsernameNotFoundException(string UserName) : base($"Could not log in {UserName}")
-        {
-
-        }
+        public UsernameNotFoundException(string UserName) : base($"{UserName} doesn't exist"){}
     }
 }

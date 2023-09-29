@@ -1,5 +1,9 @@
 "use client";
 
+import axios from "axios";
+
+import { FormEvent, useRef } from "react";
+
 import Link from "next/link";
 import Image from "next/image";
 
@@ -13,17 +17,57 @@ import Input from "@/components/Input";
 import Button from "@/components/Button";
 
 export default function SignUpPage() {
+  const UsernameRef = useRef<HTMLInputElement>(null);
+  const EmailRef = useRef<HTMLInputElement>(null);
+  const PasswordRef = useRef<HTMLInputElement>(null);
+  const ConfirmPasswordRef = useRef<HTMLInputElement>(null);
+  const TsCsRef = useRef<HTMLButtonElement>(null);
+
+  const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
+    try {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append("email", EmailRef.current?.value || "");
+      formData.append("username", UsernameRef.current?.value || "");
+      formData.append("password", PasswordRef.current?.value || "");
+      formData.append(
+        "confirm-password",
+        ConfirmPasswordRef.current?.value || "",
+      );
+
+      const { data } = await axios({
+        method: "post",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/authentication/sign-up`,
+        data: formData,
+      });
+
+      console.log(data);
+    } catch (err: any) {
+      console.log(err.response.data);
+    }
+
+    // console.log(data);
+  };
+
   return (
     <main className="prose flex flex-col items-center pt-6 lg:pt-0">
       <h1 className="pl-4">Sign Up</h1>
 
-      <Form>
-        <Input label="email" icon={<FiMail />} name="email" id="email" />
+      <Form onSubmit={handleSignUp}>
+        <Input
+          label="email"
+          icon={<FiMail />}
+          name="email"
+          id="email"
+          ref={EmailRef}
+        />
         <Input
           label="username"
           icon={<FiUserPlus />}
           name="username"
           id="username"
+          ref={UsernameRef}
         />
 
         <Input
@@ -33,6 +77,7 @@ export default function SignUpPage() {
           icon={<BiLockAlt />}
           id="password"
           wrapperClassName="col-span-2"
+          ref={PasswordRef}
         />
 
         <Input
@@ -42,6 +87,7 @@ export default function SignUpPage() {
           name="confirm-password"
           id="confirm password"
           wrapperClassName="col-span-2"
+          ref={ConfirmPasswordRef}
         />
 
         <div className="col-span-2 flex items-center space-x-2">
@@ -49,6 +95,7 @@ export default function SignUpPage() {
             id="accept-ts-cs"
             className="rounded-md border border-black"
             name="accept-ts-cs"
+            ref={TsCsRef}
           />
           <label className="text-xs">
             You have read our <Link href="/">privacy policy</Link> and agree to
@@ -68,7 +115,8 @@ export default function SignUpPage() {
               disabled
             />
           </Link>
-          <Button label="sign up" className="flex-1" />
+
+          <Button label="sign up" className="flex-1" type="submit" />
         </div>
       </Form>
 

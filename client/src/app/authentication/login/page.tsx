@@ -8,17 +8,43 @@ import { FiUserPlus } from "react-icons/fi";
 import Form from "@/components/Form";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
+import { FormEvent, useRef } from "react";
+import axios from "axios";
 
 export default function Login() {
+  const EmailUsernameRef = useRef<HTMLInputElement>(null);
+  const PasswordRef = useRef<HTMLInputElement>(null);
+
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+    try {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append("username", EmailUsernameRef.current?.value || "");
+      formData.append("password", PasswordRef.current?.value || "");
+
+      const { data } = await axios({
+        method: "post",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/authentication/login`,
+        data: formData,
+      });
+
+      console.log(data);
+    } catch (err: any) {
+      console.log(err.response.data);
+    }
+  };
+
   return (
     <main className="prose flex w-full max-w-[500px] flex-col items-center pt-6 lg:pt-0">
       <h1 className="pl-4">Login</h1>
 
-      <Form className="flex">
+      <Form className="flex" onSubmit={handleLogin}>
         <Input
           label="username or password"
           wrapperClassName="col-span-2"
           icon={<FiUserPlus />}
+          ref={EmailUsernameRef}
         />
 
         <Input
