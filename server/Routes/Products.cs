@@ -1,4 +1,3 @@
-using Azure;
 using Models;
 
 namespace Routes;
@@ -21,13 +20,20 @@ public static class Product{
                     return Response.WriteAsync("You need to provide a name");
                 }
 
+                // TODO: Identify the Artist requesting to make the product
                 Models.Product NewProduct = new Models.Product(){
-                    ArtistID = 1,
-                    ProductName = Request.Form["name"]
+                    ArtistID = 1, 
+                    ProductName = ProductName,
+                    CreatedOn = DateTime.Now,
+                    LastUpdate = DateTime.Now,
+                    Public = false
                 };
 
-                Response.StatusCode = StatusCodes.Status501NotImplemented;
-                return Response.WriteAsync("Supposed to handle new products");
+                DB.Products.Add(NewProduct);
+                DB.SaveChanges();
+
+                Response.StatusCode = StatusCodes.Status201Created;
+                return Response.WriteAsync("Created product");
             }catch(Exception e){
                 Console.WriteLine(e.Message);
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
@@ -40,6 +46,11 @@ public static class Product{
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
 
+            // Getting filter queries
+            FilterProduct Filters = new(Request.Query);
+            Response.StatusCode = StatusCodes.Status200OK;
+            // return DB.Products.Where();
+
             Response.StatusCode = StatusCodes.Status501NotImplemented;
             Response.WriteAsync("Supposed to handle getting multiple products");
 
@@ -47,10 +58,37 @@ public static class Product{
 
         group.MapGet("/{id}", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
-            var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
             
-            Response.StatusCode = StatusCodes.Status501NotImplemented;
-            Response.WriteAsync("Not implmeneted yet");
+            try{
+                var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+                
+                int ProductID = int.Parse(context.GetRouteValue("id") as string);
+
+                Models.Product? Product = DB.Products.FirstOrDefault(P => P.ProductID == ProductID);
+
+                // Checking if product exists
+                if(Product == null){
+                    Response.StatusCode = StatusCodes.Status404NotFound;
+                    return Response.WriteAsync("Coudln't find the product");
+                }
+
+                // Checking accessibility of product || If user requesting, then allow access to product
+                if(!Product.Public /* || Product.ArtistID == User Artist ID */){
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Response.WriteAsync("Unauthorised to access product");
+                }
+
+                Response.StatusCode = StatusCodes.Status200OK;
+                return Response.WriteAsync($"Supposed to get {context.GetRouteValue("id")}");
+            }
+            catch(FormatException){
+                Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                return Response.WriteAsync("Product ID format is incorrect");    
+            }
+            catch(Exception){
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                return Response.WriteAsync("Something went wrong");
+            }
         });
 
         // Update
@@ -74,4 +112,45 @@ public static class Product{
         return group;
     }
 
+    private class FilterProduct {
+        public bool Verified { get; }
+        public int? ArtistID { get; }
+        public double? MinPrice { get; }
+        public double? MaxPrice { get; }
+
+        public FilterProduct(IQueryCollection Queries){
+            // Checking out verified query
+            try{
+                Verified = Convert.ToBoolean(Queries["verified"]);
+            }
+            catch(Exception) {
+                Verified = false;
+            }
+
+            // Checking ArtistID
+            try{
+                ArtistID = int.Parse(Queries["artistid"]);
+            }
+            catch(Exception){
+                ArtistID = null;
+            }
+
+            // Checking the min price
+            try{
+                MinPrice = double.Parse(Queries["min_price"]);
+            }
+            catch(Exception){
+                MinPrice = null;
+            }
+
+            // Checking the max price
+            try{
+                MaxPrice = double.Parse(Queries["max_price"]);
+            }
+            catch(Exception){
+                MaxPrice = null;
+            }
+
+        }
+    }
 }
