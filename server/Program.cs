@@ -5,18 +5,49 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Models;
 using Routes;
 using GalleriaMiddleware;
+using Microsoft.AspNetCore.Cors;
 
 var builder = WebApplication.CreateBuilder(args);
 // builder.Services.AddDbContext<GalleriaHubDBContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("Lite")));
 builder.Services.AddSqlite<GalleriaHubDBContext>(builder.Configuration.GetConnectionString("Lite"));
+
+// CORS
+string ClientOrigins = "_ClientOrigins";
+builder.Services.AddCors(options =>{
+    options.AddPolicy( 
+        name: ClientOrigins, 
+        policy => {
+            policy
+            .WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod();            
+        });
+});
+
+string DevelopmentCORS = "_DevModeCors";
+builder.Services.AddCors(options => {
+    options.AddPolicy(
+        name: DevelopmentCORS ,
+        policy => {
+            policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+        }
+    );
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-app.UseSwagger();
-app.UseSwaggerUI();
 
 app.UseDatabaseConnectionTest();
+
+app.UseCors(app.Environment.IsProduction() ? ClientOrigins : DevelopmentCORS);
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapGet("/", ()=> "Hello World");
 
@@ -26,10 +57,10 @@ app.MapGet("/db-connected", (HttpContext context) => {
 });
 
 app.MapGroup(Developers.RouterPrefix)
-    .DeveloperRoutes();
+    .DeveloperRoutes();//.WithMetadata(new EnableCorsAttribute(ClientOrigins));
 
 app.MapGroup(Routes.User.RouterPrefix)
-    .UserEndpoints();
+    .UserEndpoints();//.WithMetadata(new EnableCorsAttribute(ClientOrigins));
     // .RequireAuthorization();
 
 app.MapGroup(Routes.Product.RouterPrefix)

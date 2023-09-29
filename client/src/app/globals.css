@@ -2,7 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #fffaf5;
-  color: #475569;
+@layer base {
+  html {
+    @apply bg-white text-black;
+  }
+}
+
+.max-width {
+  @apply mx-auto max-w-7xl px-4;
+}
+
+a,
+.prose a {
+  @apply text-active no-underline;
 }

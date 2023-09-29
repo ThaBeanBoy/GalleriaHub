@@ -9,3 +9,13 @@
 ### Next Js Intellisense
 
 ### Automatic Class Sorting
+
+## Website Setup
+
+### Colors
+
+### Widths
+
+### Typography
+
+### Component Documentation
