@@ -6,6 +6,7 @@ using Models;
 using Routes;
 using GalleriaMiddleware;
 using Microsoft.AspNetCore.Cors;
+using server.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 // builder.Services.AddDbContext<GalleriaHubDBContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("Lite")));
@@ -47,7 +48,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseDatabaseConnectionTest();
+// app.UseDatabaseConnectionTest();
+app.UseUserMiddleware();
 
 app.UseCors(app.Environment.IsProduction() ? ClientOrigins : DevelopmentCORS);
 

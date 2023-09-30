@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Azure;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.IdentityModel.Tokens;
@@ -158,34 +159,15 @@ public static class User
         // Add logout route
 
         // cookie experiment
-        group.MapGet("/cookie-login", (MyAuthService Auth) => {
-            Auth.SignIn();
+        group.MapGet("/cookie-login", (HttpContext context) => {
+            MyAuthService MyAuthService = context.RequestServices.GetRequiredService<MyAuthService>();
+            MyAuthService.SignIn();
             return "ok";
         });
 
         group.MapGet("cookie-username", (HttpContext context, IDataProtectionProvider IDataProtector) => {
             var (Request, Response) = (context.Request, context.Response);
-
-            try{
-
-                string? AuthCookie = Request.Headers.Cookie.FirstOrDefault(Cookie => Cookie.StartsWith("auth="));
-
-                if(AuthCookie == null){
-                    Response.StatusCode = StatusCodes.Status404NotFound;
-                    return Response.WriteAsync("auth cookie unavailable");
-                }
-
-                var Protector = IDataProtector.CreateProtector(User.CookieProtector);
-                string CookiePayload = Protector.Unprotect(AuthCookie.Split("=").Last());
-                int UserID = int.Parse(CookiePayload.Split(":").Last());
-
-                return Response.WriteAsync($"User ID: {UserID}");
-            }
-            catch(FormatException e){
-                Console.WriteLine(e.Message);
-                Response.StatusCode = StatusCodes.Status404NotFound;
-                return Response.WriteAsync("Can't get user from cookie payload");
-            }
+            return context.User;
         });
 
         return group;
@@ -217,7 +199,7 @@ public static class User
 public class MyAuthService {
     private readonly IDataProtectionProvider ProtectionProvider;
     private readonly IHttpContextAccessor ContextAccessor;
-    private readonly string CookieProtector = "auth-cookie";
+    public static readonly string CookieProtector = "auth-cookie";
 
 
     public MyAuthService(IDataProtectionProvider IDataProtectionProvider, IHttpContextAccessor IHttpContextAccessor){
