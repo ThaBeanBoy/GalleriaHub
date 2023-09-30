@@ -37,6 +37,9 @@ builder.Services.AddCors(options => {
     );
 });
 
+// Adding data protection service
+builder.Services.AddDataProtection();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Security;
 using Microsoft.EntityFrameworkCore;
 
 namespace Models;
@@ -54,7 +55,7 @@ public class Product : IDateTime
         throw new NotImplementedException();
     }
 
-    public Verifier[] GetVerifiers(DbSet<ProductVerification> ProductVerificationSet)
+    public List<Verifier> GetVerifiers(GalleriaHubDBContext DB)
     {
         throw new NotImplementedException();
     }

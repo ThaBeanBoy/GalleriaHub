@@ -1,3 +1,5 @@
+using Azure;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.IdentityModel.Tokens;
 using Models;
 using Utility;
@@ -6,6 +8,7 @@ namespace Routes;
 
 public static class User 
 {
+    private static string CookieProtector = "auth-cookie";
     public static string RouterPrefix = "/authentication";
 
     public static RouteGroupBuilder UserEndpoints(this RouteGroupBuilder group)
@@ -150,6 +153,42 @@ public static class User
                 return Response.WriteAsync("Login Fail");
             }
 
+        });
+
+        // Add logout route
+
+        // cookie experiment
+        group.MapGet("/cookie-login", (HttpContext context, IDataProtectionProvider IDataProtector) => {
+            var (Request, Response) = (context.Request, context.Response);
+            
+            var Protector = IDataProtector.CreateProtector(User.CookieProtector);
+            Response.Headers["set-cookie"] = $"auth={Protector.Protect("usrid:1")}";
+            return "ok";
+        });
+
+        group.MapGet("cookie-username", (HttpContext context, IDataProtectionProvider IDataProtector) => {
+            var (Request, Response) = (context.Request, context.Response);
+
+            try{
+
+                string? AuthCookie = Request.Headers.Cookie.FirstOrDefault(Cookie => Cookie.StartsWith("auth="));
+
+                if(AuthCookie == null){
+                    Response.StatusCode = StatusCodes.Status404NotFound;
+                    return Response.WriteAsync("auth cookie unavailable");
+                }
+
+                var Protector = IDataProtector.CreateProtector(User.CookieProtector);
+                string CookiePayload = Protector.Unprotect(AuthCookie.Split("=").Last());
+                int UserID = int.Parse(CookiePayload.Split(":").Last());
+
+                return Response.WriteAsync($"User ID: {UserID}");
+            }
+            catch(FormatException e){
+                Console.WriteLine(e.Message);
+                Response.StatusCode = StatusCodes.Status404NotFound;
+                return Response.WriteAsync("Can't get user from cookie payload");
+            }
         });
 
         return group;
