@@ -158,11 +158,8 @@ public static class User
         // Add logout route
 
         // cookie experiment
-        group.MapGet("/cookie-login", (HttpContext context, IDataProtectionProvider IDataProtector) => {
-            var (Request, Response) = (context.Request, context.Response);
-            
-            var Protector = IDataProtector.CreateProtector(User.CookieProtector);
-            Response.Headers["set-cookie"] = $"auth={Protector.Protect("usrid:1")}";
+        group.MapGet("/cookie-login", (MyAuthService Auth) => {
+            Auth.SignIn();
             return "ok";
         });
 
@@ -214,5 +211,22 @@ public static class User
     public class UsernameNotFoundException : Exception
     {
         public UsernameNotFoundException(string UserName) : base($"{UserName} doesn't exist"){}
+    }
+}
+
+public class MyAuthService {
+    private readonly IDataProtectionProvider ProtectionProvider;
+    private readonly IHttpContextAccessor ContextAccessor;
+    private readonly string CookieProtector = "auth-cookie";
+
+
+    public MyAuthService(IDataProtectionProvider IDataProtectionProvider, IHttpContextAccessor IHttpContextAccessor){
+        this.ProtectionProvider = IDataProtectionProvider;
+        this.ContextAccessor = IHttpContextAccessor;
+    }
+
+    public void SignIn(){
+        var Protector = ProtectionProvider.CreateProtector(CookieProtector);
+        ContextAccessor.HttpContext.Response.Headers["set-cookie"] = $"auth={Protector.Protect("usrid:1")}";
     }
 }

@@ -38,7 +38,9 @@ builder.Services.AddCors(options => {
 });
 
 // Adding data protection service
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDataProtection();
+builder.Services.AddScoped<MyAuthService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
