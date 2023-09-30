@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using Azure;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Models;
 using Utility;
@@ -9,7 +11,6 @@ namespace Routes;
 
 public static class User 
 {
-    private static string CookieProtector = "auth-cookie";
     public static string RouterPrefix = "/authentication";
 
     public static RouteGroupBuilder UserEndpoints(this RouteGroupBuilder group)
@@ -157,17 +158,36 @@ public static class User
         });
 
         // Add logout route
+        group.MapPost("/logout", async (HttpContext context) => {
+            await context.SignOutAsync();
+            return "logged out";
+        });
 
         // cookie experiment
-        group.MapGet("/cookie-login", (HttpContext context) => {
-            MyAuthService MyAuthService = context.RequestServices.GetRequiredService<MyAuthService>();
-            MyAuthService.SignIn();
+        group.MapGet("/cookie-login", async (HttpContext context) => {
+            List<Claim> Claims = new(){
+                new Claim(ClaimTypes.NameIdentifier, 7.ToString())
+            };
+            var Identity = new ClaimsIdentity(Claims, "cookie");
+            var User = new ClaimsPrincipal(Identity);
+            
+            await context.SignInAsync("cookie", User);
             return "ok";
         });
 
-        group.MapGet("cookie-username", (HttpContext context, IDataProtectionProvider IDataProtector) => {
+        group.MapGet("cookie-username", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
-            return context.User;
+            
+            Models.User? User = context.Items["User"] as Models.User;
+            
+            if(User != null)
+            {
+                return User.Email;
+            }
+            else
+            {
+                return "No one is here";
+            }
         });
 
         return group;
@@ -193,22 +213,5 @@ public static class User
     public class UsernameNotFoundException : Exception
     {
         public UsernameNotFoundException(string UserName) : base($"{UserName} doesn't exist"){}
-    }
-}
-
-public class MyAuthService {
-    private readonly IDataProtectionProvider ProtectionProvider;
-    private readonly IHttpContextAccessor ContextAccessor;
-    public static readonly string CookieProtector = "auth-cookie";
-
-
-    public MyAuthService(IDataProtectionProvider IDataProtectionProvider, IHttpContextAccessor IHttpContextAccessor){
-        this.ProtectionProvider = IDataProtectionProvider;
-        this.ContextAccessor = IHttpContextAccessor;
-    }
-
-    public void SignIn(){
-        var Protector = ProtectionProvider.CreateProtector(CookieProtector);
-        ContextAccessor.HttpContext.Response.Headers["set-cookie"] = $"auth={Protector.Protect("usrid:1")}";
     }
 }

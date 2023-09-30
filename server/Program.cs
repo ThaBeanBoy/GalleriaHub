@@ -38,10 +38,8 @@ builder.Services.AddCors(options => {
     );
 });
 
-// Adding data protection service
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddDataProtection();
-builder.Services.AddScoped<MyAuthService>();
+builder.Services.AddAuthentication("cookie")
+    .AddCookie("cookie");
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -49,6 +47,8 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // app.UseDatabaseConnectionTest();
+// app.UseUserMiddleware();
+app.UseAuthentication();
 app.UseUserMiddleware();
 
 app.UseCors(app.Environment.IsProduction() ? ClientOrigins : DevelopmentCORS);
