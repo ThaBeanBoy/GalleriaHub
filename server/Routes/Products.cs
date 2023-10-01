@@ -28,7 +28,6 @@ public static class Product{
                     return Response.WriteAsync("You need to provide a name");
                 }
 
-                // TODO: Identify the Artist requesting to make the product
                 Models.Product NewProduct = new Models.Product(){
                     UserID = User.UserID, 
                     ProductName = ProductName,
@@ -41,7 +40,7 @@ public static class Product{
                 DB.SaveChanges();
 
                 Response.StatusCode = StatusCodes.Status201Created;
-                return Response.WriteAsync("Created product");
+                return Response.WriteAsJsonAsync(NewProduct);
             }catch(Exception e){
                 Console.WriteLine(e.Message);
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
@@ -58,7 +57,7 @@ public static class Product{
             FilterProps Filters = new(Request.Query);
             Response.StatusCode = StatusCodes.Status200OK;
 
-            return DB.Products;
+            return DB.Products/* .Where(Product => Product.Public) */;
         });
 
         group.MapGet("/{id}", (HttpContext context) => {
@@ -67,7 +66,7 @@ public static class Product{
             try{
                 var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
                 
-                int ProductID = int.Parse(context.GetRouteValue("id") as string);
+                int ProductID = int.Parse(context.GetRouteValue("id") as string ?? "error");
 
                 Models.Product? Product = DB.Products.FirstOrDefault(P => P.ProductID == ProductID);
 
