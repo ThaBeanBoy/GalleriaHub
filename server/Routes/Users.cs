@@ -15,7 +15,7 @@ public static class User
 
     public static RouteGroupBuilder UserEndpoints(this RouteGroupBuilder group)
     {
-        group.MapPost("/sign-up", (HttpContext context) => {
+        group.MapPost("/sign-up", async (HttpContext context) => {
             Console.WriteLine("handling sign up");
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
@@ -67,11 +67,12 @@ public static class User
 
                 DB.SaveChanges();
 
-                // Send Response & JWT Token
+                // Signing user in
+                await SignUserInAsync(context, NewUser);
 
                 // Sending response
                 Response.StatusCode = StatusCodes.Status201Created;
-                return Response.WriteAsync("Successful login");
+                return Response.WriteAsJsonAsync(NewUser);
             }
             catch (NullReferenceException e)
             {
@@ -102,8 +103,7 @@ public static class User
             }
         });
 
-        group.MapPost("/login", (HttpContext context) => {
-            Console.WriteLine("handling login");
+        group.MapPost("/login", async (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
 
@@ -135,8 +135,16 @@ public static class User
                     return Response.WriteAsync("Incorrect Password");
                 }
 
+                List<Claim> Claims = new(){
+                    new Claim(ClaimTypes.NameIdentifier, 7.ToString())
+                };
+                var Identity = new ClaimsIdentity(Claims, "cookie");
+                var User = new ClaimsPrincipal(Identity);
+                
+                await context.SignInAsync("cookie", User);
+
                 Response.StatusCode = StatusCodes.Status200OK;
-                return Response.WriteAsync("Access Granted");
+                return Response.WriteAsJsonAsync(User);
 
             }
             catch(NullReferenceException)
@@ -164,16 +172,16 @@ public static class User
         });
 
         // cookie experiment
-        group.MapGet("/cookie-login", async (HttpContext context) => {
-            List<Claim> Claims = new(){
-                new Claim(ClaimTypes.NameIdentifier, 7.ToString())
-            };
-            var Identity = new ClaimsIdentity(Claims, "cookie");
-            var User = new ClaimsPrincipal(Identity);
+        // group.MapGet("/cookie-login", async (HttpContext context) => {
+        //     List<Claim> Claims = new(){
+        //         new Claim(ClaimTypes.NameIdentifier, 7.ToString())
+        //     };
+        //     var Identity = new ClaimsIdentity(Claims, "cookie");
+        //     var User = new ClaimsPrincipal(Identity);
             
-            await context.SignInAsync("cookie", User);
-            return "ok";
-        });
+        //     await context.SignInAsync("cookie", User);
+        //     return "ok";
+        // });
 
         group.MapGet("cookie-username", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
@@ -191,6 +199,17 @@ public static class User
         });
 
         return group;
+    }
+
+    private static async Task SignUserInAsync(HttpContext context,Models.User UserModel)
+    {
+        List<Claim> Claims = new(){
+            // new Claim(ClaimTypes.NameIdentifier, User.UserID.ToString())
+            new Claim(ClaimTypes.NameIdentifier, UserModel.UserID.ToString())
+        };
+        var Identity = new ClaimsIdentity(Claims, "cookie");
+        var User = new ClaimsPrincipal(Identity);
+        await context.SignInAsync("cookie", User);
     }
 
     // Exceptions
