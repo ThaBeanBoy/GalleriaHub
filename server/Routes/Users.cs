@@ -16,7 +16,6 @@ public static class User
     public static RouteGroupBuilder UserEndpoints(this RouteGroupBuilder group)
     {
         group.MapPost("/sign-up", async (HttpContext context) => {
-            Console.WriteLine("handling sign up");
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
             
@@ -35,12 +34,19 @@ public static class User
 
                 Console.WriteLine(inputs);
 
-                if(inputs.Any(string.IsNullOrEmpty))
-                    throw new NullReferenceException();
+                if(inputs.Any(string.IsNullOrEmpty)){
+                    Response.StatusCode = StatusCodes.Status400BadRequest;
+                    await Response.WriteAsync("email, username, password & confirm-password required");
+                    return;
+                }
 
                 // Checking password matching
                 if(Password != ConfirmPassword)
-                    throw new PasswordConfirmationException();
+                {
+                    Response.StatusCode = StatusCodes.Status409Conflict;
+                    await Response.WriteAsync("Password did not match the confirmation password");
+                    return;
+                }
 
                 // Checking if email is registered
                 if(DB.Users.Any(U => U.Email == Email))
@@ -72,34 +78,22 @@ public static class User
 
                 // Sending response
                 Response.StatusCode = StatusCodes.Status201Created;
-                return Response.WriteAsJsonAsync(NewUser);
-            }
-            catch (NullReferenceException e)
-            {
-                Console.WriteLine(e.StackTrace);
-
-                Response.StatusCode = StatusCodes.Status400BadRequest;
-                return Response.WriteAsync("email, username, password & confirm-password required");
-            }
-            catch(PasswordConfirmationException e)
-            {
-                Response.StatusCode = StatusCodes.Status409Conflict;
-                return Response.WriteAsync(e.Message);
+                await Response.WriteAsJsonAsync(NewUser);
             }
             catch(EmailAlreadyRegisteredException e)
             {
                 Response.StatusCode = StatusCodes.Status400BadRequest;
-                return Response.WriteAsync(e.Message);
+                await Response.WriteAsync(e.Message);
             }
             catch(UsernameAlreadyTakenException e)
             {
                 Response.StatusCode = StatusCodes.Status400BadRequest;
-                return Response.WriteAsync(e.Message);
+                await Response.WriteAsync(e.Message);
             }
             catch (Exception)
             {
                 Response.StatusCode = StatusCodes.Status500InternalServerError;  
-                return Response.WriteAsync("Something went wrong"); 
+                await Response.WriteAsync("Something went wrong"); 
             }
         });
 
@@ -175,19 +169,14 @@ public static class User
 
     // Exceptions
 
-    public class PasswordConfirmationException : Exception
-    {
-        public PasswordConfirmationException(): base("Password did not match the confirmation password"){}
-    }
-
     public class EmailAlreadyRegisteredException : Exception
     {
-        public EmailAlreadyRegisteredException(string Email) : base($"{Email} has already been registered"){}
+        public EmailAlreadyRegisteredException(string Email) : base($"email {Email} has already been registered"){}
     }
 
     public class UsernameAlreadyTakenException : Exception
     {
-        public UsernameAlreadyTakenException(string Username) : base($"{Username} already taken"){}
+        public UsernameAlreadyTakenException(string Username) : base($"username {Username} already taken"){}
     }
 
     public class UsernameNotFoundException : Exception
