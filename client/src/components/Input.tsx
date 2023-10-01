@@ -26,7 +26,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cn("relative flex flex-col gap-1", wrapperClassName)}>
         {label && (
-          <label htmlFor={id} className="flex items-center gap-1 pl-4 text-xs">
+          <label
+            htmlFor={id}
+            className="flex items-center gap-1 pl-4 text-xs capitalize"
+          >
             {icon} {label}
           </label>
         )}

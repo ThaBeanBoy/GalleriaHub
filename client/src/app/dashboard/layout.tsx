@@ -12,7 +12,15 @@ import {
   FiDollarSign,
 } from "react-icons/fi";
 
+import { BsGraphUp, BsListNested } from "react-icons/bs";
+
+import { VscVerified } from "react-icons/vsc";
+import { PiBuildings } from "react-icons/pi";
+import { GiReceiveMoney } from "react-icons/gi";
+import { CiBoxes } from "react-icons/ci";
+
 import Button from "@/components/Button";
+
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
@@ -20,7 +28,7 @@ const Navigation: { title: string; href: string; icon: React.ReactNode }[] = [
   {
     title: "dashboard",
     href: "/dashboard",
-    icon: <FiUser />,
+    icon: <BsGraphUp />,
   },
   {
     title: "my profile",
@@ -30,7 +38,7 @@ const Navigation: { title: string; href: string; icon: React.ReactNode }[] = [
   {
     title: "lists",
     href: "/dashboard/lists",
-    icon: <FiFile />,
+    icon: <BsListNested />,
   },
   {
     title: "invoices",
@@ -40,22 +48,22 @@ const Navigation: { title: string; href: string; icon: React.ReactNode }[] = [
   {
     title: "sales",
     href: "/dashboard/invoices",
-    icon: <FiDollarSign />,
+    icon: <GiReceiveMoney />,
   },
   {
     title: "products",
     href: "/dashboard/products",
-    icon: <FiDollarSign />,
+    icon: <CiBoxes />,
   },
   {
     title: "verify",
     href: "/dashboard/verify",
-    icon: <FiDollarSign />,
+    icon: <VscVerified />,
   },
   {
     title: "gallery",
     href: "/dashboard/gallery",
-    icon: <FiDollarSign />,
+    icon: <PiBuildings />,
   },
 ];
 
@@ -73,7 +81,7 @@ export default function DashboardLayout({
       <aside className={cn({ "w-[284px]": navExpanded })}>
         <Button
           icon={navExpanded ? <FiChevronLeft /> : <FiChevronRight />}
-          variant="hollow"
+          // variant="hollow"
           onClick={() => setNavExpanded(!navExpanded)}
           className="mb-4"
         />
