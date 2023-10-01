@@ -10,7 +10,15 @@ public static class Product{
         // Create
         group.MapPost("/new-product", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
+            
             try{
+                Models.User? User = context.Items["User"] as Models.User;
+
+                if(User == null){
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Response.WriteAsync("Only logged in users can make products");
+                }
+
                 var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
 
                 string? ProductName = Convert.ToString(Request.Form["name"]).Trim();
@@ -22,7 +30,7 @@ public static class Product{
 
                 // TODO: Identify the Artist requesting to make the product
                 Models.Product NewProduct = new Models.Product(){
-                    UserID = 1, 
+                    UserID = User.UserID, 
                     ProductName = ProductName,
                     CreatedOn = DateTime.Now,
                     LastUpdate = DateTime.Now,
