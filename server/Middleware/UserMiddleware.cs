@@ -33,9 +33,9 @@ public class UserMiddleware
                 }
             }
         }
-        catch(Exception)
+        catch(Exception e)
         {
-            /* Do nothing */
+            Console.WriteLine(e.Message);
         }
         finally
         {

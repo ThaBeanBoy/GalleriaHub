@@ -22,7 +22,7 @@ public static class Product{
 
                 // TODO: Identify the Artist requesting to make the product
                 Models.Product NewProduct = new Models.Product(){
-                    ArtistID = 1, 
+                    UserID = 1, 
                     ProductName = ProductName,
                     CreatedOn = DateTime.Now,
                     LastUpdate = DateTime.Now,
@@ -47,13 +47,10 @@ public static class Product{
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
 
             // Getting filter queries
-            FilterProduct Filters = new(Request.Query);
+            FilterProps Filters = new(Request.Query);
             Response.StatusCode = StatusCodes.Status200OK;
-            // return DB.Products.Where();
 
-            Response.StatusCode = StatusCodes.Status501NotImplemented;
-            Response.WriteAsync("Supposed to handle getting multiple products");
-
+            return DB.Products;
         });
 
         group.MapGet("/{id}", (HttpContext context) => {
@@ -112,13 +109,13 @@ public static class Product{
         return group;
     }
 
-    private class FilterProduct {
+    private class FilterProps {
         public bool Verified { get; }
         public int? ArtistID { get; }
         public double? MinPrice { get; }
         public double? MaxPrice { get; }
 
-        public FilterProduct(IQueryCollection Queries){
+        public FilterProps(IQueryCollection Queries){
             // Checking out verified query
             try{
                 Verified = Convert.ToBoolean(Queries["verified"]);
@@ -151,6 +148,14 @@ public static class Product{
                 MaxPrice = null;
             }
 
+        }
+    
+        public static bool Filter(Object? FilterProp, Object FilterValue){
+            if(FilterProp != null){
+                return FilterProp == FilterValue;
+            }
+
+            return true;
         }
     }
 }

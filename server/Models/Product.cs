@@ -9,8 +9,8 @@ public class Product : IDateTime
 {
     public int ProductID { get; set; }
 
-    public int ArtistID { get; set; }
-    public Artist Artist { get; set; } = null!;
+    public int UserID { get; set; }
+    public User User { get; set; } = null!;
 
     public string ProductName {get; set;} = null!; 
 

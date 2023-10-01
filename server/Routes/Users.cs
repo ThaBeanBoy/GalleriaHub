@@ -117,50 +117,31 @@ public static class User
                 //Checking if the received Username and Password is not empty
                 if((UserName == null) || (Password == null))
                 {
-                    throw new NullReferenceException();
+                    Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                    await Response.WriteAsync("Can not accept empty field. Provide username and password");
+                    return;
                 }
-
+                
                 //Getting the user based on the username
                 Models.User? userEntity = DB.Users.FirstOrDefault(user => user.Username == UserName || user.Email == UserName);
 
-                if(userEntity == null)
+                if(userEntity == null || Security.hashauth(Password) != userEntity.Password)
                 {
-                    throw new UsernameNotFoundException(UserName);
+                    Response.StatusCode = StatusCodes.Status404NotFound;
+                    await Response.WriteAsync("Username/Email and/or Password is incorrect");
+                    return;
                 }
 
-                // Console.WriteLine($"{userEntity.Password}\n{Security.hashauth(Password)}");
-                if(Security.Match(userEntity.Password, Password))
-                {
-                    Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return Response.WriteAsync("Incorrect Password");
-                }
+                await SignUserInAsync(context, userEntity);
 
-                List<Claim> Claims = new(){
-                    new Claim(ClaimTypes.NameIdentifier, 7.ToString())
-                };
-                var Identity = new ClaimsIdentity(Claims, "cookie");
-                var User = new ClaimsPrincipal(Identity);
-                
-                await context.SignInAsync("cookie", User);
-
-                Response.StatusCode = StatusCodes.Status200OK;
-                return Response.WriteAsJsonAsync(User);
-
+                // Returning user object
+                await Response.WriteAsJsonAsync(userEntity);
             }
-            catch(NullReferenceException)
+            catch(Exception e)
             {
-                Response.StatusCode = StatusCodes.Status406NotAcceptable;
-                return Response.WriteAsync("Can not accept empty field. Provide username and password");
-            }
-            catch(UsernameNotFoundException e)
-            {
-                Response.StatusCode = StatusCodes.Status404NotFound;
-                return Response.WriteAsync(e.Message);
-            }
-            catch(Exception)
-            {
+                Console.WriteLine(e.Message);
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
-                return Response.WriteAsync("Login Fail");
+                await Response.WriteAsync("Login Fail");
             }
 
         });
@@ -171,45 +152,25 @@ public static class User
             return "logged out";
         });
 
-        // cookie experiment
-        // group.MapGet("/cookie-login", async (HttpContext context) => {
-        //     List<Claim> Claims = new(){
-        //         new Claim(ClaimTypes.NameIdentifier, 7.ToString())
-        //     };
-        //     var Identity = new ClaimsIdentity(Claims, "cookie");
-        //     var User = new ClaimsPrincipal(Identity);
-            
-        //     await context.SignInAsync("cookie", User);
-        //     return "ok";
-        // });
-
-        group.MapGet("cookie-username", (HttpContext context) => {
-            var (Request, Response) = (context.Request, context.Response);
-            
-            Models.User? User = context.Items["User"] as Models.User;
-            
-            if(User != null)
-            {
-                return User.Email;
-            }
-            else
-            {
-                return "No one is here";
-            }
-        });
-
         return group;
     }
 
     private static async Task SignUserInAsync(HttpContext context,Models.User UserModel)
     {
-        List<Claim> Claims = new(){
-            // new Claim(ClaimTypes.NameIdentifier, User.UserID.ToString())
-            new Claim(ClaimTypes.NameIdentifier, UserModel.UserID.ToString())
-        };
-        var Identity = new ClaimsIdentity(Claims, "cookie");
-        var User = new ClaimsPrincipal(Identity);
-        await context.SignInAsync("cookie", User);
+        try
+        {
+            List<Claim> Claims = new(){
+                // new Claim(ClaimTypes.NameIdentifier, User.UserID.ToString())
+                new Claim(ClaimTypes.NameIdentifier, UserModel.UserID.ToString())
+            };
+            var Identity = new ClaimsIdentity(Claims, "cookie");
+            var User = new ClaimsPrincipal(Identity);
+            await context.SignInAsync("cookie", User);
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 
     // Exceptions

@@ -48,10 +48,11 @@ var app = builder.Build();
 
 // app.UseDatabaseConnectionTest();
 // app.UseUserMiddleware();
-app.UseAuthentication();
-app.UseUserMiddleware();
 
 app.UseCors(app.Environment.IsProduction() ? ClientOrigins : DevelopmentCORS);
+
+app.UseAuthentication();
+app.UseUserMiddleware();
 
 app.UseSwagger();
 app.UseSwaggerUI();

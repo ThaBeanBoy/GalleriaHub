@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
@@ -15,6 +16,7 @@ public class User : IDateTime
 
     public string Email {get; set;} = null!;
 
+    [JsonIgnore]
     public string Password {get; set;} = null!;
 
     public bool Public { get; set; }
@@ -65,6 +67,24 @@ public class User : IDateTime
     {
         throw new NotImplementedException();
     }
+
+    // Products CRUD
+    public void NewProduct(DbSet<Product> ProductSet, Product Product)
+    {
+        throw new NotImplementedException();
+    }
+
+    // RETRIEVE - getting products
+    public Product[] GetProducts(DbSet<Product> ProductSet)
+    {
+        throw new NotImplementedException();
+    }
+
+    // DELETE - delete products
+    public void DeleteProduct(DbSet<Product> ProductSet, Product Product)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 [PrimaryKey(nameof(UserID), nameof(ListID))]
@@ -93,19 +113,19 @@ public class Verifier
 
     // ARTIST VERIFICATION CRUD
     // CREATE - verify new artist
-    public void VerifyArtist(DbSet<ArtistVerification> verifications, Artist Artist)
+    public void VerifyUser(DbSet<ArtistVerification> verifications, User User)
     {
         throw new NotImplementedException();
     }
 
     // RETRIEVE - get verified artists
-    public Artist[] GetVerifiedArtists(DbSet<ArtistVerification> verifications)
+    public User[] GetVerifiedArtists(DbSet<ArtistVerification> verifications)
     {
         throw new NotImplementedException();
     }
 
     // DELETE - Remove verification
-    public void RemoveArtistVerification(DbSet<ArtistVerification> verifications, Artist Artist)
+    public void RemoveArtistVerification(DbSet<ArtistVerification> verifications, User Artist)
     {
         throw new NotImplementedException();
     }
@@ -124,37 +144,11 @@ public class Verifier
     }
 }
 
-public class Artist
-{
-    public int ArtistID { get; set; }
-    public int UserID {get; set;}
-    public User User { get; set; } = null!;
-
-    // PRODUCTS CRUD
-    // CREATE - create new product
-    public void NewProduct(DbSet<Product> ProductSet, Product Product)
-    {
-        throw new NotImplementedException();
-    }
-
-    // RETRIEVE - getting products
-    public Product[] GetProducts(DbSet<Product> ProductSet)
-    {
-        throw new NotImplementedException();
-    }
-
-    // DELETE - delete products
-    public void DeleteProduct(DbSet<Product> ProductSet, Product Product)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-[PrimaryKey(nameof(ArtistID), nameof(VerifierID))]
+[PrimaryKey(nameof(UserID), nameof(VerifierID))]
 public class ArtistVerification
 {
-    public int ArtistID { get; set; }
-    public Artist Artist { get; set; } = null!;
+    public int UserID { get; set; }
+    public User User { get; set; } = null!;
 
     public int VerifierID { get; set; }
     public Verifier Verifier { get; set; } = null!;

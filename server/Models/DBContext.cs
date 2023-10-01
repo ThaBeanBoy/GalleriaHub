@@ -12,7 +12,6 @@ public class GalleriaHubDBContext : DbContext
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<UserList> UserLists { get; set; } = null!;
     public DbSet<Verifier> Verifiers { get; set; } = null!;
-    public DbSet<Artist> Artists { get; set; } = null!;
     public DbSet<ArtistVerification> ArtistVerifications { get; set; } = null!;
     public DbSet<Product> Products { get; set; } = null!;
     public DbSet<ProductFile> ProductFiles { get; set; } = null!;
@@ -52,19 +51,6 @@ public class GalleriaHubDBContext : DbContext
         builder.Entity<User>()
             .HasIndex(U => U.PhoneNumber)
             .IsUnique();
-
-        /*
-        Artist Table
-
-        UserID both a alternate key & primary key
-        */
-        builder.Entity<Artist>()
-            .HasAlternateKey(A => A.UserID);
-
-        builder.Entity<Artist>()
-            .HasOne(A => A.User)
-            .WithOne()
-            .HasForeignKey<Artist>(A => A.UserID);
 
         /*
         Verifier Table
