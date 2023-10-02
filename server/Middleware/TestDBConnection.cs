@@ -2,7 +2,7 @@
 using Models;
 
 // tutorial: https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/write?view=aspnetcore-7.0
-namespace GalleriaMiddleware;
+namespace Galleria.Middleware;
 
 public class DatabaseConnectionTestMiddleware
 {

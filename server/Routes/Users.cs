@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
+
 using Models;
 using Utility;
+using Galleria.Services;
 
 namespace Routes;
 
@@ -103,6 +105,7 @@ public static class User
         group.MapPost("/login", async (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+            var JWT = context.RequestServices.GetRequiredService<JWTService>();
 
             try
             {
@@ -131,8 +134,9 @@ public static class User
                 }
 
                 // await SignUserInAsync(context, userEntity);
-                Console.WriteLine(generateToken(userEntity, configuration));
-                
+                string TokenString = JWTService.TokenString(JWT.GenerateToken(userEntity)); 
+                Console.WriteLine($"Token String: {TokenString}\nPayload: {JWT.GetClaims(TokenString).FindFirst(ClaimTypes.NameIdentifier).Value}");
+
                 // Returning user object
                 await Response.WriteAsJsonAsync(userEntity);
             }
@@ -189,27 +193,30 @@ public static class User
         }
     }
 
-    private static string generateToken(Models.User User, IConfigurationSection configuration){
-        List<Claim> Claims = new(){
-            // new Claim(ClaimTypes.NameIdentifier, User.UserID.ToString())
-            new Claim(ClaimTypes.NameIdentifier, User.UserID.ToString())
-        };
+    // private static string generateToken(Models.User User, IConfigurationSection configuration){
+    //     List<Claim> Claims = new(){
+    //         // new Claim(ClaimTypes.NameIdentifier, User.UserID.ToString())
+    //         new Claim(ClaimTypes.NameIdentifier, User.UserID.ToString())
+    //     };
 
-        // ! The way I made the JwtKey is kinda sus, 
-        var Jwtkey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Key"]));
-        var creds = new SigningCredentials(Jwtkey, SecurityAlgorithms.HmacSha256);
+    //     // ! The way I made the JwtKey is kinda sus, 
+    //     var Jwtkey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Key"]));
+    //     var creds = new SigningCredentials(Jwtkey, SecurityAlgorithms.HmacSha256);
         
-        // Creating the token
-        var token = new JwtSecurityToken(
-            issuer: configuration["Issuer"],
-            audience: configuration["Audience"],
-            claims: Claims,
-            expires: DateTime.UtcNow.AddHours(5),
-            signingCredentials: creds
-        );
+    //     // Creating the token
+    //     var token = new JwtSecurityToken(
+    //         issuer: configuration["Issuer"],
+    //         audience: configuration["Audience"],
+    //         claims: Claims,
+    //         expires: DateTime.UtcNow.AddHours(5),
+    //         signingCredentials: creds
+    //     );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
+    //     // Checking the value in JWT
+        
+
+    //     return new JwtSecurityTokenHandler().WriteToken(token);
+    // }
 
     // Exceptions
 

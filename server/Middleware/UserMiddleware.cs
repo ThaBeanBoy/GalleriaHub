@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Models;
 
-namespace server.Middleware;
+namespace Galleria.Middleware;
 
 public class UserMiddleware
 {

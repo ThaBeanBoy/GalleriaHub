@@ -5,11 +5,12 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Models;
 using Routes;
-using GalleriaMiddleware;
 using Microsoft.AspNetCore.Cors;
-using server.Middleware;
+using Galleria.Middleware;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+
+using Galleria.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 // builder.Services.AddDbContext<GalleriaHubDBContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("Lite")));
@@ -47,6 +48,7 @@ builder.Services.AddCors(options => {
 // Configuring JWT
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var key = Encoding.ASCII.GetBytes(jwtSettings["key"]);
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options => {
         options.TokenValidationParameters = new TokenValidationParameters{
@@ -59,6 +61,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(key)
         };
     });
+
+// Adding custom JWT Service
+builder.Services.AddGalleriaJWT(jwtSettings);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -91,61 +96,3 @@ app.MapGroup(Routes.Product.RouterPrefix)
     .ProductEndpoints();
 
 app.Run();
-
-public class TeamMember {
-    // Properties
-    private string _name;
-    private string _studentNr;
-    private string? _initials;
-
-    // Constructors
-    public TeamMember(string Name, string StudentNr){
-        this._name = Name;
-        this._studentNr = StudentNr;
-    }
-
-    public TeamMember(string Name, string StudentNr, string Initials): this(Name, StudentNr)  {
-        this._initials = Initials;
-    }
-
-    // Getters & setters
-    public string Name {
-        get{
-            return this._name;
-        }
-        set{
-            this._name = value;
-        }
-    }
-
-    public string StudentNr {
-        get {
-            return this._studentNr;
-        }
-        set {
-            ValidateStudentNr(value);
-            this._studentNr = value.Trim();
-        }
-    }
-
-    public string? Initials {
-        get {
-            return this._initials;
-        }
-        set {
-            this._initials = value;
-        }
-    }
-
-    private static void ValidateStudentNr(string StudentNr){
-        if(StudentNr.Length != 9){
-            throw new InvalidStudentNumber();
-        }
-    }
-
-    public class InvalidStudentNumber : Exception {
-        public InvalidStudentNumber(): base("The student number is invalid"){
-
-        }
-    }
-}
