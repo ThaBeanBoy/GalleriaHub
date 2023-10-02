@@ -23,7 +23,8 @@ public static class User
         group.MapPost("/sign-up", async (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
-            
+            var JWT = context.RequestServices.GetRequiredService<JWTService>();
+
             Response.StatusCode = StatusCodes.Status501NotImplemented;
 
             try
@@ -80,10 +81,10 @@ public static class User
 
                 // Signing user in
                 // await SignUserInAsync(context, NewUser);
-
+                var Token = JWT.GenerateToken(NewUser);
                 // Sending response
                 Response.StatusCode = StatusCodes.Status201Created;
-                await Response.WriteAsJsonAsync(NewUser);
+                await Response.WriteAsJsonAsync(APIResponse.Authentication(NewUser, Token));
             }
             catch(EmailAlreadyRegisteredException e)
             {
@@ -133,12 +134,9 @@ public static class User
                     return;
                 }
 
-                // await SignUserInAsync(context, userEntity);
-                string TokenString = JWTService.TokenString(JWT.GenerateToken(userEntity)); 
-                Console.WriteLine($"Token String: {TokenString}\nPayload: {JWT.GetClaims(TokenString).FindFirst(ClaimTypes.NameIdentifier).Value}");
-
-                // Returning user object
-                await Response.WriteAsJsonAsync(userEntity);
+                // Returning user object (succesful login)
+                var Token = JWT.GenerateToken(userEntity);
+                await Response.WriteAsJsonAsync(APIResponse.Authentication(userEntity, Token));
             }
             catch(Exception e)
             {
@@ -162,61 +160,47 @@ public static class User
             return Response.WriteAsJsonAsync(User);
         });
 
-        // Add logout route
-        group.MapPost("/logout", async (HttpContext context) => {
-            await context.SignOutAsync();
-            return "logged out";
-        });
-
         return group;
     }
 
-    private static async Task SignUserInAsync(HttpContext context,Models.User UserModel)
+
+    // private static object TokenResponse
+    private static class APIResponse
     {
-        try
+        public static object User(Models.User User)
         {
-            //Cookie sign in
-            // List<Claim> Claims = new(){
-            //     // new Claim(ClaimTypes.NameIdentifier, User.UserID.ToString())
-            //     new Claim(ClaimTypes.NameIdentifier, UserModel.UserID.ToString())
-            // };
-            // var Identity = new ClaimsIdentity(Claims, "cookie");
-            // var User = new ClaimsPrincipal(Identity);
-            // await context.SignInAsync("cookie", User);
-
-            // JWT Sign in
-
+            return new 
+            {
+                userID = User.UserID,
+                email = User.Email,
+                username = User.Username,
+                createdOn = User.CreatedOn,
+                lastUpdate = User.LastUpdate,
+                profilePicture = User.ProfilePictureFileID,
+                name = User.Name,
+                surname = User.Surname,
+                phoneNumber = User.PhoneNumber,
+                location = User.Location
+            };
         }
-        catch(Exception e)
+
+        public static object JWTToken(JwtSecurityToken Token)
         {
-            Console.WriteLine(e.Message);
+            return new 
+            {
+                token = JWTService.TokenString(Token),
+                expiryDate = Token.ValidTo
+            };
+        }
+
+        public static object Authentication(Models.User User, JwtSecurityToken Token)
+        {
+            return new {
+                JWT = JWTToken(Token),
+                User = APIResponse.User(User)
+            };
         }
     }
-
-    // private static string generateToken(Models.User User, IConfigurationSection configuration){
-    //     List<Claim> Claims = new(){
-    //         // new Claim(ClaimTypes.NameIdentifier, User.UserID.ToString())
-    //         new Claim(ClaimTypes.NameIdentifier, User.UserID.ToString())
-    //     };
-
-    //     // ! The way I made the JwtKey is kinda sus, 
-    //     var Jwtkey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Key"]));
-    //     var creds = new SigningCredentials(Jwtkey, SecurityAlgorithms.HmacSha256);
-        
-    //     // Creating the token
-    //     var token = new JwtSecurityToken(
-    //         issuer: configuration["Issuer"],
-    //         audience: configuration["Audience"],
-    //         claims: Claims,
-    //         expires: DateTime.UtcNow.AddHours(5),
-    //         signingCredentials: creds
-    //     );
-
-    //     // Checking the value in JWT
-        
-
-    //     return new JwtSecurityTokenHandler().WriteToken(token);
-    // }
 
     // Exceptions
 

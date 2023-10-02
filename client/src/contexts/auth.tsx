@@ -34,6 +34,7 @@ export type UserContextType = {
   user: UserType | null;
   loginHandler: (loginDetails: loginProps) => void;
   signUpHandler: (signUpDetails: signUpProps) => void;
+  logoutHandler: () => void;
 };
 
 export const UserContext = createContext<UserContextType | null>(null);
@@ -95,6 +96,11 @@ export default function AuthProvider({
     }
   };
 
+  const logoutHandler = () => {
+    //make the user object null
+    // remove the jwt token from the cookies/internal storage
+  };
+
   // Get user on initial run
   useEffect(() => {
     axios({
@@ -108,7 +114,9 @@ export default function AuthProvider({
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, loginHandler, signUpHandler }}>
+    <UserContext.Provider
+      value={{ user, loginHandler, signUpHandler, logoutHandler }}
+    >
       {children}
     </UserContext.Provider>
   );
