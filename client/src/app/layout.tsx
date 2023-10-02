@@ -1,8 +1,11 @@
+"use client";
+
 import "./globals.css";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 
 import Navigation from "@/components/LayoutNav";
+import AuthProvider from "@/contexts/auth";
 
 const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -21,19 +24,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${poppins.className} `}>
-        <Navigation />
+      <AuthProvider>
+        <body className={`${poppins.className} `}>
+          <Navigation />
 
-        <div id="page-container" className="max-width min-h-screen py-8">
-          {children}
-        </div>
+          <div id="page-container" className="max-width min-h-screen py-8">
+            {children}
+          </div>
 
-        <div id="footer-container" className="bg-grey-light py-8">
-          <footer className="max-width ">
-            <h1>Footer</h1>
-          </footer>
-        </div>
-      </body>
+          <div id="footer-container" className="bg-grey-light py-8">
+            <footer className="max-width ">
+              <h1>Footer</h1>
+            </footer>
+          </div>
+        </body>
+      </AuthProvider>
     </html>
   );
 }

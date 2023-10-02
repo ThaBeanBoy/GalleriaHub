@@ -2,7 +2,9 @@
 
 import axios from "axios";
 
-import { FormEvent, useRef } from "react";
+import { UserContext } from "@/contexts/auth";
+
+import { FormEvent, useContext, useRef } from "react";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -23,31 +25,27 @@ export default function SignUpPage() {
   const ConfirmPasswordRef = useRef<HTMLInputElement>(null);
   const TsCsRef = useRef<HTMLButtonElement>(null);
 
+  const authContext = useContext(UserContext);
+
+  // context.
+
   const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
-    try {
-      e.preventDefault();
+    e.preventDefault();
 
-      const formData = new FormData();
-      formData.append("email", EmailRef.current?.value || "");
-      formData.append("username", UsernameRef.current?.value || "");
-      formData.append("password", PasswordRef.current?.value || "");
-      formData.append(
-        "confirm-password",
-        ConfirmPasswordRef.current?.value || "",
-      );
+    authContext?.signUpHandler({
+      email: EmailRef.current?.value || "",
+      username: UsernameRef.current?.value || "",
+      password: PasswordRef.current?.value || "",
+      confirmPassword: ConfirmPasswordRef.current?.value || "",
 
-      const { data } = await axios({
-        method: "post",
-        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/authentication/sign-up`,
-        data: formData,
-      });
+      success() {
+        alert("successfully logged in");
+      },
 
-      console.log(data);
-    } catch (err: any) {
-      console.log(err.response.data);
-    }
-
-    // console.log(data);
+      failed(error) {
+        console.log(error);
+      },
+    });
   };
 
   return (

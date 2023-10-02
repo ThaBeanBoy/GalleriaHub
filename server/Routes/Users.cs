@@ -106,10 +106,11 @@ public static class User
                 string? UserName = Convert.ToString(Request.Form["username"]).Trim();
                 string? Password = Convert.ToString(Request.Form["password"]).Trim();
 
-                string?[] info = {UserName,Password};
+                // Console.WriteLine($"Username / Email : {UserName}\nPassword: {Password}");
 
+                string?[] inputs = {UserName,Password};
                 //Checking if the received Username and Password is not empty
-                if((UserName == null) || (Password == null))
+                if(inputs.Any(string.IsNullOrEmpty))
                 {
                     Response.StatusCode = StatusCodes.Status406NotAcceptable;
                     await Response.WriteAsync("Can not accept empty field. Provide username and password");

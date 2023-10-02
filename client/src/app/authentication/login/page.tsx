@@ -8,31 +8,29 @@ import { FiUserPlus } from "react-icons/fi";
 import Form from "@/components/Form";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
-import { FormEvent, useRef } from "react";
+import { FormEvent, useContext, useRef } from "react";
 import axios from "axios";
+import { UserContext } from "@/contexts/auth";
 
 export default function Login() {
+  const authContext = useContext(UserContext);
+
   const EmailUsernameRef = useRef<HTMLInputElement>(null);
   const PasswordRef = useRef<HTMLInputElement>(null);
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
-    try {
-      e.preventDefault();
+    e.preventDefault();
 
-      const formData = new FormData();
-      formData.append("username", EmailUsernameRef.current?.value || "");
-      formData.append("password", PasswordRef.current?.value || "");
-
-      const { data } = await axios({
-        method: "post",
-        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/authentication/login`,
-        data: formData,
-      });
-
-      console.log(data);
-    } catch (err: any) {
-      console.log(err.response.data);
-    }
+    authContext?.loginHandler({
+      username: EmailUsernameRef.current?.value || "",
+      password: PasswordRef.current?.value || "",
+      success(data) {
+        console.log(data);
+      },
+      failed(error) {
+        console.log(error.response);
+      },
+    });
   };
 
   return (
@@ -55,6 +53,7 @@ export default function Login() {
           id="password"
           className="col-span-2"
           wrapperClassName="col-span-2"
+          ref={PasswordRef}
         />
 
         <div className="col-span-2 flex flex-col-reverse gap-4 lg:flex-row">
