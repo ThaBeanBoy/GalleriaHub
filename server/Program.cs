@@ -2,11 +2,14 @@ using System.Text.RegularExpressions;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Models;
 using Routes;
 using GalleriaMiddleware;
 using Microsoft.AspNetCore.Cors;
 using server.Middleware;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 // builder.Services.AddDbContext<GalleriaHubDBContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("Lite")));
@@ -38,21 +41,34 @@ builder.Services.AddCors(options => {
     );
 });
 
-builder.Services.AddAuthentication("cookie")
-    .AddCookie("cookie");
+// builder.Services.AddAuthentication("cookie")
+//     .AddCookie("cookie");
+
+// Configuring JWT
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var key = Encoding.ASCII.GetBytes(jwtSettings["key"]);
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options => {
+        options.TokenValidationParameters = new TokenValidationParameters{
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(key)
+        };
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// app.UseDatabaseConnectionTest();
-// app.UseUserMiddleware();
-
 app.UseCors(app.Environment.IsProduction() ? ClientOrigins : DevelopmentCORS);
 
 app.UseAuthentication();
-app.UseUserMiddleware();
+// app.UseUserMiddleware();
 
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -68,7 +84,7 @@ app.MapGroup(Developers.RouterPrefix)
     .DeveloperRoutes();//.WithMetadata(new EnableCorsAttribute(ClientOrigins));
 
 app.MapGroup(Routes.User.RouterPrefix)
-    .UserEndpoints();//.WithMetadata(new EnableCorsAttribute(ClientOrigins));
+    .UserEndpoints(jwtSettings);//.WithMetadata(new EnableCorsAttribute(ClientOrigins));
     // .RequireAuthorization();
 
 app.MapGroup(Routes.Product.RouterPrefix)

@@ -1,4 +1,7 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
+using System.Text;
 using Azure;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
@@ -13,7 +16,7 @@ public static class User
 {
     public static string RouterPrefix = "/authentication";
 
-    public static RouteGroupBuilder UserEndpoints(this RouteGroupBuilder group)
+    public static RouteGroupBuilder UserEndpoints(this RouteGroupBuilder group, IConfigurationSection configuration)
     {
         group.MapPost("/sign-up", async (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
@@ -74,7 +77,7 @@ public static class User
                 DB.SaveChanges();
 
                 // Signing user in
-                await SignUserInAsync(context, NewUser);
+                // await SignUserInAsync(context, NewUser);
 
                 // Sending response
                 Response.StatusCode = StatusCodes.Status201Created;
@@ -127,8 +130,9 @@ public static class User
                     return;
                 }
 
-                await SignUserInAsync(context, userEntity);
-
+                // await SignUserInAsync(context, userEntity);
+                Console.WriteLine(generateToken(userEntity, configuration));
+                
                 // Returning user object
                 await Response.WriteAsJsonAsync(userEntity);
             }
@@ -167,18 +171,44 @@ public static class User
     {
         try
         {
-            List<Claim> Claims = new(){
-                // new Claim(ClaimTypes.NameIdentifier, User.UserID.ToString())
-                new Claim(ClaimTypes.NameIdentifier, UserModel.UserID.ToString())
-            };
-            var Identity = new ClaimsIdentity(Claims, "cookie");
-            var User = new ClaimsPrincipal(Identity);
-            await context.SignInAsync("cookie", User);
+            //Cookie sign in
+            // List<Claim> Claims = new(){
+            //     // new Claim(ClaimTypes.NameIdentifier, User.UserID.ToString())
+            //     new Claim(ClaimTypes.NameIdentifier, UserModel.UserID.ToString())
+            // };
+            // var Identity = new ClaimsIdentity(Claims, "cookie");
+            // var User = new ClaimsPrincipal(Identity);
+            // await context.SignInAsync("cookie", User);
+
+            // JWT Sign in
+
         }
         catch(Exception e)
         {
             Console.WriteLine(e.Message);
         }
+    }
+
+    private static string generateToken(Models.User User, IConfigurationSection configuration){
+        List<Claim> Claims = new(){
+            // new Claim(ClaimTypes.NameIdentifier, User.UserID.ToString())
+            new Claim(ClaimTypes.NameIdentifier, User.UserID.ToString())
+        };
+
+        // ! The way I made the JwtKey is kinda sus, 
+        var Jwtkey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Key"]));
+        var creds = new SigningCredentials(Jwtkey, SecurityAlgorithms.HmacSha256);
+        
+        // Creating the token
+        var token = new JwtSecurityToken(
+            issuer: configuration["Issuer"],
+            audience: configuration["Audience"],
+            claims: Claims,
+            expires: DateTime.UtcNow.AddHours(5),
+            signingCredentials: creds
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
     // Exceptions
