@@ -140,6 +140,19 @@ public static class User
 
         });
 
+        group.MapGet("/get-user", (HttpContext context) => {
+            var (Request, Response) = (context.Request, context.Response);
+
+            Models.User? User = context.Items["User"] as Models.User;
+
+            if(User == null){
+                Response.StatusCode = StatusCodes.Status404NotFound;
+                return Response.WriteAsync("Not logged in");
+            }
+
+            return Response.WriteAsJsonAsync(User);
+        });
+
         // Add logout route
         group.MapPost("/logout", async (HttpContext context) => {
             await context.SignOutAsync();
