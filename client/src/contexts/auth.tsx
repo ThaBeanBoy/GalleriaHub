@@ -1,17 +1,24 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { createContext, useEffect, useState } from "react";
 
-export type UserType = {
-  userID: number;
-  email: string;
-  username: string;
-  createdOn: Date;
-  lastUpdate: Date;
-  profilePicture?: string;
-  name?: string;
-  surname?: string;
-  phoneNumber?: string;
-  location?: string;
+export type AuthType = {
+  jwt: {
+    token: string;
+    expiryDate: Date;
+  };
+
+  user: {
+    userID: number;
+    email: string;
+    username: string;
+    createdOn: Date;
+    lastUpdate: Date;
+    profilePicture: string | null;
+    name: string | null;
+    surname: string | null;
+    phoneNumber: string | null;
+    location: string | null;
+  };
 };
 
 type loginProps = {
@@ -31,7 +38,7 @@ type signUpProps = {
 };
 
 export type UserContextType = {
-  user: UserType | null;
+  auth: AuthType | null;
   loginHandler: (loginDetails: loginProps) => void;
   signUpHandler: (signUpDetails: signUpProps) => void;
   logoutHandler: () => void;
@@ -44,7 +51,7 @@ export default function AuthProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState<UserType | null>(null);
+  const [auth, setAuth] = useState<AuthType | null>(null);
 
   const loginHandler = async ({
     username,
@@ -57,11 +64,13 @@ export default function AuthProvider({
       formData.append("username", username);
       formData.append("password", password);
 
-      const { data } = await axios({
+      const { data } = await axios<AuthType>({
         method: "post",
         url: `${process.env.NEXT_PUBLIC_SERVER_URL}/authentication/login`,
         data: formData,
       });
+
+      setAuth(ResponseDataToAuthType(data));
 
       if (success) success(data);
     } catch (error: any) {
@@ -90,6 +99,8 @@ export default function AuthProvider({
         data: formData,
       });
 
+      setAuth(ResponseDataToAuthType(data));
+
       if (success) success(data);
     } catch (error: any) {
       if (failed) failed(error);
@@ -101,23 +112,24 @@ export default function AuthProvider({
     // remove the jwt token from the cookies/internal storage
   };
 
-  // Get user on initial run
   useEffect(() => {
-    axios({
-      method: "get",
-      url: `${process.env.NEXT_PUBLIC_SERVER_URL}/authentication/get-user`,
-    })
-      .then(({ data }) => console.log(data))
-      .catch((error) => {
-        /* Do nothing, the user is not logged in */
-      });
-  }, []);
+    console.log(auth);
+  }, [auth]);
 
   return (
     <UserContext.Provider
-      value={{ user, loginHandler, signUpHandler, logoutHandler }}
+      value={{ auth, loginHandler, signUpHandler, logoutHandler }}
     >
       {children}
     </UserContext.Provider>
   );
+}
+
+function ResponseDataToAuthType(data: AuthType) {
+  // Making dates
+  data.jwt.expiryDate = new Date(data.jwt.expiryDate);
+  data.user.createdOn = new Date(data.user.createdOn);
+  data.user.lastUpdate = new Date(data.user.lastUpdate);
+
+  return data;
 }
