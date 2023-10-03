@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 
+import { useSearchParams, redirect } from "next/navigation";
+
 import { BiLockAlt } from "react-icons/bi";
 import { FiUserPlus } from "react-icons/fi";
 
@@ -13,6 +15,8 @@ import axios from "axios";
 import { UserContext } from "@/contexts/auth";
 
 export default function Login() {
+  const searchParams = useSearchParams();
+
   const authContext = useContext(UserContext);
 
   const EmailUsernameRef = useRef<HTMLInputElement>(null);
@@ -25,10 +29,14 @@ export default function Login() {
       username: EmailUsernameRef.current?.value || "",
       password: PasswordRef.current?.value || "",
       success(data) {
-        console.log(data);
+        alert(`logged in`);
+
+        // const callBack = searchParams?.get("callback") ?? "/";
+        // console.log(`going to ${callBack}`);
+        // redirect(callBack);
       },
       failed(error) {
-        console.log(error.response);
+        console.log(error);
       },
     });
   };

@@ -23,6 +23,7 @@ import Button from "@/components/Button";
 
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import useProtectPage from "@/lib/protectPage";
 
 const Navigation: { title: string; href: string; icon: React.ReactNode }[] = [
   {
@@ -72,6 +73,8 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  useProtectPage();
+
   const [navExpanded, setNavExpanded] = useState(true);
 
   const currentPath = usePathname();

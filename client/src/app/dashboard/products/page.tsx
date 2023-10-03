@@ -7,34 +7,41 @@ import * as Dialog from "@radix-ui/react-dialog";
 import Form from "@/components/Form";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
-import { useRef } from "react";
+import { FormEvent, useContext, useRef } from "react";
+import { UserContext } from "@/contexts/auth";
+import useProtectPage from "@/lib/protectPage";
 
 export default /* async */ function Products() {
-  // await axios({
-  //   method: 'get',
-  //   url: '',
-  //   params: {
-  //     artistid: ''
-  //   }
-  // });
+  const Auth = useContext(UserContext);
 
   const TitleRef = useRef<HTMLInputElement>(null);
   const PriceRef = useRef<HTMLInputElement>(null);
   const StockRef = useRef<HTMLInputElement>(null);
 
-  const handleNewProduct = async () => {
-    const ProductData = new FormData();
-    ProductData.append("title", TitleRef.current?.value || "");
-    ProductData.append("price", PriceRef.current?.value || "");
-    ProductData.append("title", StockRef.current?.value || "");
+  const handleNewProduct = async (e: FormEvent<HTMLFormElement>) => {
+    try {
+      e.preventDefault();
 
-    const { data } = await axios({
-      method: "get",
-      url: "",
-      data: ProductData,
-    });
+      const ProductData = new FormData();
+      ProductData.append("title", TitleRef.current?.value || "");
+      ProductData.append("price", PriceRef.current?.value || "");
+      ProductData.append("title", StockRef.current?.value || "");
 
-    console.log(data);
+      console.log("my auth:", Auth);
+
+      // const { data } = await axios({
+      //   method: "post",
+      //   url: `${process.env.NEXT_PUBLIC_SERVER_URL}/products/new-product`,
+      //   data: ProductData,
+      //   // headers: {
+      //   //   Authorization: `Bearer ${Auth?.auth?.jwt.token}`,
+      //   // },
+      // });
+
+      // console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -53,7 +60,7 @@ export default /* async */ function Products() {
 
             <hr className="my-2" />
 
-            <Form>
+            <Form onSubmit={handleNewProduct}>
               <Input
                 label="product title"
                 wrapperClassName="col-span-2"
@@ -77,11 +84,7 @@ export default /* async */ function Products() {
                   <Button label="Cancel" variant="hollow" className="flex-1" />
                 </Dialog.Close>
 
-                <Button
-                  label="Make Product"
-                  className="flex-1"
-                  onClick={handleNewProduct}
-                />
+                <Button label="Make Product" className="flex-1" type="submit" />
               </div>
             </Form>
           </Dialog.Content>

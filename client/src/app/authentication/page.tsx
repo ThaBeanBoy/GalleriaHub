@@ -2,6 +2,9 @@
 
 import axios from "axios";
 
+import { useSearchParams } from "next/navigation";
+import { redirect } from "next/navigation";
+
 import { UserContext } from "@/contexts/auth";
 
 import { FormEvent, useContext, useRef } from "react";
@@ -17,8 +20,11 @@ import { FiMail, FiUserPlus } from "react-icons/fi";
 import Form from "@/components/Form";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
+import { RedirectType } from "next/dist/client/components/redirect";
 
 export default function SignUpPage() {
+  const searchParams = useSearchParams();
+
   const UsernameRef = useRef<HTMLInputElement>(null);
   const EmailRef = useRef<HTMLInputElement>(null);
   const PasswordRef = useRef<HTMLInputElement>(null);
@@ -40,6 +46,9 @@ export default function SignUpPage() {
 
       success() {
         alert("successfully logged in");
+
+        const callBack = searchParams?.get("callback");
+        redirect(callBack ?? "/");
       },
 
       failed(error) {

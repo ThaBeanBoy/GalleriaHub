@@ -11,6 +11,8 @@ public static class Product{
         group.MapPost("/new-product", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
             
+            Console.WriteLine("Making new product");
+            
             try{
                 Models.User? User = context.Items["User"] as Models.User;
 
