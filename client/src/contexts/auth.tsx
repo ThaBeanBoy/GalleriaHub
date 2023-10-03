@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { createContext, useEffect, useState } from "react";
 
 export type AuthType = {
