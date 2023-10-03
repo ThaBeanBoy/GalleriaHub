@@ -73,7 +73,7 @@ var app = builder.Build();
 app.UseCors(app.Environment.IsProduction() ? ClientOrigins : DevelopmentCORS);
 
 app.UseAuthentication();
-// app.UseUserMiddleware();
+app.UseUserMiddleware();
 
 app.UseSwagger();
 app.UseSwaggerUI();
