@@ -34,7 +34,8 @@ public class JWTService
             issuer: JwtSettings["Issuer"],
             audience: JwtSettings["Audience"],
             claims: Claims,
-            expires: DateTime.UtcNow.AddHours(5),
+            // expires: DateTime.UtcNow.AddHours(5),
+            expires: DateTime.UtcNow.AddHours(8),
             signingCredentials: creds
         );
     }

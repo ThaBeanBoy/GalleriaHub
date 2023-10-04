@@ -1,11 +1,17 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
+
+import useProtectPage from "@/lib/protectPage";
 
 export default function AuthenticationLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  useProtectPage({ from: "authenticated" });
+
   return (
     <div className="flex h-full w-full items-center justify-center lg:justify-between lg:px-6">
       {children}

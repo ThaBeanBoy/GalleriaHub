@@ -1,5 +1,8 @@
 import axios from "axios";
+// import { redirect } from "next/dist/server/api-utils";
+import { usePathname, redirect } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
+import { setInterval } from "timers/promises";
 
 export type AuthType = {
   jwt: {
@@ -51,6 +54,7 @@ export default function AuthProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   const [auth, setAuth] = useState<AuthType | null>(null);
 
   const loginHandler = async ({
@@ -114,7 +118,15 @@ export default function AuthProvider({
 
   useEffect(() => {
     console.log(auth);
-  }, [auth]);
+
+    if (auth) {
+      setTimeout(() => {
+        alert("Authentication token expired, please login again");
+        setAuth(null);
+        redirect(`/authentication/login`);
+      }, auth.jwt.expiryDate.getTime() - new Date().getTime());
+    }
+  }, [auth, pathname]);
 
   return (
     <UserContext.Provider
