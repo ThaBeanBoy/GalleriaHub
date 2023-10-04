@@ -15,11 +15,11 @@ export default function useProtectPage({
   const path = usePathname();
 
   useEffect(() => {
-    if (Auth?.auth == null && from === "unauthenticated") {
+    if (Auth?.auth === undefined && from === "unauthenticated") {
       // Send user to login page with callback url
       redirect(`/authentication/login?callback=${path}`);
     } else if (from === "unauthenticated") {
       router.back();
     }
-  }, [Auth, path]);
+  }, [Auth, from, path, router]);
 }

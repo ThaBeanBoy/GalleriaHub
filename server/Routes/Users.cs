@@ -157,7 +157,7 @@ public static class User
                 return Response.WriteAsync("Not logged in");
             }
 
-            return Response.WriteAsJsonAsync(User);
+            return Response.WriteAsJsonAsync(APIResponse.User(User));
         });
 
         return group;

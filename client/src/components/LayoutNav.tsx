@@ -67,12 +67,12 @@ export default function Navigation() {
                 if (navLink.display === undefined) return Item;
 
                 if (
-                  Auth?.auth === null &&
+                  Auth?.auth === undefined &&
                   navLink.display === "unauthenticated"
                 )
                   return Item;
 
-                if (Auth?.auth !== null && navLink.display === "authenticated")
+                if (Auth?.auth && navLink.display === "authenticated")
                   return Item;
               })}
 

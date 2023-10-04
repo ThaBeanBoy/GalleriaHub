@@ -2,26 +2,28 @@ import axios from "axios";
 // import { redirect } from "next/dist/server/api-utils";
 import { usePathname, redirect } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
-import { setInterval } from "timers/promises";
+
+type JwtType = {
+  token: string;
+  expiryDate: Date;
+};
+
+type UserType = {
+  userID: number;
+  email: string;
+  username: string;
+  createdOn: Date;
+  lastUpdate: Date;
+  profilePicture: string | null;
+  name: string | null;
+  surname: string | null;
+  phoneNumber: string | null;
+  location: string | null;
+};
 
 export type AuthType = {
-  jwt: {
-    token: string;
-    expiryDate: Date;
-  };
-
-  user: {
-    userID: number;
-    email: string;
-    username: string;
-    createdOn: Date;
-    lastUpdate: Date;
-    profilePicture: string | null;
-    name: string | null;
-    surname: string | null;
-    phoneNumber: string | null;
-    location: string | null;
-  };
+  jwt: JwtType;
+  user: UserType;
 };
 
 type loginProps = {
@@ -40,8 +42,10 @@ type signUpProps = {
   failed?: (error: any) => void;
 };
 
+type userContextAuthType = AuthType | undefined;
+
 export type UserContextType = {
-  auth: AuthType | null;
+  auth: userContextAuthType;
   loginHandler: (loginDetails: loginProps) => void;
   signUpHandler: (signUpDetails: signUpProps) => void;
   logoutHandler: () => void;
@@ -55,7 +59,7 @@ export default function AuthProvider({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const [auth, setAuth] = useState<AuthType | null>(null);
+  const [auth, setAuth] = useState<userContextAuthType>(undefined);
 
   const loginHandler = async ({
     username,
@@ -120,11 +124,56 @@ export default function AuthProvider({
     console.log(auth);
 
     if (auth) {
+      // handling the expirations
+      sessionStorage.setItem("jwt", JSON.stringify(auth.jwt));
+
       setTimeout(() => {
         alert("Authentication token expired, please login again");
-        setAuth(null);
+        // removing token from storage
+        sessionStorage.removeItem("jwt");
+
+        // setting auth to null
+        setAuth(undefined);
+
+        // redirecting
         redirect(`/authentication/login`);
       }, auth.jwt.expiryDate.getTime() - new Date().getTime());
+    } else {
+      // handling retrieving token from memory
+      try {
+        const JwtInStorage = sessionStorage.getItem("jwt");
+
+        if (!JwtInStorage) {
+          throw new Error("JWT Token not in storage");
+        }
+
+        const jwt = JSON.parse(JwtInStorage) as JwtType;
+        jwt.expiryDate = new Date(jwt.expiryDate);
+
+        if (JwtExpired(jwt)) {
+          // Removing from session storage
+          sessionStorage.removeItem("jwt");
+          throw new Error("Web token expired");
+        }
+
+        // Get the user object
+        axios<UserType>({
+          method: "get",
+          headers: {
+            Authorization: `Bearer ${jwt.token}`,
+          },
+          url: `${process.env.NEXT_PUBLIC_SERVER_URL}/authentication/get-user`,
+        })
+          .then(({ data }) => {
+            setAuth(ResponseDataToAuthType({ jwt, user: data }));
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } catch (error: any) {
+        // console.log(error.mess);
+        console.warn(error.message);
+      }
     }
   }, [auth, pathname]);
 
@@ -144,4 +193,9 @@ function ResponseDataToAuthType(data: AuthType) {
   data.user.lastUpdate = new Date(data.user.lastUpdate);
 
   return data;
+}
+
+function JwtExpired(JWT: JwtType) {
+  console.log(JWT.expiryDate.getTime() - new Date().getTime());
+  return JWT.expiryDate.getTime() - new Date().getTime() < 0;
 }
