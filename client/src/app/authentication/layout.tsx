@@ -10,7 +10,7 @@ export default function AuthenticationLayout({
 }: {
   children: React.ReactNode;
 }) {
-  useProtectPage({ from: "authenticated" });
+  // useProtectPage({ from: "authenticated" });
 
   return (
     <div className="flex h-full w-full items-center justify-center lg:justify-between lg:px-6">

@@ -15,7 +15,8 @@ export default function useProtectPage({
   const path = usePathname();
 
   useEffect(() => {
-    if (Auth?.auth === undefined && from === "unauthenticated") {
+    console.log(`protection order`, Auth?.auth);
+    if (!Auth?.auth) {
       // Send user to login page with callback url
       redirect(`/authentication/login?callback=${path}`);
     } else if (from === "unauthenticated") {

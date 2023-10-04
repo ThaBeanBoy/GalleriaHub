@@ -73,7 +73,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  useProtectPage({ from: "unauthenticated" });
+  // useProtectPage({ from: "unauthenticated" });
 
   const [navExpanded, setNavExpanded] = useState(true);
 
