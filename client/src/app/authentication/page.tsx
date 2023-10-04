@@ -45,8 +45,6 @@ export default function SignUpPage() {
       confirmPassword: ConfirmPasswordRef.current?.value || "",
 
       success() {
-        alert("successfully logged in");
-
         const callBack = searchParams?.get("callback");
         redirect(callBack ?? "/");
       },

@@ -3,6 +3,8 @@ import axios from "axios";
 import { usePathname, redirect } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 
+import { useToast } from "@/components/ui/use-toast";
+
 type JwtType = {
   token: string;
   expiryDate: Date;
@@ -61,6 +63,8 @@ export default function AuthProvider({
   const pathname = usePathname();
   const [auth, setAuth] = useState<userContextAuthType>(undefined);
 
+  const { toast } = useToast();
+
   const loginHandler = async ({
     username,
     password,
@@ -79,6 +83,11 @@ export default function AuthProvider({
       });
 
       setAuth(ResponseDataToAuthType(data));
+
+      toast({
+        title: "Login",
+        description: `Successfully logged in as ${auth?.user.username}`,
+      });
 
       if (success) success(data);
     } catch (error: any) {
@@ -109,6 +118,11 @@ export default function AuthProvider({
 
       setAuth(ResponseDataToAuthType(data));
 
+      toast({
+        title: "Login",
+        description: `Successfully logged in as ${auth?.user.username}`,
+      });
+
       if (success) success(data);
     } catch (error: any) {
       if (failed) failed(error);
@@ -118,6 +132,14 @@ export default function AuthProvider({
   const logoutHandler = () => {
     //make the user object null
     // remove the jwt token from the cookies/internal storage
+    sessionStorage.removeItem("jwt");
+
+    setAuth(undefined);
+
+    toast({
+      title: "Logout",
+      description: "Successfully logged out",
+    });
   };
 
   useEffect(() => {
