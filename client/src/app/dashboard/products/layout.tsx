@@ -2,6 +2,8 @@
 
 import axios from "axios";
 
+import Link from "next/link";
+
 import * as Dialog from "@radix-ui/react-dialog";
 
 import Form from "@/components/Form";
@@ -13,6 +15,8 @@ import useProtectPage from "@/lib/protectPage";
 import { ErrorDialog } from "@/components/dialogs";
 
 import { BsPlus } from "react-icons/bs";
+import { ProductType } from "@/lib/types";
+import { EyeIcon, EyeOff } from "lucide-react";
 
 export default /* async */ function Products({
   children,
@@ -24,6 +28,10 @@ export default /* async */ function Products({
   const TitleRef = useRef<HTMLInputElement>(null);
   const PriceRef = useRef<HTMLInputElement>(null);
   const StockRef = useRef<HTMLInputElement>(null);
+
+  const [products, setProducts] = useState<ProductType[] | undefined>(
+    undefined,
+  );
 
   const [newProductSubmissionError, setNewProductSubmissionError] =
     useState(false);
@@ -60,7 +68,7 @@ export default /* async */ function Products({
   };
 
   useEffect(() => {
-    axios({
+    axios<ProductType[]>({
       method: "get",
       headers: {
         Authorization: `Bearer ${Auth?.auth?.jwt.token}`,
@@ -70,80 +78,115 @@ export default /* async */ function Products({
       },
       url: `${process.env.NEXT_PUBLIC_SERVER_URL}/products/`,
     })
-      .then(({ data }) => console.log(data))
+      .then(({ data }) => {
+        data = data.map((product) => {
+          const temp = product;
+
+          temp.createdOn = new Date(temp.createdOn);
+          temp.lastUpdate = new Date(temp.lastUpdate);
+
+          return temp;
+        });
+
+        setProducts(data);
+      })
       .catch((error) => console.log(error));
   }, []);
 
   return (
-    <div>
-      <h2 className="mb-5 text-3xl font-bold">Product Management</h2>
+    <div className="flex gap-4">
+      <aside>
+        <div id="top" className="flex items-end gap-2">
+          <Input placeholder="search" />
+          <Dialog.Root>
+            <Dialog.Trigger asChild>
+              <Button icon={<BsPlus />} />
+            </Dialog.Trigger>
 
-      <div className="flex gap-4">
-        <aside>
-          <div id="top" className="flex items-end gap-2">
-            <Input label="Search" />
-            <Dialog.Root>
-              <Dialog.Trigger asChild>
-                <Button icon={<BsPlus />} />
-              </Dialog.Trigger>
+            <Dialog.Portal>
+              <Dialog.Overlay className="data-[state=open]:animate-overlayShow fixed inset-0 bg-black opacity-60" />
 
-              <Dialog.Portal>
-                <Dialog.Overlay className="data-[state=open]:animate-overlayShow fixed inset-0 bg-black opacity-60" />
+              <Dialog.Content className="data-[state=open]:animate-contentShow fixed left-[50%] top-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-3xl bg-white p-[25px] shadow-lg">
+                <h2 className="text-xl font-semibold">New Product</h2>
 
-                <Dialog.Content className="data-[state=open]:animate-contentShow fixed left-[50%] top-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-3xl bg-white p-[25px] shadow-lg">
-                  <h2 className="text-xl font-semibold">New Product</h2>
+                <hr className="my-2" />
 
-                  <hr className="my-2" />
+                <Form onSubmit={handleNewProduct}>
+                  <Input
+                    label="product title"
+                    wrapperClassName="col-span-2"
+                    ref={TitleRef}
+                  />
+                  <Input
+                    label="price"
+                    className="mb-3"
+                    type="number"
+                    ref={PriceRef}
+                  />
+                  <Input
+                    label="stock"
+                    className="mb-3"
+                    type="number"
+                    ref={StockRef}
+                  />
 
-                  <Form onSubmit={handleNewProduct}>
-                    <Input
-                      label="product title"
-                      wrapperClassName="col-span-2"
-                      ref={TitleRef}
-                    />
-                    <Input
-                      label="price"
-                      className="mb-3"
-                      type="number"
-                      ref={PriceRef}
-                    />
-                    <Input
-                      label="stock"
-                      className="mb-3"
-                      type="number"
-                      ref={StockRef}
-                    />
-
-                    <div className="col-span-2 flex gap-2">
-                      <Dialog.Close asChild>
-                        <Button
-                          label="Cancel"
-                          variant="hollow"
-                          className="flex-1"
-                        />
-                      </Dialog.Close>
-
+                  <div className="col-span-2 flex gap-2">
+                    <Dialog.Close asChild>
                       <Button
-                        label="Make Product"
+                        label="Cancel"
+                        variant="hollow"
                         className="flex-1"
-                        type="submit"
                       />
-                      {/* <ErrorDialog
+                    </Dialog.Close>
+
+                    <Button
+                      label="Make Product"
+                      className="flex-1"
+                      type="submit"
+                    />
+                    {/* <ErrorDialog
                     trigger={
                     }
                     title="New Product"
                     message={submissionErrorMessage || ""}
                   /> */}
-                    </div>
-                  </Form>
-                </Dialog.Content>
-              </Dialog.Portal>
-            </Dialog.Root>
-          </div>
-        </aside>
+                  </div>
+                </Form>
+              </Dialog.Content>
+            </Dialog.Portal>
+          </Dialog.Root>
+        </div>
 
-        <div>{children}</div>
-      </div>
+        {/* User products */}
+        <ul>
+          {products
+            ? products.map(
+                (
+                  { productName, productID, stockQuantity, lastUpdate, Public },
+                  key,
+                ) => (
+                  <li key={key}>
+                    <Link
+                      className="hover:text-active block border-r-2 px-4 py-3 text-sm text-black"
+                      href={`/dashboard/products/${productID}`}
+                    >
+                      <h3 className="font-semibold">{productName}</h3>
+                      <p className="text-xs">
+                        Last updated on: {lastUpdate.toUTCString()}
+                      </p>
+                      <p className="text-xs">Stock: {stockQuantity}</p>
+                      <p className="text-xs">
+                        Visibility: {Public ? <EyeIcon /> : <EyeOff />}
+                      </p>
+                    </Link>
+                  </li>
+                ),
+              )
+            : "Loading your products"}
+        </ul>
+      </aside>
+
+      <div>{children}</div>
     </div>
   );
 }
