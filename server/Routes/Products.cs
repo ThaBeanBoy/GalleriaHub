@@ -111,6 +111,12 @@ public static class Product{
                 Products = Products.Where(P => P.UserID == Filters.UserID).ToList();
             }
 
+            //Filtering based on min price
+            if(Filters.MinPrice != null)
+            {
+                Products = Products.Where(P => Convert.ToDouble(P.Price) >= Filters.MinPrice).ToList();
+            }
+
             // Perform skip & take
 
             // return modified object/json
