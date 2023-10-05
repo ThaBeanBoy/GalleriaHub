@@ -7,9 +7,10 @@ import * as Dialog from "@radix-ui/react-dialog";
 import Form from "@/components/Form";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
-import { FormEvent, useContext, useRef } from "react";
+import { FormEvent, useContext, useRef, useState } from "react";
 import { UserContext } from "@/contexts/auth";
 import useProtectPage from "@/lib/protectPage";
+import { ErrorDialog } from "@/components/dialogs";
 
 export default /* async */ function Products() {
   const Auth = useContext(UserContext);
@@ -18,29 +19,37 @@ export default /* async */ function Products() {
   const PriceRef = useRef<HTMLInputElement>(null);
   const StockRef = useRef<HTMLInputElement>(null);
 
+  const [newProductSubmissionError, setNewProductSubmissionError] =
+    useState(false);
+  const [submissionErrorMessage, setsubmissionErrorMessage] = useState<
+    string | undefined
+  >(undefined);
+
   const handleNewProduct = async (e: FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
 
       const ProductData = new FormData();
-      ProductData.append("title", TitleRef.current?.value || "");
+      ProductData.append("name", TitleRef.current?.value || "");
       ProductData.append("price", PriceRef.current?.value || "");
-      ProductData.append("title", StockRef.current?.value || "");
+      ProductData.append("stock", StockRef.current?.value || "");
 
       console.log("my auth:", Auth);
 
-      // const { data } = await axios({
-      //   method: "post",
-      //   url: `${process.env.NEXT_PUBLIC_SERVER_URL}/products/new-product`,
-      //   data: ProductData,
-      //   // headers: {
-      //   //   Authorization: `Bearer ${Auth?.auth?.jwt.token}`,
-      //   // },
-      // });
+      const { data } = await axios({
+        method: "post",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/products/new-product`,
+        data: ProductData,
+        headers: {
+          Authorization: `Bearer ${Auth?.auth?.jwt.token}`,
+        },
+      });
 
-      // console.log(data);
-    } catch (error) {
+      console.log(data);
+    } catch (error: any) {
       console.log(error);
+      setsubmissionErrorMessage(error.response.data);
+      setNewProductSubmissionError(true);
     }
   };
 
@@ -85,6 +94,12 @@ export default /* async */ function Products() {
                 </Dialog.Close>
 
                 <Button label="Make Product" className="flex-1" type="submit" />
+                {/* <ErrorDialog
+                  trigger={
+                  }
+                  title="New Product"
+                  message={submissionErrorMessage || ""}
+                /> */}
               </div>
             </Form>
           </Dialog.Content>

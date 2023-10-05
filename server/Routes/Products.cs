@@ -30,9 +30,36 @@ public static class Product{
                     return Response.WriteAsync("You need to provide a name");
                 }
 
-                Models.Product NewProduct = new Models.Product(){
+                // Checking the product price
+                double ProductPrice = 0;
+                try
+                {
+                    ProductPrice = Convert.ToDouble(Convert.ToString(Request.Form["price"]).Trim() ?? "0");
+                } 
+                catch(FormatException ex)
+                {
+                    Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                    return Response.WriteAsync(ex.Message);
+                }
+                catch(Exception){/* Do nothing */}
+
+                // Checking for stock input
+                int ProductStock = 0;
+                try{
+                    ProductStock = Convert.ToInt32(Convert.ToString(Request.Form["stock"]).Trim() ?? "0");
+                }
+                catch(FormatException ex)
+                {
+                    Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                    return Response.WriteAsync(ex.Message);
+                }
+                catch(Exception) {/* Do nothing */}
+
+                Models.Product NewProduct = new Models.Product{
                     UserID = User.UserID, 
                     ProductName = ProductName,
+                    Price = new decimal(ProductPrice),
+                    StockQuantity = ProductStock,
                     CreatedOn = DateTime.Now,
                     LastUpdate = DateTime.Now,
                     Public = false
@@ -64,9 +91,10 @@ public static class Product{
 
         group.MapGet("/{id}", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
-            
+            var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+            var User = context.Items["User"] as Models.User;
+
             try{
-                var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
                 
                 int ProductID = int.Parse(context.GetRouteValue("id") as string ?? "error");
 
@@ -78,8 +106,8 @@ public static class Product{
                     return Response.WriteAsync("Coudln't find the product");
                 }
 
-                // Checking accessibility of product || If user requesting, then allow access to product
-                if(!Product.Public /* || Product.ArtistID == User Artist ID */){
+                // Checking accessibility of product || If user owns product, then allow access to product
+                if(!Product.Public && User != null && Product.UserID != User.UserID){
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return Response.WriteAsync("Unauthorised to access product");
                 }
@@ -106,7 +134,7 @@ public static class Product{
             Response.WriteAsync("Not implmeneted yet");
         });
 
-        // Delete
+        // Delete | Archive
         group.MapDelete("/{id}", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
@@ -120,7 +148,7 @@ public static class Product{
 
     private class FilterProps {
         public bool Verified { get; }
-        public int? ArtistID { get; }
+        public int? UserID { get; }
         public double? MinPrice { get; }
         public double? MaxPrice { get; }
 
@@ -135,10 +163,10 @@ public static class Product{
 
             // Checking ArtistID
             try{
-                ArtistID = int.Parse(Queries["artistid"]);
+                UserID = int.Parse(Queries["artistid"]);
             }
             catch(Exception){
-                ArtistID = null;
+                UserID = null;
             }
 
             // Checking the min price

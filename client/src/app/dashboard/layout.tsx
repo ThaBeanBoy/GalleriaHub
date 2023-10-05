@@ -97,8 +97,8 @@ export default function DashboardLayout({
                 <Link
                   href={href}
                   className={cn(
-                    "hover:text-active flex h-[50px] items-center gap-3 rounded-xl rounded-r-none border-r px-4 py-3 font-medium capitalize text-black",
-                    { "text-active border border-r-0": active },
+                    "hover:text-active flex h-[50px] items-center gap-3 rounded-xl rounded-r-none border-r-2 px-4 py-3 font-medium capitalize text-black",
+                    { "text-active border-2 border-r-0": active },
                   )}
                 >
                   {" "}
