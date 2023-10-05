@@ -100,12 +100,17 @@ public static class Product{
 
             // Filter based on (public || Request User own's product), user id, min price & max price
             Console.WriteLine(UserID);
-            Models.Product[] Products = 
+            List<Models.Product> Products = 
                 DB.Products
                 .Where(Product => Product.Public || (Product.UserID == UserID))
-                .ToArray();
+                .ToList();
 
             //Filter based on user id param
+            if(Filters.UserID != null)
+            {
+                Products = Products.Where(P => P.UserID == Filters.UserID).ToList();
+            }
+
             // Perform skip & take
 
             // return modified object/json
