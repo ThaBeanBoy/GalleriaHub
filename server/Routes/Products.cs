@@ -81,15 +81,46 @@ public static class Product{
         group.MapGet("/", (HttpContext context)=>{
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+            var user = context.Items["User"] as Models.User;
+
+            //Validating the user
+            int UserID;
+            if(user != null)
+            {
+                UserID = user.UserID;
+            }
+            else
+            {
+                UserID = -1;
+            }
 
             // Getting filter queries
             FilterProps Filters = new(Request.Query);
 
             // Filter based on (public || Request User own's product), user id, min price & max price
-            Models.Product[] Products = 
+            Console.WriteLine(UserID);
+            List<Models.Product> Products = 
                 DB.Products
-                .Where(Product => Product.Public)
-                .ToArray();//.Where(P => P.Public)
+                .Where(Product => Product.Public || (Product.UserID == UserID))
+                .ToList();
+
+            //Filter based on user id param
+            if(Filters.UserID != null)
+            {
+                Products = Products.Where(P => P.UserID == Filters.UserID).ToList();
+            }
+
+            //Filtering based on min price
+            if(Filters.MinPrice != null)
+            {
+                Products = Products.Where(P => Convert.ToDouble(P.Price) >= Filters.MinPrice).ToList();
+            }
+
+            //Filtering based on max price
+            if(Filters.MaxPrice != null)
+            {
+                Products = Products.Where(P => Convert.ToDouble(P.Price) <= Filters.MaxPrice).ToList();
+            }
             // Perform skip & take
 
             // return modified object/json
@@ -115,13 +146,14 @@ public static class Product{
                 }
 
                 // Checking accessibility of product || If user owns product, then allow access to product
-                if(!Product.Public && User != null && Product.UserID != User.UserID){
+                Console.WriteLine($"Public:{Product.Public}\nLogged In: {User == null}\nOwner: {Product.UserID}\nRequester: {User.UserID}");
+                if(!Product.Public && (User == null || Product.UserID != User.UserID)){
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return Response.WriteAsync("Unauthorised to access product");
                 }
 
                 Response.StatusCode = StatusCodes.Status200OK;
-                return Response.WriteAsync($"Supposed to get {context.GetRouteValue("id")}");
+                return Response.WriteAsJsonAsync(Product);
             }
             catch(FormatException){
                 Response.StatusCode = StatusCodes.Status406NotAcceptable;
