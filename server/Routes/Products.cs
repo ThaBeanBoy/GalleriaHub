@@ -126,7 +126,15 @@ public static class Product{
 
             // return modified object/json
 
-            return Products/* .Where(Product => Product.Public) */;
+            return Products.Select(Product => {
+
+                var User = DB.Users.FirstOrDefault(User => User.UserID == Product.UserID);
+
+                return new {
+                    productID = Product.ProductID,
+                    user = User,
+                };
+            });
         });
 
         group.MapGet("/{id}", (HttpContext context) => {

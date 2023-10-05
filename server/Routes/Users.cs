@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using Models;
 using Utility;
 using Galleria.Services;
+using server.Routes;
 
 namespace Routes;
 
@@ -84,7 +85,7 @@ public static class User
                 var Token = JWT.GenerateToken(NewUser);
                 // Sending response
                 Response.StatusCode = StatusCodes.Status201Created;
-                await Response.WriteAsJsonAsync(APIResponse.Authentication(NewUser, Token));
+                await Response.WriteAsJsonAsync(APIResponse.User(NewUser, Token));
             }
             catch(EmailAlreadyRegisteredException e)
             {
@@ -136,7 +137,7 @@ public static class User
 
                 // Returning user object (succesful login)
                 var Token = JWT.GenerateToken(userEntity);
-                await Response.WriteAsJsonAsync(APIResponse.Authentication(userEntity, Token));
+                await Response.WriteAsJsonAsync(APIResponse.User(userEntity, Token));
             }
             catch(Exception e)
             {
@@ -165,42 +166,42 @@ public static class User
 
 
     // private static object TokenResponse
-    private static class APIResponse
-    {
-        public static object User(Models.User User)
-        {
-            return new 
-            {
-                userID = User.UserID,
-                email = User.Email,
-                username = User.Username,
-                createdOn = User.CreatedOn,
-                lastUpdate = User.LastUpdate,
-                profilePicture = User.ProfilePictureFileID,
-                name = User.Name,
-                surname = User.Surname,
-                phoneNumber = User.PhoneNumber,
-                location = User.Location
-            };
-        }
+    // private static class APIResponse
+    // {
+    //     public static object User(Models.User User)
+    //     {
+    //         return new 
+    //         {
+    //             userID = User.UserID,
+    //             email = User.Email,
+    //             username = User.Username,
+    //             createdOn = User.CreatedOn,
+    //             lastUpdate = User.LastUpdate,
+    //             profilePicture = User.ProfilePictureFileID,
+    //             name = User.Name,
+    //             surname = User.Surname,
+    //             phoneNumber = User.PhoneNumber,
+    //             location = User.Location
+    //         };
+    //     }
 
-        public static object JWTToken(JwtSecurityToken Token)
-        {
-            return new 
-            {
-                token = JWTService.TokenString(Token),
-                expiryDate = Token.ValidTo
-            };
-        }
+    //     public static object JWTToken(JwtSecurityToken Token)
+    //     {
+    //         return new 
+    //         {
+    //             token = JWTService.TokenString(Token),
+    //             expiryDate = Token.ValidTo
+    //         };
+    //     }
 
-        public static object Authentication(Models.User User, JwtSecurityToken Token)
-        {
-            return new {
-                JWT = JWTToken(Token),
-                User = APIResponse.User(User)
-            };
-        }
-    }
+    //     public static object Authentication(Models.User User, JwtSecurityToken Token)
+    //     {
+    //         return new {
+    //             JWT = JWTToken(Token),
+    //             User = APIResponse.User(User)
+    //         };
+    //     }
+    // }
 
     // Exceptions
 
