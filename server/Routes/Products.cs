@@ -147,7 +147,8 @@ public static class Product{
                 }
 
                 // Checking accessibility of product || If user owns product, then allow access to product
-                if(!Product.Public && User != null && Product.UserID != User.UserID){
+                Console.WriteLine($"Public:{Product.Public}\nLogged In: {User == null}\nOwner: {Product.UserID}\nRequester: {User.UserID}");
+                if(!Product.Public && User == null && Product.UserID != User.UserID){
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return Response.WriteAsync("Unauthorised to access product");
                 }
