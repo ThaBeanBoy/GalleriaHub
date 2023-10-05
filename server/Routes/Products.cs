@@ -99,10 +99,13 @@ public static class Product{
             FilterProps Filters = new(Request.Query);
 
             // Filter based on (public || Request User own's product), user id, min price & max price
+            Console.WriteLine(UserID);
             Models.Product[] Products = 
                 DB.Products
-                .Where(Product => Product.Public && (Product.UserID == UserID))
-                .ToArray();//.Where(P => P.Public)
+                .Where(Product => Product.Public || (Product.UserID == UserID))
+                .ToArray();
+
+            //Filter based on user id param
             // Perform skip & take
 
             // return modified object/json
