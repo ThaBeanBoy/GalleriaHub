@@ -148,13 +148,13 @@ public static class Product{
 
                 // Checking accessibility of product || If user owns product, then allow access to product
                 Console.WriteLine($"Public:{Product.Public}\nLogged In: {User == null}\nOwner: {Product.UserID}\nRequester: {User.UserID}");
-                if(!Product.Public && User == null && Product.UserID != User.UserID){
+                if(!Product.Public && (User == null || Product.UserID != User.UserID)){
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return Response.WriteAsync("Unauthorised to access product");
                 }
 
                 Response.StatusCode = StatusCodes.Status200OK;
-                return Response.WriteAsync($"Supposed to get {context.GetRouteValue("id")}");
+                return Response.WriteAsJsonAsync(Product);
             }
             catch(FormatException){
                 Response.StatusCode = StatusCodes.Status406NotAcceptable;
