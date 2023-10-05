@@ -84,9 +84,17 @@ public static class Product{
 
             // Getting filter queries
             FilterProps Filters = new(Request.Query);
-            Response.StatusCode = StatusCodes.Status200OK;
 
-            return DB.Products/* .Where(Product => Product.Public) */;
+            // Filter based on (public || Request User own's product), user id, min price & max price
+            Models.Product[] Products = 
+                DB.Products
+                .Where(Product => Product.Public)
+                .ToArray();//.Where(P => P.Public)
+            // Perform skip & take
+
+            // return modified object/json
+
+            return Products/* .Where(Product => Product.Public) */;
         });
 
         group.MapGet("/{id}", (HttpContext context) => {
