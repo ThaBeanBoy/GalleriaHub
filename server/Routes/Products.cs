@@ -148,6 +148,9 @@ public static class Product{
 
     private class FilterProps {
         public bool Verified { get; }
+
+        public int? Skip { get; }
+        public int? Take { get; }
         public int? UserID { get; }
         public double? MinPrice { get; }
         public double? MaxPrice { get; }
@@ -161,9 +164,25 @@ public static class Product{
                 Verified = false;
             }
 
+            //Skip
+            try{
+                Skip = Convert.ToInt32(Queries["skip"]);
+            }
+            catch(Exception) {
+                Skip = null;
+            }
+
+            //Take
+            try{
+                Take = Convert.ToInt32(Queries["take"]);
+            }
+            catch(Exception) {
+                Take = null;
+            }
+
             // Checking ArtistID
             try{
-                UserID = int.Parse(Queries["artistid"]);
+                UserID = int.Parse(Queries["userid"]);
             }
             catch(Exception){
                 UserID = null;
