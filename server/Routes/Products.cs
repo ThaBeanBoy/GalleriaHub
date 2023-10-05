@@ -1,6 +1,8 @@
 using System.Xml;
 using Models;
 
+using static server.Routes.APIResponse;
+
 namespace Routes;
 
 public static class Product{
@@ -126,15 +128,7 @@ public static class Product{
 
             // return modified object/json
 
-            return Products.Select(Product => {
-
-                var User = DB.Users.FirstOrDefault(User => User.UserID == Product.UserID);
-
-                return new {
-                    productID = Product.ProductID,
-                    user = User,
-                };
-            });
+            return Products.Select(Product => Product.ResponseObj(DB));
         });
 
         group.MapGet("/{id}", (HttpContext context) => {

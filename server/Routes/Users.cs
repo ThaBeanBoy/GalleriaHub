@@ -13,6 +13,8 @@ using Utility;
 using Galleria.Services;
 using server.Routes;
 
+using static server.Routes.APIResponse;
+
 namespace Routes;
 
 public static class User 
@@ -85,7 +87,7 @@ public static class User
                 var Token = JWT.GenerateToken(NewUser);
                 // Sending response
                 Response.StatusCode = StatusCodes.Status201Created;
-                await Response.WriteAsJsonAsync(APIResponse.User(NewUser, Token));
+                await Response.WriteAsJsonAsync(NewUser.ResponseObj());
             }
             catch(EmailAlreadyRegisteredException e)
             {
@@ -137,7 +139,9 @@ public static class User
 
                 // Returning user object (succesful login)
                 var Token = JWT.GenerateToken(userEntity);
-                await Response.WriteAsJsonAsync(APIResponse.User(userEntity, Token));
+                await Response.WriteAsJsonAsync(
+                    userEntity.ResponseObj(Token)
+                );
             }
             catch(Exception e)
             {
@@ -158,7 +162,7 @@ public static class User
                 return Response.WriteAsync("Not logged in");
             }
 
-            return Response.WriteAsJsonAsync(APIResponse.User(User));
+            return Response.WriteAsJsonAsync(User.ResponseObj());
         });
 
         return group;

@@ -4,49 +4,65 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using Galleria.Services;
+using Models;
 
-namespace server.Routes
+namespace server.Routes;
+
+public static class APIResponse
 {
-    public static class APIResponse
+    // USER Response objects
+    public static object ResponseObj(this User User)
     {
-        
-        public static object User(Models.User User)
+        return new
         {
-            return new 
-            {
-                userID = User.UserID,
-                email = User.Email,
-                username = User.Username,
-                createdOn = User.CreatedOn,
-                lastUpdate = User.LastUpdate,
-                profilePicture = User.ProfilePictureFileID,
-                name = User.Name,
-                surname = User.Surname,
-                phoneNumber = User.PhoneNumber,
-                location = User.Location
-            };
-        }
+            userID = User.UserID,
+            email = User.Email,
+            username = User.Username,
+            createdOn = User.CreatedOn,
+            lastUpdate = User.LastUpdate,
+            profilePicture = User.ProfilePictureFileID,
+            name = User.Name,
+            surname = User.Surname,
+            phoneNumber = User.PhoneNumber,
+            location = User.Location
+        };
+    }
 
-        public static object User(JwtSecurityToken Token)
+    public static object ResponseObj(this JwtSecurityToken Token)
+    {
+        return new
         {
-            return new 
-            {
-                token = JWTService.TokenString(Token),
-                expiryDate = Token.ValidTo
-            };
-        }
+            token = JWTService.TokenString(Token),
+            expiryDate = Token.ValidTo
+        };
+    }
 
-        public static object User(Models.User User, JwtSecurityToken Token)
+    public static object ResponseObj(this User User, JwtSecurityToken Token)
+    {
+        return new
         {
-            return new {
-                JWT = APIResponse.User(Token),
-                User = APIResponse.User(User)
-            };
-        }
+            JWT = Token.ResponseObj(),
+            User = User.ResponseObj()
+        };
+    }
 
-        public static object User(JwtSecurityToken Token, Models.User User)
-        {
-            return APIResponse.User(User, Token);
-        }
+    // Product response
+    public static object ResponseObj(this Product Product, GalleriaHubDBContext DB)
+    {
+        // Getting the user
+        User ProductOwner = DB.Users.FirstOrDefault(User => Product.UserID == User.UserID);
+        ProductFile Description = DB.ProductFiles.FirstOrDefault(PD => PD.FileID == Product.FileID);
+
+        return new {
+            productID = Product.ProductID,
+            productName = Product.ProductName,
+            price = Product.Price,
+            stockQuantity = Product.StockQuantity,
+            Public = Product.Public,
+            createdOn = Product.CreatedOn,
+            lastUpdate = Product.LastUpdate,
+            Description = Description,
+            seller = ProductOwner.ResponseObj()
+        };
     }
 }
