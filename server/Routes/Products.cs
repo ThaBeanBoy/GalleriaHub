@@ -1,3 +1,4 @@
+using System.Xml;
 using Models;
 
 namespace Routes;
@@ -81,6 +82,18 @@ public static class Product{
         group.MapGet("/", (HttpContext context)=>{
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+            var user = context.Items["User"] as Models.User;
+
+            //Validating the user
+            int UserID;
+            if(user != null)
+            {
+                UserID = user.UserID;
+            }
+            else
+            {
+                UserID = -1;
+            }
 
             // Getting filter queries
             FilterProps Filters = new(Request.Query);
@@ -88,7 +101,7 @@ public static class Product{
             // Filter based on (public || Request User own's product), user id, min price & max price
             Models.Product[] Products = 
                 DB.Products
-                .Where(Product => Product.Public)
+                .Where(Product => Product.Public && (Product.UserID == UserID))
                 .ToArray();//.Where(P => P.Public)
             // Perform skip & take
 
