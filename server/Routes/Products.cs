@@ -117,6 +117,11 @@ public static class Product{
                 Products = Products.Where(P => Convert.ToDouble(P.Price) >= Filters.MinPrice).ToList();
             }
 
+            //Filtering based on max price
+            if(Filters.MaxPrice != null)
+            {
+                Products = Products.Where(P => Convert.ToDouble(P.Price) <= Filters.MaxPrice).ToList();
+            }
             // Perform skip & take
 
             // return modified object/json
