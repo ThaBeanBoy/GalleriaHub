@@ -130,6 +130,7 @@ public static class Product{
             return Products.Select(Product => Product.ResponseObj(DB));
         });
 
+        //Getting a specific product
         group.MapGet("/{id}", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
@@ -176,13 +177,45 @@ public static class Product{
             Response.WriteAsync("Not implmeneted yet");
         });
 
-        // Delete | Archive
-        group.MapDelete("/{id}", (HttpContext context) => {
+        //Delete
+        group.MapDelete("/{id}", async (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
-            
-            Response.StatusCode = StatusCodes.Status501NotImplemented;
-            Response.WriteAsync("Not implmeneted yet");
+            var User = context.Items["User"] as Models.User;
+
+            try {
+                int ProductID = int.Parse(context.GetRouteValue("id") as string ?? "error");
+
+                Models.Product? Product = DB.Products.FirstOrDefault(P => P.ProductID == ProductID);
+
+                // Checking if product exists
+                if (Product == null) {
+                    Response.StatusCode = StatusCodes.Status404NotFound;
+                    await Response.WriteAsync("Couldn't find the product");
+                    return;
+                }
+
+                // Checking accessibility of product and ownership
+                if (User == null || Product.UserID != User.UserID) {
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await Response.WriteAsync("Unauthorized to delete the product");
+                    return;
+                }
+
+                // Perform the deletion
+                DB.Products.Remove(Product);
+                await DB.SaveChangesAsync();
+
+                Response.StatusCode = StatusCodes.Status200OK;
+            }
+            catch (FormatException) {
+                Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                await Response.WriteAsync("Product ID format is incorrect");
+            }
+            catch (Exception) {
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await Response.WriteAsync("Something went wrong");
+            }
         });
 
         return group;
