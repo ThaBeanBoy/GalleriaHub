@@ -50,7 +50,7 @@ export default /* async */ function Products({
 
       console.log("my auth:", Auth);
 
-      const { data } = await axios({
+      const { data } = await axios<ProductType>({
         method: "post",
         url: `${process.env.NEXT_PUBLIC_SERVER_URL}/products/new-product`,
         data: ProductData,
@@ -58,6 +58,8 @@ export default /* async */ function Products({
           Authorization: `Bearer ${Auth?.auth?.jwt.token}`,
         },
       });
+
+      // toast the product & visit button
 
       console.log(data);
     } catch (error: any) {
