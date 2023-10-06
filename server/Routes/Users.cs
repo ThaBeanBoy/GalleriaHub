@@ -170,32 +170,41 @@ public static class User
 
         // get user on id
         group.MapGet("/{id}", (HttpContext context) => {
-            try{
-                // todo: get the id from the route & convert to a interger using int.Parse()
-                
-                // todo: Getting the Request, Response, DB Context & User (user could be null)
+            var (Request, Response) = (context.Request, context.Response);
+            var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+            var User = context.Items["User"] as Models.User;
 
-                // todo: get the user from the db context, if not found, return 404 to client
+            try {
+                // Get the user ID from the route and convert it to an integer using int.Parse()
+                int userId = int.Parse(context.GetRouteValue("id") as string ?? "error");
 
-                /*
-                    todo: If the user set to private (not public), request user doesn't own account
-                    todo: return a 40Something response code & error message 
-                */
+                // Check if the user with the specified ID exists in the database
+                Models.User? userEntity = DB.Users.FirstOrDefault(user => user.UserID == userId);
 
-                // todo: if not public, check if request user is the user, if not, return error to client
+                // If the user is not found, return a 404 response to the client
+                if (userEntity == null) {
+                    Response.StatusCode = StatusCodes.Status404NotFound;
+                    return Response.WriteAsync("User not found");
+                }
 
-                // todo: return user obj to client using the `ResponseObj` method
+                // If the user profile is set to private (not public) and the request user is not the same as the requested user, return an error
+                if (!userEntity.Public && (User == null || User.UserID != userEntity.UserID)) {
+                    Response.StatusCode = StatusCodes.Status403Forbidden;
+                    return Response.WriteAsync("User profile is private");
+                }
+
+                // Return the user object to the client using the `ResponseObj` method
+                return Response.WriteAsJsonAsync(userEntity.ResponseObj());
             }
-            // todo: Conversion of id could throw an exception, return an appropriate response code & error message
-            // catch()
-            // {
-
-            // }
-            catch(Exception)
-            {
-                // todo: set response code of 500
-                
-                // todo: send message to the client saying something went wrong
+            catch (FormatException) {
+                // Handle the case where ID conversion throws an exception
+                Response.StatusCode = StatusCodes.Status400BadRequest;
+                return Response.WriteAsync("Invalid user ID format");
+            }
+            catch (Exception) {
+                // Handle other exceptions and return a 500 response
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                return Response.WriteAsync("Something went wrong");
             }
         });
 
