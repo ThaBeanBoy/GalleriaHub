@@ -165,6 +165,27 @@ public static class User
             return Response.WriteAsJsonAsync(User.ResponseObj());
         });
 
+        // Delete user request
+        group.MapDelete("/", (HttpContext context) => {
+           try
+           {
+                /* 
+                    todo: Get the User object from the context items
+                    todo: If the userobject is null, return a error code & error message
+                */
+
+                // todo: Get the Request, Response, DB Context from the context
+
+                // todo: Delete the user from the database
+
+                // Send a success response code & response message
+           }
+           catch(Exception)
+           {
+                // Send server error 500 & server error message to the client
+           }
+        });
+
         return group;
     }
 
