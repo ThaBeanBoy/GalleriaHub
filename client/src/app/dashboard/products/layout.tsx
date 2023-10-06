@@ -5,6 +5,9 @@ import axios from "axios";
 import Link from "next/link";
 
 import * as Dialog from "@radix-ui/react-dialog";
+import { useToast } from "@/components/ui/use-toast";
+
+import { formatDistance, subDays } from "date-fns";
 
 import Form from "@/components/Form";
 import Button from "@/components/Button";
@@ -24,7 +27,6 @@ import { ErrorDialog } from "@/components/dialogs";
 import { BsPlus } from "react-icons/bs";
 import { ProductType } from "@/lib/types";
 import { EyeIcon, EyeOff } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
 
 export default /* async */ function Products({
   children,
@@ -193,29 +195,54 @@ export default /* async */ function Products({
         {/* User products */}
         <ul>
           {products
-            ? products.map(
-                (
-                  { productName, productID, stockQuantity, lastUpdate, Public },
-                  key,
-                ) => (
-                  <li key={key}>
-                    <Link
-                      className="hover:text-active block border-r-2 px-4 py-3 text-sm text-black"
-                      href={`/dashboard/products/${productID}`}
-                    >
-                      <h3 className="mb-1 font-semibold">{productName}</h3>
-                      <p className="text-xs">
-                        Last update: {lastUpdate.toUTCString()}
-                      </p>
-                    </Link>
-                  </li>
-                ),
-              )
+            ? products.map((product, key) => (
+                <li key={key}>
+                  <ProductItem {...product} />
+                </li>
+              ))
             : "Loading your products"}
         </ul>
       </aside>
 
       <div>{children}</div>
     </div>
+  );
+}
+
+function ProductItem({
+  productID,
+  productName,
+  lastUpdate,
+  createdOn,
+}: ProductType) {
+  const dateLabel =
+    lastUpdate.getTime() === createdOn.getTime() ? "Created on" : "Last update";
+
+  const [dateDisplayed, setdateDisplayed] = useState(
+    formatDistance(lastUpdate, new Date(), {
+      addSuffix: true,
+    }),
+  );
+
+  setInterval(
+    () =>
+      setdateDisplayed(
+        formatDistance(lastUpdate, new Date(), {
+          addSuffix: true,
+        }),
+      ),
+    1000,
+  );
+
+  return (
+    <Link
+      className="hover:text-active block border-r-2 px-4 py-3 text-sm text-black"
+      href={`/dashboard/products/${productID}`}
+    >
+      <h3 className="mb-1 font-semibold">{productName}</h3>
+      <p className="text-xs">
+        {dateLabel} : {dateDisplayed}
+      </p>
+    </Link>
   );
 }
