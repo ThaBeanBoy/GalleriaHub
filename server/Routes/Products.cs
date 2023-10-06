@@ -1,5 +1,7 @@
 using Models;
 
+using static server.Routes.APIResponse;
+
 namespace Routes;
 
 public static class Product{
@@ -125,7 +127,7 @@ public static class Product{
 
             // return modified object/json
 
-            return Products/* .Where(Product => Product.Public) */;
+            return Products.Select(Product => Product.ResponseObj(DB));
         });
 
         group.MapGet("/{id}", (HttpContext context) => {

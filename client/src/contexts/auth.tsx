@@ -5,23 +5,7 @@ import { createContext, useEffect, useState } from "react";
 
 import { useToast } from "@/components/ui/use-toast";
 
-type JwtType = {
-  token: string;
-  expiryDate: Date;
-};
-
-type UserType = {
-  userID: number;
-  email: string;
-  username: string;
-  createdOn: Date;
-  lastUpdate: Date;
-  profilePicture: string | null;
-  name: string | null;
-  surname: string | null;
-  phoneNumber: string | null;
-  location: string | null;
-};
+import { JwtType, UserType } from "@/lib/types";
 
 export type AuthType = {
   jwt: JwtType;
