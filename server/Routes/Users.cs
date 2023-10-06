@@ -19,7 +19,7 @@ namespace Routes;
 
 public static class User 
 {
-    public static string RouterPrefix = "/authentication";
+    public static string RouterPrefix = "/users";
 
     public static RouteGroupBuilder UserEndpoints(this RouteGroupBuilder group, IConfigurationSection configuration)
     {
@@ -208,6 +208,7 @@ public static class User
             }
         });
 
+        //update user based
         return group;
     }
 
