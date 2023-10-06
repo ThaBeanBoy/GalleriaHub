@@ -9,7 +9,14 @@ import * as Dialog from "@radix-ui/react-dialog";
 import Form from "@/components/Form";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
-import { FormEvent, useContext, useEffect, useRef, useState } from "react";
+import {
+  FormEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { UserContext } from "@/contexts/auth";
 import useProtectPage from "@/lib/protectPage";
 import { ErrorDialog } from "@/components/dialogs";
@@ -17,12 +24,15 @@ import { ErrorDialog } from "@/components/dialogs";
 import { BsPlus } from "react-icons/bs";
 import { ProductType } from "@/lib/types";
 import { EyeIcon, EyeOff } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 export default /* async */ function Products({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { toast } = useToast();
+
   const Auth = useContext(UserContext);
 
   const TitleRef = useRef<HTMLInputElement>(null);
@@ -43,6 +53,15 @@ export default /* async */ function Products({
     try {
       e.preventDefault();
 
+      if (!products) {
+        toast({
+          title: "Products",
+          description: "Still loading products",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const ProductData = new FormData();
       ProductData.append("name", TitleRef.current?.value || "");
       ProductData.append("price", PriceRef.current?.value || "");
@@ -59,9 +78,21 @@ export default /* async */ function Products({
         },
       });
 
-      // toast the product & visit button
+      // Cleaning up dates
+      data.createdOn = new Date(data.createdOn);
+      data.lastUpdate = new Date(data.lastUpdate);
 
-      console.log(data);
+      // Add product to list of products
+      setProducts([...products, data]);
+
+      // toast the product & visit button
+      toast({
+        title: "New Product",
+        description: `${data.productName} has been created`,
+        action: (
+          <Link href={`/dashboard/products/${data.productID}`}>View Now</Link>
+        ),
+      });
     } catch (error: any) {
       console.log(error);
       setsubmissionErrorMessage(error.response.data);
@@ -172,13 +203,9 @@ export default /* async */ function Products({
                       className="hover:text-active block border-r-2 px-4 py-3 text-sm text-black"
                       href={`/dashboard/products/${productID}`}
                     >
-                      <h3 className="font-semibold">{productName}</h3>
+                      <h3 className="mb-1 font-semibold">{productName}</h3>
                       <p className="text-xs">
-                        Last updated on: {lastUpdate.toUTCString()}
-                      </p>
-                      <p className="text-xs">Stock: {stockQuantity}</p>
-                      <p className="text-xs">
-                        Visibility: {Public ? <EyeIcon /> : <EyeOff />}
+                        Last update: {lastUpdate.toUTCString()}
                       </p>
                     </Link>
                   </li>
