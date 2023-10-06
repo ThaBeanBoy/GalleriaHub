@@ -1,3 +1,5 @@
+using System.Reflection.Metadata;
+using Microsoft.AspNetCore.Http.Extensions;
 using Models;
 
 namespace Routes;
@@ -126,10 +128,51 @@ public static class Product{
         });
 
         // Update
-        group.MapPut("/{id}", (HttpContext context) => {
+        group.MapPut("/{id}", (HttpContext context) =>
+        {
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
-            
+            var bodyStream = new StreamReader(Request.Body);
+            try {
+                int? id = Convert.ToInt32(Request.RouteValues["id"].ToString());
+                
+                var product = (from p in DB.Products
+                        where id == p.ProductID
+                        select p).FirstOrDefault();
+
+                if (product != null)
+                {
+                    dynamic keys = bodyStream.ReadToEndAsync();
+                    dynamic items = keys.split();
+                    bool hasChanged = ((items["Name"].ToString() != product.ProductName) || 
+                    (Convert.ToDecimal(items["Price"].ToString()) != product.Price) || 
+                    (Convert.ToInt32(items["Quantity"].ToString()) != product.StockQuantity) || 
+                    (Convert.ToBoolean(items["AccountStatus"].ToString()) != product.Public));
+                    if (hasChanged) {
+                        var prod = new Models.Product
+                        {
+                            ProductName = items["Name"].ToString(),
+                            Price = Convert.ToDecimal(items["Price"].ToString()),
+                            StockQuantity = Convert.ToInt32(items["Quantity"].ToString()),
+                            Public = Convert.ToBoolean(items["AccountStatus"].ToString()),
+                            LastUpdate = DateTime.Now
+                        };
+                        
+                        DB.SaveChanges();
+                        Response.StatusCode = StatusCodes.Status200OK;
+                        Response.WriteAsJsonAsync(prod);
+                    }
+                }
+                else {
+                    Response.StatusCode = StatusCodes.Status404NotFound;
+                    Response.WriteAsync("Invalid ID");
+                }
+            }
+            catch (Exception) {
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                Response.WriteAsync("Something Happened");
+            }
+
             Response.StatusCode = StatusCodes.Status501NotImplemented;
             Response.WriteAsync("Not implmeneted yet");
         });
