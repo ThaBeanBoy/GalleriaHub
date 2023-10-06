@@ -23,6 +23,7 @@ public static class User
 
     public static RouteGroupBuilder UserEndpoints(this RouteGroupBuilder group, IConfigurationSection configuration)
     {
+        // sign up
         group.MapPost("/sign-up", async (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
@@ -106,6 +107,7 @@ public static class User
             }
         });
 
+        // login
         group.MapPost("/login", async (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
@@ -152,6 +154,7 @@ public static class User
 
         });
 
+        // gets user based on jwt token
         group.MapGet("/get-user", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
 
@@ -165,49 +168,39 @@ public static class User
             return Response.WriteAsJsonAsync(User.ResponseObj());
         });
 
+        // get user on id
+        group.MapGet("/{id}", (HttpContext context) => {
+            try{
+                // todo: get the id from the route & convert to a interger using int.Parse()
+                
+                // todo: Getting the Request, Response, DB Context & User (user could be null)
+
+                // todo: get the user from the db context, if not found, return 404 to client
+
+                /*
+                    todo: If the user set to private (not public), request user doesn't own account
+                    todo: return a 40Something response code & error message 
+                */
+
+                // todo: if not public, check if request user is the user, if not, return error to client
+
+                // todo: return user obj to client using the `ResponseObj` method
+            }
+            // todo: Conversion of id could throw an exception, return an appropriate response code & error message
+            // catch()
+            // {
+
+            // }
+            catch(Exception)
+            {
+                // todo: set response code of 500
+                
+                // todo: send message to the client saying something went wrong
+            }
+        });
+
         return group;
     }
-
-
-    // private static object TokenResponse
-    // private static class APIResponse
-    // {
-    //     public static object User(Models.User User)
-    //     {
-    //         return new 
-    //         {
-    //             userID = User.UserID,
-    //             email = User.Email,
-    //             username = User.Username,
-    //             createdOn = User.CreatedOn,
-    //             lastUpdate = User.LastUpdate,
-    //             profilePicture = User.ProfilePictureFileID,
-    //             name = User.Name,
-    //             surname = User.Surname,
-    //             phoneNumber = User.PhoneNumber,
-    //             location = User.Location
-    //         };
-    //     }
-
-    //     public static object JWTToken(JwtSecurityToken Token)
-    //     {
-    //         return new 
-    //         {
-    //             token = JWTService.TokenString(Token),
-    //             expiryDate = Token.ValidTo
-    //         };
-    //     }
-
-    //     public static object Authentication(Models.User User, JwtSecurityToken Token)
-    //     {
-    //         return new {
-    //             JWT = JWTToken(Token),
-    //             User = APIResponse.User(User)
-    //         };
-    //     }
-    // }
-
-    // Exceptions
 
     public class EmailAlreadyRegisteredException : Exception
     {
