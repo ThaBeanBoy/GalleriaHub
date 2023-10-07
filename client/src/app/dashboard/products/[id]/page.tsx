@@ -7,7 +7,8 @@ import { LucideLoader2 } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+// import "react-quill/dist/quill.snow.css";
+import "react-quill/dist/quill.bubble.css";
 
 import Input from "@/components/Input";
 import Button from "@/components/Button";
@@ -64,11 +65,11 @@ export default function ProductEditorPage({
       <Button label="Update" />
       <Input
         label="Product Name"
-        className="focus:border-b-active w-full max-w-none rounded-none border-x-0 border-b-2 border-t-0 bg-white px-0 py-2 text-5xl font-bold outline-none"
+        className="focus:border-b-active mb-4 mt-0 w-full max-w-none rounded-none border-x-0 border-b-2 border-t-0 bg-white px-0 py-2 text-5xl font-bold outline-none"
         type="text"
         defaultValue={product.productName}
       />
-      <div className="flex gap-3">
+      <div className="mb-4 flex gap-3">
         <Input label="price" type="number" defaultValue={product.price} />
         <Input
           label="stock"
@@ -78,9 +79,17 @@ export default function ProductEditorPage({
         <Switch label="Public" className="flex-col text-sm" />
       </div>
 
-      <ReactQuill theme="snow" value={description} onChange={setdescription} />
-
-      <Button label="Delete" desctructive />
+      <label className="mb-4 pl-4 text-xs">Description</label>
+      <ReactQuill
+        theme="bubble"
+        style={{
+          fontSize: 16,
+          minHeight: 500,
+        }}
+        placeholder="Product Description"
+        value={description}
+        onChange={setdescription}
+      />
     </main>
   );
 }

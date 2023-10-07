@@ -132,7 +132,7 @@ export default /* async */ function Products({
 
   return (
     <div className="flex gap-4">
-      <aside className="resize-x">
+      <aside className="sticky top-3 resize-x">
         <div id="top" className="mb-4 flex items-end gap-2">
           <Input placeholder="search" className="w-[250px] flex-1" />
           <Dialog.Root>
@@ -247,7 +247,7 @@ function ProductItem({
   return (
     <Link
       className={cn(
-        "hover:text-active block rounded-xl rounded-r-none border-r-2 px-4 py-3 text-sm text-black",
+        "hover:text-active block rounded-xl rounded-r-none border-r-2 px-4 py-3 text-black",
         { "text-active border-2 border-r-0": active },
       )}
       href={href}
