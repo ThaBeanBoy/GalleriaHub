@@ -132,7 +132,7 @@ export default /* async */ function Products({
 
   return (
     <div className="flex gap-4">
-      <aside>
+      <aside className="resize-x">
         <div id="top" className="mb-4 flex items-end gap-2">
           <Input placeholder="search" />
           <Dialog.Root>

@@ -7,6 +7,8 @@ import { LucideLoader2 } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 
 import Input from "@/components/Input";
+import Button from "@/components/Button";
+import Switch from "@/components/Switch";
 
 export default function ProductEditorPage({
   params,
@@ -30,7 +32,7 @@ export default function ProductEditorPage({
       .then(({ data }) => {
         data.createdOn = new Date(data.createdOn);
         data.lastUpdate = new Date(data.lastUpdate);
-        // setProduct(data);
+        setProduct(data);
       })
       .catch((error: any) => setProduct(error.response.data));
   }, []);
@@ -39,7 +41,7 @@ export default function ProductEditorPage({
     // Return loading screen
     return (
       <main>
-        <LucideLoader2 className="animate-spin" />;
+        <LucideLoader2 className="animate-spin" />
       </main>
     );
   }
@@ -54,12 +56,23 @@ export default function ProductEditorPage({
 
   return (
     <main>
+      <Button label="Update" />
       <Input
         label="Product Name"
-        className="focus:border-b-active rounded-none border-x-0 border-b-2 border-t-0 bg-white px-0 py-2 text-5xl font-bold outline-none"
+        className="focus:border-b-active w-full max-w-none rounded-none border-x-0 border-b-2 border-t-0 bg-white px-0 py-2 text-5xl font-bold outline-none"
         type="text"
         defaultValue={product.productName}
       />
+      <div className="flex gap-3">
+        <Input label="price" type="number" defaultValue={product.price} />
+        <Input
+          label="stock"
+          type="number"
+          defaultValue={product.stockQuantity}
+        />
+        <Switch label="Public" className="flex-col text-sm" />
+      </div>
+      <Button label="Delete" desctructive />
     </main>
   );
 }
