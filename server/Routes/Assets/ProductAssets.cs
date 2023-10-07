@@ -17,7 +17,7 @@ public static class ProductAssets
             Console.WriteLine("Uploading");
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
-            var User = context.Items["User"] as Models.User;
+            var User = context.Items["User"] as User;
 
             try
             {
@@ -29,7 +29,7 @@ public static class ProductAssets
                 }
 
                 int ProductID = int.Parse(context.GetRouteValue("id") as string ?? "error");
-                Models.Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == ProductID);
+                Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == ProductID);
                 
                 if(Product == null)
                 {
@@ -45,26 +45,32 @@ public static class ProductAssets
                 }
 
                  // todo: get the files from the form
-                var Files = context.Request.Form.Files;
+                IFormFileCollection Files = context.Request.Form.Files;
 
                 // todo: check for empty files
-                if(Files.Count == 0)
+                if(Files == null || Files.Count == 0)
                 {
                     Response.StatusCode = StatusCodes.Status406NotAcceptable;
-                    Response.WriteAsync("No files found");
+                    return Response.WriteAsync("No files found");
                 }
 
                 /*
                     todo: upload files to S3,
                     todo: Add the path to the db
                 */
-
+                
                 // todo: return the updated product
                 Response.StatusCode = StatusCodes.Status501NotImplemented;
-                return Response.WriteAsync($"Not implemented, files {Files.Count}");
+                return Response.WriteAsync($"Supposed to upload {Files.Count} files,");
             }
-            catch(Exception)
+            catch(InvalidOperationException ex)
             {
+                Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                return Response.WriteAsync(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
                 return Response.WriteAsync("Something went wrong");
             }
