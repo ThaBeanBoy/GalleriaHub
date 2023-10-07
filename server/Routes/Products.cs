@@ -218,6 +218,36 @@ public static class Product{
             }
         });
 
+        // (create) upload file
+        group.MapPut("/{id}/asset", (HttpContext context) => {
+            // todo: Check if the request user owns the product
+            
+            // todo: get the files from the form
+
+            // todo: check for empty files
+
+            /*
+                todo: upload files to S3,
+                todo: Add the path to the db
+            */
+
+            // todo: return the updated product
+        });
+
+        // (read) get file
+        group.MapGet("/{id}/{asset}", (HttpContext context) => {
+            // check if the product is private or the request user owns the product
+
+            // return the asset
+        });
+
+        // delete files
+        group.MapDelete("/{id}/{asset}", (HttpContext context) => {
+            // Check if the request user owns the product
+
+            // delegte the file
+        });
+
         return group;
     }
 

@@ -85,6 +85,20 @@ app.MapGet("/db-connected", (HttpContext context) => {
     return Results.Ok(DB != null);
 });
 
+app.MapPut("/put-expriment", async (HttpContext context) => {
+    var (Request, Response) = (context.Request, context.Response);
+
+    // var Body = await Request.ReadFromJsonAsync<PutModel>();
+
+    await Response.WriteAsJsonAsync(Request.Form);
+});
+
+app.MapPost("/upload-img", (HttpContext context)=> {
+    var Files = context.Request.Form.Files;
+
+    context.Response.WriteAsync($"Uploaded {Files.Count}");
+});
+
 app.MapGroup(Developers.RouterPrefix)
     .DeveloperRoutes();//.WithMetadata(new EnableCorsAttribute(ClientOrigins));
 
@@ -96,3 +110,10 @@ app.MapGroup(Routes.Product.RouterPrefix)
     .ProductEndpoints();
 
 app.Run();
+
+class PutModel
+{
+    public string? Name { get; set; }
+    public string? Age { get; set; }
+    public IFormFile[]? File {get; set; }
+}
