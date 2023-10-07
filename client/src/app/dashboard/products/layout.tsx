@@ -247,7 +247,7 @@ function ProductItem({
   return (
     <Link
       className={cn(
-        "hover:text-active block rounded-xl rounded-r-none border-r-2 px-4 py-3 text-black",
+        "hover:text-active-light block rounded-xl rounded-r-none border-r-2 px-4 py-3 text-black",
         { "text-active border-2 border-r-0": active },
       )}
       href={href}

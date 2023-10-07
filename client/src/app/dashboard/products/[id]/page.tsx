@@ -5,14 +5,20 @@ import { ProductType } from "@/lib/types";
 import axios from "axios";
 import { LucideLoader2 } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
+import { FiTrash } from "react-icons/fi";
+import { SlOptionsVertical } from "react-icons/sl";
 
 import ReactQuill from "react-quill";
 // import "react-quill/dist/quill.snow.css";
 import "react-quill/dist/quill.bubble.css";
 
+import * as Tabs from "@radix-ui/react-tabs";
+import * as Dropdown from "@radix-ui/react-dropdown-menu";
+
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 import Switch from "@/components/Switch";
+import Tooltip from "@/components/Tooltip";
 
 export default function ProductEditorPage({
   params,
@@ -60,36 +66,76 @@ export default function ProductEditorPage({
     );
   }
 
+  const tabs: {
+    label: string;
+    value: string;
+  }[] = [
+    { label: "information", value: "info" },
+    { label: "assets", value: "assets" },
+  ];
+
   return (
     <main>
-      <Button label="Update" />
-      <Input
-        label="Product Name"
-        className="focus:border-b-active mb-4 mt-0 w-full max-w-none rounded-none border-x-0 border-b-2 border-t-0 bg-white px-0 py-2 text-5xl font-bold outline-none"
-        type="text"
-        defaultValue={product.productName}
-      />
-      <div className="mb-4 flex gap-3">
-        <Input label="price" type="number" defaultValue={product.price} />
-        <Input
-          label="stock"
-          type="number"
-          defaultValue={product.stockQuantity}
-        />
-        <Switch label="Public" className="flex-col text-sm" />
-      </div>
+      <Tabs.Root defaultValue="info">
+        <Tabs.List className="mb-4 flex min-w-[720px] justify-between">
+          <div className="flex">
+            {tabs.map(({ label, value }) => (
+              <Tabs.Trigger value={value} key={`tab-${value}`} asChild>
+                <Button
+                  label={label}
+                  variant="flat"
+                  className="hover:text-active-light data-[state=active]:text-active data-[state=active]:border-b-active border-b text-black"
+                />
+              </Tabs.Trigger>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <Tooltip
+              trigger={<Button icon={<SlOptionsVertical />} variant="flat" />}
+            >
+              Information
+              <Dropdown.Separator className="bg-grey m-[5px] h-[1px]" />
+              <Button
+                label="delete"
+                icon={<FiTrash />}
+                className="px-1 py-2"
+                variant="flat"
+                desctructive
+              />
+            </Tooltip>
 
-      <label className="mb-4 pl-4 text-xs">Description</label>
-      <ReactQuill
-        theme="bubble"
-        style={{
-          fontSize: 16,
-          minHeight: 500,
-        }}
-        placeholder="Product Description"
-        value={description}
-        onChange={setdescription}
-      />
+            <Button label="Update" />
+          </div>
+        </Tabs.List>
+
+        <Tabs.Content value="info">
+          <Input
+            label="Product Name"
+            className="focus:border-b-active mb-4 mt-0 w-full max-w-none rounded-none border-x-0 border-b-2 border-t-0 bg-white px-0 py-2 text-5xl font-bold outline-none"
+            type="text"
+            defaultValue={product.productName}
+          />
+          <div className="mb-4 flex gap-3">
+            <Input label="price" type="number" defaultValue={product.price} />
+            <Input
+              label="stock"
+              type="number"
+              defaultValue={product.stockQuantity}
+            />
+            <Switch label="Public" className="flex-col text-sm" />
+          </div>
+
+          <label className="mb-4 pl-4 text-xs">Description</label>
+          <ReactQuill
+            theme="bubble"
+            placeholder="Product Description"
+            value={description}
+            onChange={setdescription}
+          />
+        </Tabs.Content>
+
+        <Tabs.TabsContent value="assets">Assets management</Tabs.TabsContent>
+      </Tabs.Root>
     </main>
   );
 }

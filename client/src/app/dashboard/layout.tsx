@@ -82,7 +82,7 @@ export default function DashboardLayout({
   return (
     <div className="flex gap-4">
       <aside
-        className={cn("sticky top-0", { "w-[284px] resize-x": navExpanded })}
+        className={cn("sticky top-0", { "w-[195px] resize-x": navExpanded })}
       >
         <Button
           icon={navExpanded ? <FiChevronLeft /> : <FiChevronRight />}
@@ -99,7 +99,7 @@ export default function DashboardLayout({
                 <Link
                   href={href}
                   className={cn(
-                    "hover:text-active flex h-[50px] items-center gap-3 rounded-xl rounded-r-none border-r-2 px-4 py-3 font-medium capitalize text-black",
+                    "hover:text-active-light flex h-[50px] items-center gap-3 rounded-xl rounded-r-none border-r-2 px-4 py-3 font-medium capitalize text-black",
                     { "text-active border-2 border-r-0": active },
                   )}
                 >

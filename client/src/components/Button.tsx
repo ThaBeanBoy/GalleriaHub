@@ -5,7 +5,7 @@ import Link from "next/link";
 export type ButtonProps = {
   label?: string;
   icon?: React.ReactElement;
-  variant?: "fill" | "hollow";
+  variant?: "fill" | "hollow" | "flat";
   desctructive?: boolean;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
@@ -33,7 +33,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
           //desctructive
           "border-red-500 bg-red-500": desctructive,
-          "text-red-500": desctructive && variant === "hollow",
+
+          // flat
+          "text-active border-none bg-white shadow-none": variant === "flat",
+
+          "text-red-500":
+            (desctructive && variant === "hollow") ||
+            (variant === "flat" && desctructive),
         },
         className,
       )}
