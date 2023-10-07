@@ -11,6 +11,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
 using Galleria.Services;
+using server.Routes;
 
 var builder = WebApplication.CreateBuilder(args);
 // builder.Services.AddDbContext<GalleriaHubDBContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("Lite")));
@@ -88,9 +89,9 @@ app.MapGet("/db-connected", (HttpContext context) => {
 app.MapPut("/put-expriment", async (HttpContext context) => {
     var (Request, Response) = (context.Request, context.Response);
 
-    // var Body = await Request.ReadFromJsonAsync<PutModel>();
+    var Body = await Request.ReadFromJsonAsync<PutModel>();
 
-    await Response.WriteAsJsonAsync(Request.Form);
+    // await Response.WriteAsJsonAsync(Request.Form);
 });
 
 app.MapPost("/upload-img", (HttpContext context)=> {
@@ -108,6 +109,9 @@ app.MapGroup(Routes.User.RouterPrefix)
 
 app.MapGroup(Routes.Product.RouterPrefix)
     .ProductEndpoints();
+
+app.MapGroup(AssetsEndpoints.RouterPrefix)
+    .AssetEndpoints();
 
 app.Run();
 

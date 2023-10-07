@@ -148,8 +148,6 @@ public static class Product{
                     return Response.WriteAsync("Coudln't find the product");
                 }
 
-                // Checking accessibility of product || If user owns product, then allow access to product
-                Console.WriteLine($"Public:{Product.Public}\nLogged In: {User == null}\nOwner: {Product.UserID}\nRequester: {User.UserID}");
                 if(!Product.Public && (User == null || Product.UserID != User.UserID)){
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return Response.WriteAsync("Unauthorised to access product");
@@ -162,7 +160,8 @@ public static class Product{
                 Response.StatusCode = StatusCodes.Status406NotAcceptable;
                 return Response.WriteAsync("Product ID format is incorrect");    
             }
-            catch(Exception){
+            catch(Exception ex){
+                Console.WriteLine(ex.Message);
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
                 return Response.WriteAsync("Something went wrong");
             }
@@ -216,36 +215,6 @@ public static class Product{
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
                 await Response.WriteAsync("Something went wrong");
             }
-        });
-
-        // (create) upload file
-        group.MapPut("/{id}/asset", (HttpContext context) => {
-            // todo: Check if the request user owns the product
-            
-            // todo: get the files from the form
-
-            // todo: check for empty files
-
-            /*
-                todo: upload files to S3,
-                todo: Add the path to the db
-            */
-
-            // todo: return the updated product
-        });
-
-        // (read) get file
-        group.MapGet("/{id}/{asset}", (HttpContext context) => {
-            // check if the product is private or the request user owns the product
-
-            // return the asset
-        });
-
-        // delete files
-        group.MapDelete("/{id}/{asset}", (HttpContext context) => {
-            // Check if the request user owns the product
-
-            // delegte the file
         });
 
         return group;
