@@ -6,6 +6,9 @@ import axios from "axios";
 import { LucideLoader2 } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 import Switch from "@/components/Switch";
@@ -20,6 +23,8 @@ export default function ProductEditorPage({
   const [product, setProduct] = useState<ProductType | undefined | string>(
     undefined,
   );
+
+  const [description, setdescription] = useState("");
 
   useEffect(() => {
     axios<ProductType>({
@@ -72,6 +77,9 @@ export default function ProductEditorPage({
         />
         <Switch label="Public" className="flex-col text-sm" />
       </div>
+
+      <ReactQuill theme="snow" value={description} onChange={setdescription} />
+
       <Button label="Delete" desctructive />
     </main>
   );

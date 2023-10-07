@@ -53,7 +53,7 @@ export default function Navigation() {
   ];
   return (
     <>
-      <div id="header-container" className="sticky top-0 z-50 bg-white">
+      <div id="header-container" className="z-50 bg-white">
         <header className="max-width flex items-center justify-between border-b py-5">
           <Link href="/">
             <p>logo</p>

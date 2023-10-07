@@ -134,7 +134,7 @@ export default /* async */ function Products({
     <div className="flex gap-4">
       <aside className="resize-x">
         <div id="top" className="mb-4 flex items-end gap-2">
-          <Input placeholder="search" />
+          <Input placeholder="search" className="w-[250px] flex-1" />
           <Dialog.Root>
             <Dialog.Trigger asChild>
               <Button icon={<BsPlus />} />
@@ -248,7 +248,7 @@ function ProductItem({
     <Link
       className={cn(
         "hover:text-active block rounded-xl rounded-r-none border-r-2 px-4 py-3 text-sm text-black",
-        { " text-active border-2 border-r-0": active },
+        { "text-active border-2 border-r-0": active },
       )}
       href={href}
     >
