@@ -26,7 +26,9 @@ import { ErrorDialog } from "@/components/dialogs";
 
 import { BsPlus } from "react-icons/bs";
 import { ProductType } from "@/lib/types";
-import { EyeIcon, EyeOff } from "lucide-react";
+import { EyeIcon, EyeOff, LucideLoader2 } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export default /* async */ function Products({
   children,
@@ -131,7 +133,7 @@ export default /* async */ function Products({
   return (
     <div className="flex gap-4">
       <aside>
-        <div id="top" className="flex items-end gap-2">
+        <div id="top" className="mb-4 flex items-end gap-2">
           <Input placeholder="search" />
           <Dialog.Root>
             <Dialog.Trigger asChild>
@@ -194,13 +196,18 @@ export default /* async */ function Products({
 
         {/* User products */}
         <ul>
-          {products
-            ? products.map((product, key) => (
-                <li key={key}>
-                  <ProductItem {...product} />
-                </li>
-              ))
-            : "Loading your products"}
+          {products ? (
+            products.map((product, key) => (
+              <li key={key}>
+                <ProductItem {...product} />
+              </li>
+            ))
+          ) : (
+            <p className="flex items-center gap-2">
+              <LucideLoader2 className="animate-spin" />
+              <span>Loading</span>
+            </p>
+          )}
         </ul>
       </aside>
 
@@ -215,8 +222,11 @@ function ProductItem({
   lastUpdate,
   createdOn,
 }: ProductType) {
+  const href = `/dashboard/products/${productID}`;
+  const active = href === usePathname();
+
   const dateLabel =
-    lastUpdate.getTime() === createdOn.getTime() ? "Created on" : "Last update";
+    lastUpdate.getTime() === createdOn.getTime() ? "Created" : "Last updated";
 
   const [dateDisplayed, setdateDisplayed] = useState(
     formatDistance(lastUpdate, new Date(), {
@@ -236,12 +246,15 @@ function ProductItem({
 
   return (
     <Link
-      className="hover:text-active block border-r-2 px-4 py-3 text-sm text-black"
-      href={`/dashboard/products/${productID}`}
+      className={cn(
+        "hover:text-active block rounded-xl rounded-r-none border-r-2 px-4 py-3 text-sm text-black",
+        { " text-active border-2 border-r-0": active },
+      )}
+      href={href}
     >
       <h3 className="mb-1 font-semibold">{productName}</h3>
       <p className="text-xs">
-        {dateLabel} : {dateDisplayed}
+        {dateLabel} {dateDisplayed}
       </p>
     </Link>
   );

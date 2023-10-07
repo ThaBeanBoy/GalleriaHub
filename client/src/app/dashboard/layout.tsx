@@ -91,7 +91,7 @@ export default function DashboardLayout({
 
         <ul>
           {Navigation.map(({ title, href, icon }, key) => {
-            const active = currentPath == href;
+            const active = currentPath?.startsWith(href);
             return (
               <li key={key} className="">
                 <Link
