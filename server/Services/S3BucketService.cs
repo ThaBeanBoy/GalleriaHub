@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace server.Services;
+namespace Galleria.Services;
 
 public class S3BucketService
 {
