@@ -9,11 +9,12 @@ namespace server.Routes.Assets;
 public static class ProductAssets
 {
     public static string RouterPrefix = "/products";
-    
+
     public static RouteGroupBuilder ProductAssetEndpoints(this RouteGroupBuilder group)
     {
         // (create) upload file
-        group.MapPost("/{id}", (HttpContext context) => {
+        group.MapPost("/{id}", (HttpContext context) =>
+        {
             Console.WriteLine("Uploading");
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
@@ -22,7 +23,7 @@ public static class ProductAssets
             try
             {
                 // Check if user is logged in
-                if(User == null)
+                if (User == null)
                 {
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return Response.WriteAsync("Not logged in");
@@ -30,25 +31,25 @@ public static class ProductAssets
 
                 int ProductID = int.Parse(context.GetRouteValue("id") as string ?? "error");
                 Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == ProductID);
-                
-                if(Product == null)
+
+                if (Product == null)
                 {
                     Response.StatusCode = StatusCodes.Status404NotFound;
                     return Response.WriteAsync("Product not found");
                 }
 
                 // todo: Check if the request user owns the product
-                if(Product.UserID != User.UserID)
+                if (Product.UserID != User.UserID)
                 {
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return Response.WriteAsync($"User {User.UserID} doesn't own the product");
                 }
 
-                 // todo: get the files from the form
+                // todo: get the files from the form
                 IFormFileCollection Files = context.Request.Form.Files;
 
                 // todo: check for empty files
-                if(Files == null || Files.Count == 0)
+                if (Files == null || Files.Count == 0)
                 {
                     Response.StatusCode = StatusCodes.Status406NotAcceptable;
                     return Response.WriteAsync("No files found");
@@ -58,17 +59,17 @@ public static class ProductAssets
                     todo: upload files to S3,
                     todo: Add the path to the db
                 */
-                
+
                 // todo: return the updated product
                 Response.StatusCode = StatusCodes.Status501NotImplemented;
                 return Response.WriteAsync($"Supposed to upload {Files.Count} files,");
             }
-            catch(InvalidOperationException ex)
+            catch (InvalidOperationException ex)
             {
                 Response.StatusCode = StatusCodes.Status406NotAcceptable;
                 return Response.WriteAsync(ex.Message);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
@@ -77,19 +78,21 @@ public static class ProductAssets
         });
 
         // (read) get file
-        group.MapGet("/{id}/assets/{asset}", (HttpContext context) => {
+        group.MapGet("/{id}/assets/{asset}", (HttpContext context) =>
+        {
             // check if the product is private or the request user owns the product
 
             // return the asset
         });
 
         // delete files
-        group.MapDelete("/{id}/assets/{asset}", (HttpContext context) => {
+        group.MapDelete("/{id}/assets/{asset}", (HttpContext context) =>
+        {
             // Check if the request user owns the product
 
             // delegte the file
         });
-        
+
         return group;
     }
 }
