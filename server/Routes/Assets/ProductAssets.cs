@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Amazon.S3;
+using Galleria.Services;
 using Models;
 
 namespace server.Routes.Assets;
@@ -18,6 +20,8 @@ public static class ProductAssets
             Console.WriteLine("Uploading");
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+            var S3 = context.RequestServices.GetRequiredService<S3BucketService>();
+
             var User = context.Items["User"] as User;
 
             try
@@ -59,6 +63,7 @@ public static class ProductAssets
                     todo: upload files to S3,
                     todo: Add the path to the db
                 */
+                S3.upload();
 
                 // todo: return the updated product
                 Response.StatusCode = StatusCodes.Status501NotImplemented;
@@ -67,6 +72,11 @@ public static class ProductAssets
             catch (InvalidOperationException ex)
             {
                 Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                return Response.WriteAsync(ex.Message);
+            }
+            catch (AmazonS3Exception ex)
+            {
+                Console.WriteLine(ex);
                 return Response.WriteAsync(ex.Message);
             }
             catch (Exception ex)
