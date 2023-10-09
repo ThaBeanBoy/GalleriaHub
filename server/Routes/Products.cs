@@ -4,21 +4,26 @@ using static server.Routes.APIResponse;
 
 namespace Routes;
 
-public static class Product{
+public static class Product
+{
 
     public static string RouterPrefix = "/products";
 
-    public static RouteGroupBuilder ProductEndpoints(this RouteGroupBuilder group){
+    public static RouteGroupBuilder ProductEndpoints(this RouteGroupBuilder group)
+    {
         // Create
-        group.MapPost("/new-product", (HttpContext context) => {
+        group.MapPost("/new-product", (HttpContext context) =>
+        {
             var (Request, Response) = (context.Request, context.Response);
-            
+
             Console.WriteLine("Making new product");
-            
-            try{
+
+            try
+            {
                 Models.User? User = context.Items["User"] as Models.User;
 
-                if(User == null){
+                if (User == null)
+                {
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return Response.WriteAsync("Only logged in users can make products");
                 }
@@ -27,7 +32,8 @@ public static class Product{
 
                 string? ProductName = Convert.ToString(Request.Form["name"]).Trim();
 
-                if(string.IsNullOrEmpty(ProductName)){
+                if (string.IsNullOrEmpty(ProductName))
+                {
                     Response.StatusCode = StatusCodes.Status406NotAcceptable;
                     return Response.WriteAsync("You need to provide a name");
                 }
@@ -37,28 +43,30 @@ public static class Product{
                 try
                 {
                     ProductPrice = Convert.ToDouble(Convert.ToString(Request.Form["price"]).Trim() ?? "0");
-                } 
-                catch(FormatException ex)
+                }
+                catch (FormatException ex)
                 {
                     Response.StatusCode = StatusCodes.Status406NotAcceptable;
                     return Response.WriteAsync(ex.Message);
                 }
-                catch(Exception){/* Do nothing */}
+                catch (Exception) {/* Do nothing */}
 
                 // Checking for stock input
                 int ProductStock = 0;
-                try{
+                try
+                {
                     ProductStock = Convert.ToInt32(Convert.ToString(Request.Form["stock"]).Trim() ?? "0");
                 }
-                catch(FormatException ex)
+                catch (FormatException ex)
                 {
                     Response.StatusCode = StatusCodes.Status406NotAcceptable;
                     return Response.WriteAsync(ex.Message);
                 }
-                catch(Exception) {/* Do nothing */}
+                catch (Exception) {/* Do nothing */}
 
-                Models.Product NewProduct = new Models.Product{
-                    UserID = User.UserID, 
+                Models.Product NewProduct = new Models.Product
+                {
+                    UserID = User.UserID,
                     ProductName = ProductName,
                     Price = new decimal(ProductPrice),
                     StockQuantity = ProductStock,
@@ -71,23 +79,26 @@ public static class Product{
                 DB.SaveChanges();
 
                 Response.StatusCode = StatusCodes.Status201Created;
-                return Response.WriteAsJsonAsync(NewProduct);
-            }catch(Exception e){
+                return Response.WriteAsJsonAsync(NewProduct.ResponseObj(context));
+            }
+            catch (Exception e)
+            {
                 Console.WriteLine(e.Message);
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
                 return Response.WriteAsync("Something went wrong with the server");
             }
         });
-        
+
         // Retrieve
-        group.MapGet("/", (HttpContext context)=>{
+        group.MapGet("/", (HttpContext context) =>
+        {
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
             var user = context.Items["User"] as Models.User;
 
             //Validating the user
             int UserID;
-            if(user != null)
+            if (user != null)
             {
                 UserID = user.UserID;
             }
@@ -101,25 +112,25 @@ public static class Product{
 
             // Filter based on (public || Request User own's product), user id, min price & max price
             Console.WriteLine(UserID);
-            List<Models.Product> Products = 
+            List<Models.Product> Products =
                 DB.Products
                 .Where(Product => Product.Public || (Product.UserID == UserID))
                 .ToList();
 
             //Filter based on user id param
-            if(Filters.UserID != null)
+            if (Filters.UserID != null)
             {
                 Products = Products.Where(P => P.UserID == Filters.UserID).ToList();
             }
 
             //Filtering based on min price
-            if(Filters.MinPrice != null)
+            if (Filters.MinPrice != null)
             {
                 Products = Products.Where(P => Convert.ToDouble(P.Price) >= Filters.MinPrice).ToList();
             }
 
             //Filtering based on max price
-            if(Filters.MaxPrice != null)
+            if (Filters.MaxPrice != null)
             {
                 Products = Products.Where(P => Convert.ToDouble(P.Price) <= Filters.MaxPrice).ToList();
             }
@@ -127,40 +138,46 @@ public static class Product{
 
             // return modified object/json
 
-            return Products.Select(Product => Product.ResponseObj(DB));
+            return Products.Select(Product => Product.ResponseObj(context));
         });
 
         //Getting a specific product
-        group.MapGet("/{id}", (HttpContext context) => {
+        group.MapGet("/{id}", (HttpContext context) =>
+        {
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
             var User = context.Items["User"] as Models.User;
 
-            try{
-                
+            try
+            {
+
                 int ProductID = int.Parse(context.GetRouteValue("id") as string ?? "error");
 
                 Models.Product? Product = DB.Products.FirstOrDefault(P => P.ProductID == ProductID);
 
                 // Checking if product exists
-                if(Product == null){
+                if (Product == null)
+                {
                     Response.StatusCode = StatusCodes.Status404NotFound;
                     return Response.WriteAsync("Coudln't find the product");
                 }
 
-                if(!Product.Public && (User == null || Product.UserID != User.UserID)){
+                if (!Product.Public && (User == null || Product.UserID != User.UserID))
+                {
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return Response.WriteAsync("Unauthorised to access product");
                 }
 
                 Response.StatusCode = StatusCodes.Status200OK;
-                return Response.WriteAsJsonAsync(Product);
+                return Response.WriteAsJsonAsync(Product.ResponseObj(context));
             }
-            catch(FormatException){
+            catch (FormatException)
+            {
                 Response.StatusCode = StatusCodes.Status406NotAcceptable;
-                return Response.WriteAsync("Product ID format is incorrect");    
+                return Response.WriteAsync("Product ID format is incorrect");
             }
-            catch(Exception ex){
+            catch (Exception ex)
+            {
                 Console.WriteLine(ex.Message);
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
                 return Response.WriteAsync("Something went wrong");
@@ -168,34 +185,39 @@ public static class Product{
         });
 
         // Update
-        group.MapPut("/{id}", (HttpContext context) => {
+        group.MapPut("/{id}", (HttpContext context) =>
+        {
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
-            
+
             Response.StatusCode = StatusCodes.Status501NotImplemented;
             Response.WriteAsync("Not implmeneted yet");
         });
 
         //Delete
-        group.MapDelete("/{id}", async (HttpContext context) => {
+        group.MapDelete("/{id}", async (HttpContext context) =>
+        {
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
             var User = context.Items["User"] as Models.User;
 
-            try {
+            try
+            {
                 int ProductID = int.Parse(context.GetRouteValue("id") as string ?? "error");
 
                 Models.Product? Product = DB.Products.FirstOrDefault(P => P.ProductID == ProductID);
 
                 // Checking if product exists
-                if (Product == null) {
+                if (Product == null)
+                {
                     Response.StatusCode = StatusCodes.Status404NotFound;
                     await Response.WriteAsync("Couldn't find the product");
                     return;
                 }
 
                 // Checking accessibility of product and ownership
-                if (User == null || Product.UserID != User.UserID) {
+                if (User == null || Product.UserID != User.UserID)
+                {
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
                     await Response.WriteAsync("Unauthorized to delete the product");
                     return;
@@ -207,11 +229,13 @@ public static class Product{
 
                 Response.StatusCode = StatusCodes.Status200OK;
             }
-            catch (FormatException) {
+            catch (FormatException)
+            {
                 Response.StatusCode = StatusCodes.Status406NotAcceptable;
                 await Response.WriteAsync("Product ID format is incorrect");
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
                 await Response.WriteAsync("Something went wrong");
             }
@@ -220,7 +244,8 @@ public static class Product{
         return group;
     }
 
-    private class FilterProps {
+    private class FilterProps
+    {
         public bool Verified { get; }
 
         public int? Skip { get; }
@@ -229,59 +254,74 @@ public static class Product{
         public double? MinPrice { get; }
         public double? MaxPrice { get; }
 
-        public FilterProps(IQueryCollection Queries){
+        public FilterProps(IQueryCollection Queries)
+        {
             // Checking out verified query
-            try{
+            try
+            {
                 Verified = Convert.ToBoolean(Queries["verified"]);
             }
-            catch(Exception) {
+            catch (Exception)
+            {
                 Verified = false;
             }
 
             //Skip
-            try{
+            try
+            {
                 Skip = Convert.ToInt32(Queries["skip"]);
             }
-            catch(Exception) {
+            catch (Exception)
+            {
                 Skip = null;
             }
 
             //Take
-            try{
+            try
+            {
                 Take = Convert.ToInt32(Queries["take"]);
             }
-            catch(Exception) {
+            catch (Exception)
+            {
                 Take = null;
             }
 
             // Checking ArtistID
-            try{
+            try
+            {
                 UserID = int.Parse(Queries["userid"]);
             }
-            catch(Exception){
+            catch (Exception)
+            {
                 UserID = null;
             }
 
             // Checking the min price
-            try{
+            try
+            {
                 MinPrice = double.Parse(Queries["min_price"]);
             }
-            catch(Exception){
+            catch (Exception)
+            {
                 MinPrice = null;
             }
 
             // Checking the max price
-            try{
+            try
+            {
                 MaxPrice = double.Parse(Queries["max_price"]);
             }
-            catch(Exception){
+            catch (Exception)
+            {
                 MaxPrice = null;
             }
 
         }
-    
-        public static bool Filter(Object? FilterProp, Object FilterValue){
-            if(FilterProp != null){
+
+        public static bool Filter(Object? FilterProp, Object FilterValue)
+        {
+            if (FilterProp != null)
+            {
                 return FilterProp == FilterValue;
             }
 

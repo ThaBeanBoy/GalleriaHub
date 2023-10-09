@@ -477,4 +477,4 @@ $RECYCLE.BIN/
 *.lnk
 
 # ignoring the static folder
-static/
+static/*

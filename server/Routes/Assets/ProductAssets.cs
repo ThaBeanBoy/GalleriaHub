@@ -6,6 +6,8 @@ using Amazon.S3;
 using Galleria.Services;
 using Models;
 
+using static server.Routes.APIResponse;
+
 namespace server.Routes.Assets;
 
 public static class ProductAssets
@@ -69,14 +71,23 @@ public static class ProductAssets
                 // uploading files
                 foreach (IFormFile File in Files)
                 {
-                    await S3.Upload(env, File);
+                    var file = await S3.Upload(env, File);
+
+                    // Adding to file table
+                    ProductFile NewFile = new ProductFile
+                    {
+                        Product = Product,
+                        FileKey = file.Name
+                    };
+
+                    // Adding the file to the database
+                    DB.ProductFiles.Add(NewFile);
+
+                    DB.SaveChanges();
                 }
 
-                // Save the files in the static folder
-
                 // todo: return the updated product
-                Response.StatusCode = StatusCodes.Status501NotImplemented;
-                await Response.WriteAsync($"Supposed to upload {Files.Count} files,");
+                await Response.WriteAsJsonAsync(Product.ResponseObj(context));
                 return;
             }
             catch (InvalidOperationException ex)

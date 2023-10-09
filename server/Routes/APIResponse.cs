@@ -47,22 +47,45 @@ public static class APIResponse
     }
 
     // Product response
-    public static object ResponseObj(this Product Product, GalleriaHubDBContext DB)
+    public static object ResponseObj(this Product Product, HttpContext context)
     {
-        // Getting the user
-        User ProductOwner = DB.Users.FirstOrDefault(User => Product.UserID == User.UserID);
-        ProductFile Description = DB.ProductFiles.FirstOrDefault(PD => PD.FileID == Product.FileID);
+        var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+        var Request = context.Request;
 
-        return new {
+        User? User = context.Items["User"] as User;
+
+        // Getting the user
+        User? ProductOwner = DB.Users.FirstOrDefault(User => Product.UserID == User.UserID);
+        // ProductFile Description = DB.ProductFiles.FirstOrDefault(PD => PD.FileID == Product.FileID);
+
+        var Images = DB
+            .ProductFiles
+            .Where(PF => PF.ProductID == Product.ProductID)
+
+            // Filtering privacy based on publicity or owner
+            .Where(PF => PF.Public || (User != null && Product.UserID == User.UserID))
+
+            // Transforming into useable endpoints
+            .Select(PF => $"{Request.Scheme}://{Request.Host}/assets/products/{Product.ProductID}/{PF.FileKey}");
+
+        return new
+        {
             productID = Product.ProductID,
             productName = Product.ProductName,
             price = Product.Price,
             stockQuantity = Product.StockQuantity,
-            Public = Product.Public,
+            Product.Public,
             createdOn = Product.CreatedOn,
             lastUpdate = Product.LastUpdate,
-            Description = Description,
-            seller = ProductOwner.ResponseObj()
+            // Description = Description,
+            seller = ProductOwner.ResponseObj(),
+            Images,
         };
+    }
+
+    // Product File
+    public static string ResponseObj(this ProductFile File)
+    {
+        return $"/assets/products/{File.FileKey}";
     }
 }

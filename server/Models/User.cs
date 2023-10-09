@@ -10,34 +10,34 @@ namespace Models;
 https://weblogs.asp.net/manavi/inheritance-mapping-strategies-with-entity-framework-code-first-ctp5-part-1-table-per-hierarchy-tph
 */
 
-public class User : IDateTime 
+public class User : IDateTime
 {
-    public int UserID {get; set;}
+    public int UserID { get; set; }
 
-    public string Email {get; set;} = null!;
+    public string Email { get; set; } = null!;
 
     [JsonIgnore]
-    public string Password {get; set;} = null!;
+    public string Password { get; set; } = null!;
 
     public bool Public { get; set; }
 
     // Can be null
     [RegularExpression("^[a-z0-9.]$", ErrorMessage = "Only the letters (a-z), numbers (0-9) and dots (.), are allowed")]
-    public string? Username {get; set;} = null!;
+    public string? Username { get; set; } = null!;
 
     // Can be null
-    public string? Name {get; set;}
+    public string? Name { get; set; }
     public string? Surname { get; set; }
     public string? PhoneNumber { get; set; }
 
-    public DateTime CreatedOn {get; set;}
+    public DateTime CreatedOn { get; set; }
 
     public DateTime LastUpdate { get; set; }
-    
-    public int DescriptionFileID {get; set;}
+
+    public int DescriptionFileID { get; set; }
 
     // Can be null
-    public string? Location {get; set;} = null!;
+    public string? Location { get; set; } = null!;
 
     // Foreign Keys
     public int ListID { get; set; }
@@ -93,9 +93,9 @@ public class UserList
     public int UserID { get; set; }
     public User User { get; set; } = null!;
     public string ListName { get; set; } = null!;
-    
-    public int FileID { get; set; }
-    public File File { get; set; } = null!;
+
+    // public int FileID { get; set; }
+    // public File File { get; set; } = null!;
 
     public int ListID { get; set; }
     public List List { get; set; } = null!;

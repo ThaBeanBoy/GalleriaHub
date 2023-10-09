@@ -3,12 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Models;
 
-public class Gallery 
+public class Gallery
 {
-    public int GalleryID {get; set;}
+    public int GalleryID { get; set; }
 
     [Required]
-    public string Location {get; set;} = null!;
+    public string Location { get; set; } = null!;
 
     public string Description { get; set; } = null!;
 
@@ -22,7 +22,7 @@ public class Gallery
     {
         throw new NotImplementedException();
     }
-    
+
     public GalleryFile[] GetFiles(DbSet<GalleryFile> GalleryFileSet)
     {
         throw new NotImplementedException();
@@ -34,13 +34,13 @@ public class Gallery
     }
 }
 
-[PrimaryKey(nameof(GalleryID), nameof(FileID))]
+[PrimaryKey(nameof(GalleryID))]
 public class GalleryFile
 {
     public int GalleryID { get; set; }
     public Gallery Gallery { get; set; } = null!;
 
-    public File File { get; set; } = null!;
-    public int FileID { get; set; }
+    // public File File { get; set; } = null!;
+    // public int FileID { get; set; }
     public bool Public { get; set; }
 }
