@@ -128,7 +128,7 @@ export default /* async */ function Products({
         setProducts(data);
       })
       .catch((error) => console.log(error));
-  }, []);
+  }, [Auth?.auth?.jwt.token, Auth?.auth?.user.userID]);
 
   return (
     <div className="flex gap-4">
