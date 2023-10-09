@@ -1,3 +1,4 @@
+using Galleria.Services;
 using Models;
 
 using static server.Routes.APIResponse;
@@ -195,11 +196,12 @@ public static class Product
         });
 
         //Delete
-        group.MapDelete("/{id}", async (HttpContext context) =>
+        group.MapDelete("/{id}", async (HttpContext context, IWebHostEnvironment env) =>
         {
             Console.WriteLine("running delete");
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+            var S3 = context.RequestServices.GetRequiredService<S3BucketService>();
             var User = context.Items["User"] as Models.User;
 
             try
@@ -224,8 +226,23 @@ public static class Product
                     return;
                 }
 
+                // Deleting product files
+                DB.ProductFiles
+                    .Where(PF => PF.ProductID == Product.ProductID)
+                    .ToList()
+                    .ForEach(PF =>
+                    {
+                        // Deleting from the DB
+                        DB.ProductFiles.Remove(PF);
+
+                        // Delete from S3 & static folder
+                        S3.Delete(env, PF.FileKey);
+                    });
+
                 // Perform the deletion
                 DB.Products.Remove(Product);
+
+                // Saving DB Changes
                 await DB.SaveChangesAsync();
 
                 Response.StatusCode = StatusCodes.Status200OK;
