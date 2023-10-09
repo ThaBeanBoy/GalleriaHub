@@ -63,7 +63,8 @@ public static class APIResponse
             .Where(PF => PF.ProductID == Product.ProductID)
 
             // Filtering privacy based on publicity or owner
-            .Where(PF => PF.Public || (User != null && Product.UserID == User.UserID))
+            // No time to implement
+            // .Where(PF => PF.Public || (User != null && Product.UserID == User.UserID))
 
             // Transforming into useable endpoints
             .Select(PF => $"{Request.Scheme}://{Request.Host}/assets/products/{Product.ProductID}/{PF.FileKey}");

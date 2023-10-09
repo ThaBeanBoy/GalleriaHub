@@ -26,4 +26,5 @@ export type ProductType = {
   lastUpdate: Date;
   Description: string;
   seller: UserType;
+  images: string[];
 };

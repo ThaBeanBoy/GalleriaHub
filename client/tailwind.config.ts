@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  mode: 'jit',
+  mode: "jit",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -24,7 +24,7 @@ const config: Config = {
       },
 
       colors: {
-        white: "#FFFAF5",
+        white: "#ffffff",
         black: {
           DEFAULT: "#475569",
           x2: "#27313F",
@@ -106,7 +106,7 @@ const config: Config = {
   plugins: [
     require("@tailwindcss/typography"),
     require("tailwindcss-animate"),
-    require('@kamona/tailwindcss-perspective'),
+    require("@kamona/tailwindcss-perspective"),
   ],
 };
 export default config;

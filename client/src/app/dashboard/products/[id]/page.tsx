@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { UserContext } from "@/contexts/auth";
 import { ProductType } from "@/lib/types";
 import axios from "axios";
@@ -7,6 +9,7 @@ import { LucideLoader2 } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { FiTrash } from "react-icons/fi";
 import { SlOptionsVertical } from "react-icons/sl";
+import { BsCloudUpload } from "react-icons/bs";
 
 import ReactQuill from "react-quill";
 // import "react-quill/dist/quill.snow.css";
@@ -19,6 +22,7 @@ import Input from "@/components/Input";
 import Button from "@/components/Button";
 import Switch from "@/components/Switch";
 import Tooltip from "@/components/Tooltip";
+import openFilePicker from "@/lib/filePicker";
 
 export default function ProductEditorPage({
   params,
@@ -42,6 +46,7 @@ export default function ProductEditorPage({
       },
     })
       .then(({ data }) => {
+        console.log(data);
         data.createdOn = new Date(data.createdOn);
         data.lastUpdate = new Date(data.lastUpdate);
         setProduct(data);
@@ -134,7 +139,29 @@ export default function ProductEditorPage({
           />
         </Tabs.Content>
 
-        <Tabs.TabsContent value="assets">Assets management</Tabs.TabsContent>
+        <Tabs.TabsContent value="assets">
+          <Button
+            label="Upload Asset"
+            icon={<BsCloudUpload />}
+            onClick={async () => {
+              const files = await openFilePicker();
+              console.log(files);
+            }}
+          />
+
+          <h5 className="tesxt-base font-semibold">Unuploaded Assets</h5>
+          <h5 className="tesxt-base font-semibold">Assets</h5>
+
+          {product.images.map((path, key) => (
+            <img
+              key={`product-image-${key}`}
+              src={path}
+              alt={`product-image-${key}`}
+              width={500}
+              height={500}
+            />
+          ))}
+        </Tabs.TabsContent>
       </Tabs.Root>
     </main>
   );
