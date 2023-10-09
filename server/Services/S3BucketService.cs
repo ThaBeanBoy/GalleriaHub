@@ -91,7 +91,7 @@ public class S3BucketService
         });
 
         // Delete from local static file
-        File.Delete($"{env.ContentRootPath}/static/{key}");
+        File.Delete(Path.Combine(env.ContentRootPath, "static", key));
     }
 
     private static string GenerateRandomKey(int length)

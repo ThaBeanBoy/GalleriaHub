@@ -197,6 +197,7 @@ public static class Product
         //Delete
         group.MapDelete("/{id}", async (HttpContext context) =>
         {
+            Console.WriteLine("running delete");
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
             var User = context.Items["User"] as Models.User;

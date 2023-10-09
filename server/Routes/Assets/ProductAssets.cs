@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Amazon.S3;
 using Galleria.Services;
+using Microsoft.EntityFrameworkCore;
 using Models;
 
 using static server.Routes.APIResponse;
@@ -140,21 +141,67 @@ public static class ProductAssets
         group.MapDelete("/{id}/{asset}", (HttpContext context, IWebHostEnvironment env) =>
         {
             // Check if the request user owns the product
-
             var (Request, Response) = (context.Request, context.Response);
+            var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
             var S3 = context.RequestServices.GetRequiredService<S3BucketService>();
+            var User = context.Items["User"] as User;
 
-            string? key = context.GetRouteValue("asset") as string;
-
-            if (key == null)
+            try
             {
-                Response.StatusCode = StatusCodes.Status400BadRequest;
-                return Response.WriteAsync("need a file name");
+                int ProductID = int.Parse(context.GetRouteValue("id") as string ?? "error");
+
+                string? key = context.GetRouteValue("asset") as string;
+
+                if (User == null)
+                {
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    Response.WriteAsync("Need to be logged in to delete asset");
+                }
+
+                if (key == null)
+                {
+                    Response.StatusCode = StatusCodes.Status400BadRequest;
+                    return Response.WriteAsync("need a file name");
+                }
+
+                Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == ProductID);
+
+                if (Product == null)
+                {
+                    Response.StatusCode = StatusCodes.Status404NotFound;
+                    return Response.WriteAsync("Product not found");
+                }
+
+                if (Product.UserID != User.UserID)
+                {
+                    Response.StatusCode = StatusCodes.Status403Forbidden;
+                    Response.WriteAsync("Only owners of the product can delete the asset.");
+                }
+
+                // Deleting the actual file
+                S3.Delete(env, key);
+
+                // Deleting from the DB
+                DB.ProductFiles.Remove(DB.ProductFiles.FirstOrDefault(PF => PF.FileKey == key));
+                DB.SaveChanges();
+
+                return Response.WriteAsJsonAsync(Product.ResponseObj(context));
+            }
+            catch (FormatException)
+            {
+                Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                return Response.WriteAsync("Product ID no identified");
+            }
+            catch (AmazonS3Exception ex)
+            {
+                return Response.WriteAsync(ex.Message);
+            }
+            catch (Exception)
+            {
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                return Response.WriteAsync("Something went wrong");
             }
 
-            S3.Delete(env, key);
-
-            return Response.WriteAsync("Deleted");
         });
 
         return group;
