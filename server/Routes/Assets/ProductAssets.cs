@@ -65,6 +65,8 @@ public static class ProductAssets
                 */
                 S3.upload();
 
+                // Save the files in the static folder
+
                 // todo: return the updated product
                 Response.StatusCode = StatusCodes.Status501NotImplemented;
                 return Response.WriteAsync($"Supposed to upload {Files.Count} files,");
@@ -84,6 +86,33 @@ public static class ProductAssets
                 Console.WriteLine(ex);
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
                 return Response.WriteAsync("Something went wrong");
+            }
+        });
+
+        group.MapGet("/{file-name}", (HttpContext context, IWebHostEnvironment env) =>
+        {
+            var (Request, Response) = (context.Request, context.Response);
+            var S3 = context.RequestServices.GetRequiredService<S3BucketService>();
+
+            try
+            {
+                string? key = context.GetRouteValue("file-name") as string;
+
+                // Checking for nulls
+                if (key == null)
+                {
+                    Response.StatusCode = StatusCodes.Status400BadRequest;
+                    return Response.WriteAsync("Need a file name");
+                }
+
+                Response.StatusCode = StatusCodes.Status501NotImplemented;
+                return Response.SendFileAsync(S3.download(env, key));
+                // return Response.WriteAsync("Still implement");
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                return Response.WriteAsync(env.IsDevelopment() ? ex.Message : "Something went wrong");
             }
         });
 

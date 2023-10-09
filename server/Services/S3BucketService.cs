@@ -7,6 +7,7 @@ using Amazon;
 using Amazon.S3;
 using Amazon.S3.Transfer;
 using Amazon.S3.Model;
+using Microsoft.Extensions.FileProviders;
 
 namespace Galleria.Services;
 
@@ -16,6 +17,7 @@ public class S3BucketService
     private readonly string secretKey;
     private readonly string bucketName;
     private RegionEndpoint BucketRegion = RegionEndpoint.USEast1;
+    private TransferUtility Transfer;
 
     private AmazonS3Client S3Client;
     public S3BucketService(IConfigurationSection JwtSettings)
@@ -25,6 +27,8 @@ public class S3BucketService
         bucketName = "galleria-storage";// JwtSettings["AWS-S3-Bucket"];
 
         S3Client = new AmazonS3Client(accessKey, secretKey, BucketRegion);
+
+        Transfer = new TransferUtility(S3Client);
     }
 
 
@@ -47,6 +51,25 @@ public class S3BucketService
     }
 
     // download
+    public IFileInfo download(IWebHostEnvironment env, string key)
+    {
+        var ContentRootFileProvider = env.ContentRootFileProvider;
+        string filePath = $"static/{key}";
+
+        if (!ContentRootFileProvider.GetFileInfo(filePath).Exists)
+        {
+            Console.WriteLine("Donwloading");
+            // get from S3 bucket
+            Transfer.Download(new TransferUtilityDownloadRequest
+            {
+                BucketName = bucketName,
+                Key = key,
+                FilePath = $"{env.ContentRootPath}/static/{key}"
+            });
+        }
+
+        return env.ContentRootFileProvider.GetFileInfo($"static/{key}");
+    }
 
     // delete
 }
