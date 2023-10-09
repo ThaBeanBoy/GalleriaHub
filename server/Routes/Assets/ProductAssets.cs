@@ -15,11 +15,14 @@ public static class ProductAssets
     public static RouteGroupBuilder ProductAssetEndpoints(this RouteGroupBuilder group)
     {
         // (create) upload file
-        group.MapPost("/{id}", (HttpContext context) =>
+        group.MapPost("/{id}", async (HttpContext context, IWebHostEnvironment env) =>
         {
             Console.WriteLine("Uploading");
+
+
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+
             var S3 = context.RequestServices.GetRequiredService<S3BucketService>();
 
             var User = context.Items["User"] as User;
@@ -30,7 +33,8 @@ public static class ProductAssets
                 if (User == null)
                 {
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return Response.WriteAsync("Not logged in");
+                    await Response.WriteAsync("Not logged in");
+                    return;
                 }
 
                 int ProductID = int.Parse(context.GetRouteValue("id") as string ?? "error");
@@ -39,14 +43,16 @@ public static class ProductAssets
                 if (Product == null)
                 {
                     Response.StatusCode = StatusCodes.Status404NotFound;
-                    return Response.WriteAsync("Product not found");
+                    await Response.WriteAsync("Product not found");
+                    return;
                 }
 
                 // todo: Check if the request user owns the product
                 if (Product.UserID != User.UserID)
                 {
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return Response.WriteAsync($"User {User.UserID} doesn't own the product");
+                    await Response.WriteAsync($"User {User.UserID} doesn't own the product");
+                    return;
                 }
 
                 // todo: get the files from the form
@@ -56,32 +62,38 @@ public static class ProductAssets
                 if (Files == null || Files.Count == 0)
                 {
                     Response.StatusCode = StatusCodes.Status406NotAcceptable;
-                    return Response.WriteAsync("No files found");
+                    await Response.WriteAsync("No files found");
+                    return;
                 }
 
-                S3.upload();
+                // uploading files
+                foreach (IFormFile File in Files)
+                {
+                    await S3.Upload(env, File);
+                }
 
                 // Save the files in the static folder
 
                 // todo: return the updated product
                 Response.StatusCode = StatusCodes.Status501NotImplemented;
-                return Response.WriteAsync($"Supposed to upload {Files.Count} files,");
+                await Response.WriteAsync($"Supposed to upload {Files.Count} files,");
+                return;
             }
             catch (InvalidOperationException ex)
             {
                 Response.StatusCode = StatusCodes.Status406NotAcceptable;
-                return Response.WriteAsync(ex.Message);
+                await Response.WriteAsync(ex.Message);
             }
             catch (AmazonS3Exception ex)
             {
                 Console.WriteLine(ex);
-                return Response.WriteAsync(ex.Message);
+                await Response.WriteAsync(ex.Message);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
-                return Response.WriteAsync("Something went wrong");
+                await Response.WriteAsync("Something went wrong");
             }
         });
 
@@ -103,7 +115,7 @@ public static class ProductAssets
                 }
 
                 Response.StatusCode = StatusCodes.Status501NotImplemented;
-                return Response.SendFileAsync(S3.download(env, key));
+                return Response.SendFileAsync(S3.Download(env, key));
                 // return Response.WriteAsync("Still implement");
             }
             catch (Exception ex)
@@ -129,7 +141,7 @@ public static class ProductAssets
                 return Response.WriteAsync("need a file name");
             }
 
-            S3.delete(env, key);
+            S3.Delete(env, key);
 
             return Response.WriteAsync("Deleted");
         });

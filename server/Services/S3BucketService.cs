@@ -33,32 +33,41 @@ public class S3BucketService
 
 
     // upload
-    public void upload()
+    public async Task<IFileInfo> Upload(IWebHostEnvironment env, IFormFile file)
     {
-        Console.WriteLine($"Upload function fired, bucket: {bucketName}");
+        string Key = GenerateRandomKey(8);
+        string localFilePath = Path.Combine(env.ContentRootPath, "static", Key);
 
-        TransferUtility fileTransferUtility = new TransferUtility(S3Client);
-        fileTransferUtility.UploadAsync(new TransferUtilityUploadRequest
+        // save the file in local static folder
+        using (var localFileStream = new FileStream(localFilePath, FileMode.Create))
+        {
+            await file.CopyToAsync(localFileStream);
+        }
+
+        var localFile = env.ContentRootFileProvider.GetFileInfo(Path.Combine("static", Key));
+
+        // Upload to s3
+        await Transfer.UploadAsync(new TransferUtilityUploadRequest
         {
             BucketName = bucketName,
-            FilePath = "C:\\Users\\TG Chipoyera\\Pictures\\Screenshots\\Screenshot 2023-10-06 104049.png",
+            FilePath = localFile.PhysicalPath,
             StorageClass = S3StorageClass.Standard,
-            PartSize = 74109,
-            Key = "key",
-        }).GetAwaiter().GetResult();
+            PartSize = localFile.Length,
+            Key = Key,
+        });
 
-        Console.WriteLine("Uploaded");
+        // return the file
+        return localFile;
     }
 
     // download
-    public IFileInfo download(IWebHostEnvironment env, string key)
+    public IFileInfo Download(IWebHostEnvironment env, string key)
     {
         var ContentRootFileProvider = env.ContentRootFileProvider;
-        string filePath = $"static/{key}";
+        string filePath = Path.Combine("static", key);
 
         if (!ContentRootFileProvider.GetFileInfo(filePath).Exists)
         {
-            Console.WriteLine("Donwloading");
             // get from S3 bucket
             Transfer.Download(new TransferUtilityDownloadRequest
             {
@@ -72,7 +81,7 @@ public class S3BucketService
     }
 
     // delete
-    public async void delete(IWebHostEnvironment env, string key)
+    public async void Delete(IWebHostEnvironment env, string key)
     {
         // Delete from S3
         await S3Client.DeleteObjectAsync(new DeleteObjectRequest
@@ -83,6 +92,18 @@ public class S3BucketService
 
         // Delete from local static file
         File.Delete($"{env.ContentRootPath}/static/{key}");
+    }
+
+    private static string GenerateRandomKey(int length)
+    {
+        const string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        Random random = new Random();
+
+        // Use the random object to generate a sequence of random characters.
+        string randomString = new string(Enumerable.Repeat(characters, length)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
+
+        return randomString;
     }
 }
 
