@@ -247,6 +247,7 @@ export default function ProductEditorPage({
               key={`unuploaded-${key}`}
               src={URL.createObjectURL(file)}
               alt="unuploaded"
+              className="rounded-xl brightness-75"
               width="500"
               height="500"
             />
