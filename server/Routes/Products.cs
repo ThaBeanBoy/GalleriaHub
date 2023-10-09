@@ -1,6 +1,6 @@
 using Galleria.Services;
 using Models;
-
+using server.Routes;
 using static server.Routes.APIResponse;
 
 namespace Routes;
@@ -186,13 +186,111 @@ public static class Product
         });
 
         // Update
-        group.MapPut("/{id}", (HttpContext context) =>
+        group.MapPut("/{id}", async (HttpContext context) =>
         {
+            Console.WriteLine("Updating");
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+            Models.User? User = context.Items["User"] as Models.User;
 
-            Response.StatusCode = StatusCodes.Status501NotImplemented;
-            Response.WriteAsync("Not implmeneted yet");
+            try
+            {
+                if (User == null)
+                {
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await Response.WriteAsync("Not logged in");
+                    return;
+                }
+
+                int ProductID = int.Parse(context.GetRouteValue("id") as string ?? "error");
+
+                Models.Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == ProductID);
+
+                if (Product == null)
+                {
+                    Response.StatusCode = StatusCodes.Status404NotFound;
+                    await Response.WriteAsync("Product not found");
+                    return;
+                }
+
+                UpdateProductModel? Update = await Request.ReadFromJsonAsync<UpdateProductModel>();
+
+                if (Update == null)
+                {
+                    Response.StatusCode = StatusCodes.Status400BadRequest;
+                    await Response.WriteAsync("Couldn't recognise body");
+                    return;
+                }
+
+                // Updating 
+                if (Update.productName != null)
+                {
+                    // Validatign the new product name
+                    if (Update.productName.Trim() == "")
+                    {
+                        Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                        await Response.WriteAsync("Name of product cannot be empty");
+                        return;
+                    }
+
+                    Product.ProductName = Update.productName;
+
+                    Product.LastUpdate = DateTime.Now;
+                }
+
+                // updating price
+                if (Update.price != null)
+                {
+                    try
+                    {
+                        double NewPrice = double.Parse(Update.price);
+
+                        Product.Price = new decimal(NewPrice);
+
+                        Product.LastUpdate = DateTime.Now;
+                    }
+                    catch (FormatException ex)
+                    {
+                        Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                        await Response.WriteAsync(ex.Message);
+                        return;
+                    }
+                }
+
+                // Update stock
+                if (Update.stock != null)
+                {
+                    try
+                    {
+                        int NewStock = int.Parse(Update.stock);
+
+                        Product.StockQuantity = NewStock;
+
+                        Product.LastUpdate = DateTime.Now;
+                    }
+                    catch (FormatException ex)
+                    {
+                        Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                        await Response.WriteAsync(ex.Message);
+                    }
+                }
+
+                // Updating the DB
+                DB.Products.Update(Product);
+
+                await Response.WriteAsJsonAsync(Product.ResponseObj(context));
+            }
+            catch (FormatException)
+            {
+                Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                await Response.WriteAsync("Incorrect format for product id");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await Response.WriteAsync("Something went wrong");
+            }
         });
 
         //Delete
@@ -260,6 +358,14 @@ public static class Product
         });
 
         return group;
+    }
+
+    private class UpdateProductModel
+    {
+        public string? productName { get; set; }
+        public string? price { get; set; }
+        public string? stock { get; set; }
+        public string? description { get; set; }
     }
 
     private class FilterProps

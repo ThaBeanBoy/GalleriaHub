@@ -188,12 +188,10 @@ export default function ProductEditorPage({
             <Tooltip
               trigger={<Button icon={<SlOptionsVertical />} variant="flat" />}
             >
-              Information
-              <Dropdown.Separator className="bg-grey m-[5px] h-[1px]" />
               <Button
                 label="delete"
                 icon={<FiTrash />}
-                className="px-1 py-2"
+                className="p-0"
                 variant="flat"
                 desctructive
                 onClick={handleDelete}

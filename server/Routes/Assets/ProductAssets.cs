@@ -20,9 +20,6 @@ public static class ProductAssets
         // (create) upload file
         group.MapPost("/{id}", async (HttpContext context, IWebHostEnvironment env) =>
         {
-            Console.WriteLine("Uploading");
-
-
             var (Request, Response) = (context.Request, context.Response);
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
 
@@ -84,8 +81,14 @@ public static class ProductAssets
                     // Adding the file to the database
                     DB.ProductFiles.Add(NewFile);
 
-                    DB.SaveChanges();
                 }
+
+                // updating the lastupdate field
+                Product.LastUpdate = DateTime.Now;
+                DB.Products.Update(Product);
+
+                // Saving changes to the DB
+                DB.SaveChanges();
 
                 // todo: return the updated product
                 await Response.WriteAsJsonAsync(Product.ResponseObj(context));
