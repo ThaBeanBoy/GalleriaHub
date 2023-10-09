@@ -72,6 +72,18 @@ public class S3BucketService
     }
 
     // delete
+    public async void delete(IWebHostEnvironment env, string key)
+    {
+        // Delete from S3
+        await S3Client.DeleteObjectAsync(new DeleteObjectRequest
+        {
+            BucketName = bucketName,
+            Key = key
+        });
+
+        // Delete from local static file
+        File.Delete($"{env.ContentRootPath}/static/{key}");
+    }
 }
 
 public static class S3BucketServiceExtension

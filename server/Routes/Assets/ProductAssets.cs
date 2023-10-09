@@ -59,10 +59,6 @@ public static class ProductAssets
                     return Response.WriteAsync("No files found");
                 }
 
-                /*
-                    todo: upload files to S3,
-                    todo: Add the path to the db
-                */
                 S3.upload();
 
                 // Save the files in the static folder
@@ -89,14 +85,15 @@ public static class ProductAssets
             }
         });
 
-        group.MapGet("/{file-name}", (HttpContext context, IWebHostEnvironment env) =>
+        // (read) get file
+        group.MapGet("/{id}/{asset}", (HttpContext context, IWebHostEnvironment env) =>
         {
             var (Request, Response) = (context.Request, context.Response);
             var S3 = context.RequestServices.GetRequiredService<S3BucketService>();
 
             try
             {
-                string? key = context.GetRouteValue("file-name") as string;
+                string? key = context.GetRouteValue("asset") as string;
 
                 // Checking for nulls
                 if (key == null)
@@ -116,20 +113,25 @@ public static class ProductAssets
             }
         });
 
-        // (read) get file
-        group.MapGet("/{id}/assets/{asset}", (HttpContext context) =>
-        {
-            // check if the product is private or the request user owns the product
-
-            // return the asset
-        });
-
         // delete files
-        group.MapDelete("/{id}/assets/{asset}", (HttpContext context) =>
+        group.MapDelete("/{id}/{asset}", (HttpContext context, IWebHostEnvironment env) =>
         {
             // Check if the request user owns the product
 
-            // delegte the file
+            var (Request, Response) = (context.Request, context.Response);
+            var S3 = context.RequestServices.GetRequiredService<S3BucketService>();
+
+            string? key = context.GetRouteValue("asset") as string;
+
+            if (key == null)
+            {
+                Response.StatusCode = StatusCodes.Status400BadRequest;
+                return Response.WriteAsync("need a file name");
+            }
+
+            S3.delete(env, key);
+
+            return Response.WriteAsync("Deleted");
         });
 
         return group;
