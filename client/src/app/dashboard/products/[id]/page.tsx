@@ -85,16 +85,18 @@ export default function ProductEditorPage({
           data: imagesFormData,
         });
 
-        // setting the dates
-        data.createdOn = new Date(data.createdOn);
-        data.lastUpdate = new Date(data.lastUpdate);
-
         toast({
           title: "Asset Upload",
           description: "Successfully uploaded assets",
         });
 
-        setProduct(product);
+        // setting the dates
+        data.createdOn = new Date(data.createdOn);
+        data.lastUpdate = new Date(data.lastUpdate);
+
+        setProduct(data);
+
+        setUnunploadedAssets([]);
       } catch (error: any) {
         toast({
           title: "Asset Upload",
