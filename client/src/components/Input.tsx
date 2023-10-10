@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { cn } from "@/lib/utils";
 
 import Button from "./Button";
@@ -67,6 +67,28 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
   },
 );
 
+export default Input;
+
 Input.displayName = "Input";
 
-export default Input;
+export type updateableInputType = {
+  value: string;
+  set: Dispatch<SetStateAction<string>>;
+  inputProps: React.InputHTMLAttributes<HTMLInputElement>;
+};
+
+export function useInput(): updateableInputType {
+  const [value, setValue] = useState("");
+  // const ref = useRef<HTMLInputElement>(null);
+
+  return {
+    value,
+    set: setValue,
+    inputProps: {
+      onChange(e) {
+        setValue(e.target.value);
+      },
+      value,
+    },
+  };
+}

@@ -282,6 +282,11 @@ public static class Product
                     Product.LastUpdate = DateTime.Now;
                 }
 
+                if (Update.Public != null)
+                {
+                    Product.Public = Update.Public;
+                }
+
                 // Updating the DB
                 DB.Products.Update(Product);
                 DB.SaveChanges();
@@ -374,6 +379,7 @@ public static class Product
         public string? price { get; set; }
         public string? stock { get; set; }
         public string? description { get; set; }
+        public bool Public { get; set; }
     }
 
     private class FilterProps

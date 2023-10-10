@@ -14,15 +14,13 @@ import { SlOptionsVertical } from "react-icons/sl";
 import { BsCloudUpload } from "react-icons/bs";
 
 import ReactQuill from "react-quill";
-// import "react-quill/dist/quill.snow.css";
 import "react-quill/dist/quill.bubble.css";
 
 import { useToast } from "@/components/ui/use-toast";
 
 import * as Tabs from "@radix-ui/react-tabs";
-import * as Dropdown from "@radix-ui/react-dropdown-menu";
 
-import Input from "@/components/Input";
+import Input, { useInput } from "@/components/Input";
 import Button from "@/components/Button";
 import Switch from "@/components/Switch";
 import Tooltip from "@/components/Tooltip";
@@ -49,6 +47,11 @@ export default function ProductEditorPage({
 
   const { toast } = useToast();
 
+  // Element refs
+  const productNameTextField = useInput();
+  const priceTextField = useInput();
+  const stockField = useInput();
+
   // fetching data
   useEffect(() => {
     axios<ProductType>({
@@ -74,12 +77,13 @@ export default function ProductEditorPage({
       return;
     }
 
+    productNameTextField.set(product.productName);
+    priceTextField.set(product.price.toString());
+    stockField.set(product.stockQuantity.toString());
+
+    // setting description
     setDescription(product.description || "");
   }, [product]);
-
-  useEffect(() => {
-    console.log(description);
-  }, [description]);
 
   const handleUpdate = async () => {
     // Updating images
@@ -231,15 +235,11 @@ export default function ProductEditorPage({
             label="Product Name"
             className="focus:border-b-active mb-4 mt-0 w-full max-w-none rounded-none border-x-0 border-b-2 border-t-0 bg-white px-0 py-2 text-5xl font-bold outline-none"
             type="text"
-            defaultValue={product.productName}
+            {...productNameTextField.inputProps}
           />
           <div className="mb-4 flex gap-3">
-            <Input label="price" type="number" defaultValue={product.price} />
-            <Input
-              label="stock"
-              type="number"
-              defaultValue={product.stockQuantity}
-            />
+            <Input label="price" type="number" {...priceTextField.inputProps} />
+            <Input label="stock" type="number" {...stockField.inputProps} />
             <Switch label="Public" className="flex-col text-sm" />
           </div>
 

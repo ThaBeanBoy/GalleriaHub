@@ -155,6 +155,7 @@ export default /* async */ function Products({
               placeholder="search"
               ref={searchRef}
               onChange={() => setSearch(searchRef.current?.value || "")}
+              value={searchRef.current?.value}
               className="w-[250px] flex-1"
             />
 

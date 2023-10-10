@@ -16,10 +16,10 @@ export default function Switch({
         {label}
       </label>
       <RadixSwitch.Root
-        className="data-[state=checked]:bg-active bg-active-light relative h-[25px] w-[42px] cursor-default rounded-full border border-black shadow outline-none"
+        className="data-[state=checked]:bg-active data-[state=checked]:border-active relative h-[25px] w-[42px] cursor-default rounded-full border border-gray-500 bg-gray-200 shadow outline-none"
         id={id}
       >
-        <RadixSwitch.Thumb className="block h-[21px] w-[21px] translate-x-0.5 rounded-full bg-white shadow-lg transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[19px]" />
+        <RadixSwitch.Thumb className="block h-[21px] w-[21px] translate-x-[2px] rounded-full bg-black shadow-lg transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[17px] data-[state=checked]:bg-white" />
       </RadixSwitch.Root>
     </div>
   );
