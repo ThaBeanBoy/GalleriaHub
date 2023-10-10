@@ -7,7 +7,7 @@ export default function Tooltip({
   children,
   className,
   ...props
-}: { trigger: React.ReactNode } & Dropdown.DropdownMenuContentProps) {
+}: { trigger: React.ReactNode } & Menubar.MenuContentProps) {
   return (
     <Menubar.Root>
       <Menubar.Menu>

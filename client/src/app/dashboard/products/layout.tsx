@@ -13,7 +13,10 @@ import Form from "@/components/Form";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import {
+  Dispatch,
   FormEvent,
+  SetStateAction,
+  createContext,
   useContext,
   useEffect,
   useRef,
@@ -29,6 +32,16 @@ import { ProductType } from "@/lib/types";
 import { EyeIcon, EyeOff, LucideLoader2 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { SlOptionsVertical } from "react-icons/sl";
+import Tooltip from "@/components/Tooltip";
+import { FiTrash } from "react-icons/fi";
+
+export type DashboardProductsLayoutType = {
+  products: ProductType[] | undefined;
+  setProducts: Dispatch<SetStateAction<ProductType[] | undefined>>;
+};
+export const DashboardProductsLayoutContext =
+  createContext<DashboardProductsLayoutType | null>(null);
 
 export default /* async */ function Products({
   children,
@@ -46,6 +59,9 @@ export default /* async */ function Products({
   const [products, setProducts] = useState<ProductType[] | undefined>(
     undefined,
   );
+
+  const searchRef = useRef<HTMLInputElement>(null);
+  const [search, setSearch] = useState("");
 
   const [newProductSubmissionError, setNewProductSubmissionError] =
     useState(false);
@@ -131,88 +147,98 @@ export default /* async */ function Products({
   }, [Auth?.auth?.jwt.token, Auth?.auth?.user.userID]);
 
   return (
-    <div className="flex gap-4">
-      <aside className="sticky top-3 resize-x">
-        <div id="top" className="mb-4 flex items-end gap-2">
-          <Input placeholder="search" className="w-[250px] flex-1" />
-          <Dialog.Root>
-            <Dialog.Trigger asChild>
-              <Button icon={<BsPlus />} />
-            </Dialog.Trigger>
+    <DashboardProductsLayoutContext.Provider value={{ products, setProducts }}>
+      <div className="flex gap-4">
+        <aside className="sticky top-3 resize-x">
+          <div id="top" className="mb-4 flex items-end gap-2">
+            <Input
+              placeholder="search"
+              ref={searchRef}
+              onChange={() => setSearch(searchRef.current?.value || "")}
+              className="w-[250px] flex-1"
+            />
 
-            <Dialog.Portal>
-              <Dialog.Overlay className="data-[state=open]:animate-overlayShow fixed inset-0 bg-black opacity-60" />
+            <Dialog.Root>
+              <Dialog.Trigger asChild>
+                <Button icon={<BsPlus />} />
+              </Dialog.Trigger>
 
-              <Dialog.Content className="data-[state=open]:animate-contentShow fixed left-[50%] top-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-3xl bg-white p-[25px] shadow-lg">
-                <h2 className="text-xl font-semibold">New Product</h2>
+              <Dialog.Portal>
+                <Dialog.Overlay className="data-[state=open]:animate-overlayShow fixed inset-0 bg-black opacity-60" />
 
-                <hr className="my-2" />
+                <Dialog.Content className="data-[state=open]:animate-contentShow fixed left-[50%] top-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-3xl bg-white p-[25px] shadow-lg">
+                  <h2 className="text-xl font-semibold">New Product</h2>
 
-                <Form onSubmit={handleNewProduct}>
-                  <Input
-                    label="product title"
-                    wrapperClassName="col-span-2"
-                    ref={TitleRef}
-                  />
-                  <Input
-                    label="price"
-                    className="mb-3"
-                    type="number"
-                    ref={PriceRef}
-                  />
-                  <Input
-                    label="stock"
-                    className="mb-3"
-                    type="number"
-                    ref={StockRef}
-                  />
+                  <hr className="my-2" />
 
-                  <div className="col-span-2 flex gap-2">
-                    <Dialog.Close asChild>
-                      <Button
-                        label="Cancel"
-                        variant="hollow"
-                        className="flex-1"
-                      />
-                    </Dialog.Close>
-
-                    <Button
-                      label="Make Product"
-                      className="flex-1"
-                      type="submit"
+                  <Form onSubmit={handleNewProduct}>
+                    <Input
+                      label="product title"
+                      wrapperClassName="col-span-2"
+                      ref={TitleRef}
                     />
-                    {/* <ErrorDialog
-                    trigger={
-                    }
-                    title="New Product"
-                    message={submissionErrorMessage || ""}
-                  /> */}
-                  </div>
-                </Form>
-              </Dialog.Content>
-            </Dialog.Portal>
-          </Dialog.Root>
-        </div>
+                    <Input
+                      label="price"
+                      className="mb-3"
+                      type="number"
+                      ref={PriceRef}
+                    />
+                    <Input
+                      label="stock"
+                      className="mb-3"
+                      type="number"
+                      ref={StockRef}
+                    />
 
-        {/* User products */}
-        <ul>
-          {products ? (
-            products.map((product, key) => (
-              <li key={key}>
-                <ProductItem {...product} />
-              </li>
-            ))
-          ) : (
-            <p className="flex items-center gap-2">
-              <LucideLoader2 className="animate-spin" />
-              <span>Loading</span>
-            </p>
-          )}
-        </ul>
-      </aside>
+                    <div className="col-span-2 flex gap-2">
+                      <Dialog.Close asChild>
+                        <Button
+                          label="Cancel"
+                          variant="hollow"
+                          className="flex-1"
+                        />
+                      </Dialog.Close>
 
-      <div>{children}</div>
-    </div>
+                      <Button
+                        label="Make Product"
+                        className="flex-1"
+                        type="submit"
+                      />
+                    </div>
+                  </Form>
+                </Dialog.Content>
+              </Dialog.Portal>
+            </Dialog.Root>
+          </div>
+
+          {/* User products */}
+          <ul>
+            {products ? (
+              products
+                .filter(
+                  (product) =>
+                    search.trim() === "" ||
+                    product.productName
+                      .toLowerCase()
+                      .includes(search.toLowerCase().trim()),
+                )
+                .map((product, key) => (
+                  <li key={key}>
+                    <ProductItem {...product} />
+                  </li>
+                ))
+            ) : (
+              <p className="flex items-center gap-2">
+                <LucideLoader2 className="animate-spin" />
+                <span>Loading</span>
+              </p>
+            )}
+          </ul>
+        </aside>
+
+        <div>{children}</div>
+      </div>
+    </DashboardProductsLayoutContext.Provider>
   );
 }
 
@@ -224,6 +250,9 @@ function ProductItem({
 }: ProductType) {
   const href = `/dashboard/products/${productID}`;
   const active = href === usePathname();
+  const DashboardProducts = useContext(DashboardProductsLayoutContext);
+  const Auth = useContext(UserContext);
+  const { toast } = useToast();
 
   const dateLabel =
     lastUpdate.getTime() === createdOn.getTime() ? "Created" : "Last updated";
@@ -244,14 +273,71 @@ function ProductItem({
     1000,
   );
 
+  const handleDelete = async () => {
+    const ToastTitle = "Product Delete";
+
+    const continueDelete = confirm(
+      `Are you sure you want to delete ${productName}, everything related to this product will be deleted`,
+    );
+
+    if (!continueDelete) return;
+
+    try {
+      toast({
+        title: ToastTitle,
+        description: "Attempting to delete file",
+      });
+
+      //deleting product
+      await axios({
+        method: "delete",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/Products/${productID}`,
+        headers: {
+          Authorization: `Bearer ${Auth?.auth?.jwt.token}`,
+        },
+      });
+
+      // Removing the product from the dashboard
+      DashboardProducts?.setProducts(
+        DashboardProducts.products?.filter(
+          (product) => product.productID !== productID,
+        ),
+      );
+
+      // go to dashboard/products/ if the user is on this product's page
+    } catch (error: any) {
+      console.log(error.response.data);
+      toast({ title: ToastTitle, description: "Something went wrong" });
+    }
+  };
+
   return (
     <Link
       className={cn(
-        "hover:text-active-light block rounded-xl rounded-r-none border-r-2 px-4 py-3 text-black",
+        "hover:text-active-light relative block rounded-xl rounded-r-none border-r-2 px-4 py-3 text-black",
         { "text-active border-2 border-r-0": active },
       )}
       href={href}
     >
+      <Tooltip
+        trigger={
+          <Button
+            icon={<SlOptionsVertical />}
+            className="absolute right-2 top-2"
+            variant="flat"
+          />
+        }
+      >
+        <Button
+          label="delete"
+          icon={<FiTrash />}
+          className="p-0"
+          variant="flat"
+          onClick={handleDelete}
+          desctructive
+        />
+      </Tooltip>
+
       <h3 className="mb-1 font-semibold">{productName}</h3>
       <p className="text-xs">
         {dateLabel} {dateDisplayed}

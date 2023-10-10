@@ -28,7 +28,7 @@ import Switch from "@/components/Switch";
 import Tooltip from "@/components/Tooltip";
 import openFilePicker from "@/lib/filePicker";
 import { cn } from "@/lib/utils";
-import { redirect } from "next/navigation";
+import { DashboardProductsLayoutContext } from "../layout";
 
 export default function ProductEditorPage({
   params,
@@ -37,6 +37,8 @@ export default function ProductEditorPage({
 }) {
   const router = useRouter();
   const Auth = useContext(UserContext);
+
+  const DashboardProducts = useContext(DashboardProductsLayoutContext);
 
   const [product, setProduct] = useState<ProductType | undefined | string>(
     undefined,
@@ -63,6 +65,10 @@ export default function ProductEditorPage({
       })
       .catch((error: any) => setProduct(error.response.data));
   }, [Auth?.auth?.jwt.token, params.id]);
+
+  useEffect(() => {
+    console.log(description);
+  }, [description]);
 
   const handleUpdate = async () => {
     // Updating images
@@ -148,6 +154,13 @@ export default function ProductEditorPage({
         title: ToastTitle,
         description: "Succesfully deleted",
       });
+
+      // Removing the product from the dashboard
+      DashboardProducts?.setProducts(
+        DashboardProducts.products?.filter(
+          (dashProduct) => dashProduct.productID !== product.productID,
+        ),
+      );
 
       // redirect user
       router.back();
