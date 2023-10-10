@@ -222,7 +222,7 @@ public static class Product
                     return;
                 }
 
-                // Updating 
+                // Updating product name
                 if (Update.productName != null)
                 {
                     // Validatign the new product name
@@ -275,8 +275,16 @@ public static class Product
                     }
                 }
 
+                // udating product description
+                if (Update.description != null)
+                {
+                    Product.Description = Update.description;
+                    Product.LastUpdate = DateTime.Now;
+                }
+
                 // Updating the DB
                 DB.Products.Update(Product);
+                DB.SaveChanges();
 
                 await Response.WriteAsJsonAsync(Product.ResponseObj(context));
             }

@@ -78,7 +78,7 @@ public static class APIResponse
             Product.Public,
             createdOn = Product.CreatedOn,
             lastUpdate = Product.LastUpdate,
-            // Description = Description,
+            Description = Product.Description,
             seller = ProductOwner.ResponseObj(),
             Images,
         };

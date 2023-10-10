@@ -45,10 +45,11 @@ export default function ProductEditorPage({
   );
   const [ununploadedAssets, setUnunploadedAssets] = useState<File[]>([]);
 
-  const [description, setdescription] = useState("");
+  const [description, setDescription] = useState("");
 
   const { toast } = useToast();
 
+  // fetching data
   useEffect(() => {
     axios<ProductType>({
       method: "get",
@@ -61,10 +62,20 @@ export default function ProductEditorPage({
         console.log(data);
         data.createdOn = new Date(data.createdOn);
         data.lastUpdate = new Date(data.lastUpdate);
+
         setProduct(data);
       })
       .catch((error: any) => setProduct(error.response.data));
   }, [Auth?.auth?.jwt.token, params.id]);
+
+  // updating based in the product
+  useEffect(() => {
+    if (!product || typeof product === "string") {
+      return;
+    }
+
+    setDescription(product.description || "");
+  }, [product]);
 
   useEffect(() => {
     console.log(description);
@@ -237,13 +248,13 @@ export default function ProductEditorPage({
             theme="bubble"
             placeholder="Product Description"
             value={description}
-            onChange={setdescription}
+            onChange={setDescription}
           />
         </Tabs.Content>
 
         <Tabs.TabsContent value="assets">
           <Button
-            label="Upload Asset"
+            label="load asset"
             className="mb-4"
             icon={<BsCloudUpload />}
             onClick={async () => {

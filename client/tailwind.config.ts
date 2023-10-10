@@ -8,6 +8,17 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    typography: {
+      DEFAULT: {
+        css: {
+          color: "#475569",
+          a: {
+            color: "#3667DC",
+          },
+        },
+      },
+    },
+
     container: {
       center: true,
       padding: "2rem",

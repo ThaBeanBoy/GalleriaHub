@@ -21,6 +21,7 @@ export type ProductType = {
   productName: string;
   price: number;
   stockQuantity: number;
+  description?: string;
   Public: boolean;
   createdOn: Date;
   lastUpdate: Date;
