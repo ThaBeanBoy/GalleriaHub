@@ -86,12 +86,93 @@ export default function ProductEditorPage({
   }, [product]);
 
   const handleUpdate = async () => {
-    // Updating images
+    if (!product || typeof product === "string") return;
+
+    // Product info update
+    const pairings: {
+      postField: string;
+      updatedValue: string;
+      productValue: string;
+    }[] = [
+      {
+        postField: "productName",
+        updatedValue: productNameTextField.value,
+        productValue: product.productName,
+      },
+      {
+        postField: "price",
+        updatedValue: priceTextField.value,
+        productValue: product.price.toString(),
+      },
+      {
+        postField: "stock",
+        updatedValue: stockField.value,
+        productValue: product.stockQuantity.toString(),
+      },
+      {
+        postField: "description",
+        updatedValue: description,
+        productValue: product.description || "",
+      },
+    ];
+
+    if (pairings.some((p) => p.updatedValue !== p.productValue)) {
+      const ToastTile = "Product Update";
+      toast({
+        title: ToastTile,
+        description: `Attempting to update ${product.productName}'s information`,
+      });
+
+      try {
+        const updateObject: any = {};
+
+        // adding post fields
+        pairings.forEach((pairing) => {
+          if (pairing.updatedValue !== pairing.productValue) {
+            updateObject[pairing.postField] = pairing.updatedValue;
+          }
+        });
+
+        const { data } = await axios<ProductType>({
+          method: "put",
+          url: `${process.env.NEXT_PUBLIC_SERVER_URL}/products/${product.productID}`,
+          headers: {
+            Authorization: `Bearer ${Auth?.auth?.jwt.token}`,
+          },
+          data: updateObject,
+        });
+
+        data.createdOn = new Date(data.createdOn);
+        data.lastUpdate = new Date(data.lastUpdate);
+
+        setProduct(data);
+
+        // updating products in dashboard
+        // if (DashboardProducts && DashboardProducts.products) {
+        //   DashboardProducts?.setProducts(
+        //     DashboardProducts.products?.filter(
+        //       (dashProduct) => dashProduct.productID === data.productID,
+        //     ),
+        //   );
+        //   DashboardProducts?.setProducts([...DashboardProducts.products, data]);
+        // }
+
+        // notifying update status
+        toast({
+          title: ToastTile,
+          description: "Successfully updated",
+        });
+      } catch (error: any) {
+        console.log(error.response);
+        toast({ title: ToastTile, description: "Something went wrong" });
+      }
+    }
+
+    // Asset uploading
     const imagesFormData = new FormData();
     ununploadedAssets.forEach((file, fileNr) => {
       imagesFormData.append(`file${fileNr}`, file);
     });
-
     if (ununploadedAssets.length > 0) {
       try {
         toast({ title: "Asset Upload", description: "Uploading assets" });
@@ -118,6 +199,16 @@ export default function ProductEditorPage({
         setProduct(data);
 
         setUnunploadedAssets([]);
+
+        // updating products in dashboard
+        // if (DashboardProducts && DashboardProducts.products) {
+        //   DashboardProducts?.setProducts(
+        //     DashboardProducts.products?.filter(
+        //       (dashProduct) => dashProduct.productID === data.productID,
+        //     ),
+        //   );
+        //   DashboardProducts?.setProducts([...DashboardProducts.products, data]);
+        // }
       } catch (error: any) {
         toast({
           title: "Asset Upload",
@@ -226,7 +317,17 @@ export default function ProductEditorPage({
               />
             </Tooltip>
 
-            <Button label="Update" onClick={handleUpdate} />
+            <Button
+              label="Update"
+              onClick={handleUpdate}
+              disabled={
+                productNameTextField.value === product.productName &&
+                priceTextField.value === product.price.toString() &&
+                stockField.value === product.stockQuantity.toString() &&
+                description === product.description &&
+                ununploadedAssets.length === 0
+              }
+            />
           </div>
         </Tabs.List>
 
@@ -377,7 +478,13 @@ function ProductImage({
       </Tooltip>
 
       {/* Image */}
-      <img src={src} alt={src} width={500} height={500} />
+      <img
+        src={src}
+        className="rounded-xl"
+        alt={src}
+        width={500}
+        height={500}
+      />
     </div>
   );
 }

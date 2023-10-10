@@ -71,6 +71,7 @@ public static class Product
                     ProductName = ProductName,
                     Price = new decimal(ProductPrice),
                     StockQuantity = ProductStock,
+                    Description = $"<p><strong>{ProductName}</strong> is a product that is ...</p>",
                     CreatedOn = DateTime.Now,
                     LastUpdate = DateTime.Now,
                     Public = false

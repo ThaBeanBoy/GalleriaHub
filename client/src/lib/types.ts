@@ -25,7 +25,6 @@ export type ProductType = {
   Public: boolean;
   createdOn: Date;
   lastUpdate: Date;
-  Description: string;
   seller: UserType;
   images: string[];
 };
