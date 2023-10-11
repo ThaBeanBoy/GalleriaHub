@@ -258,6 +258,8 @@ public static class Product{
                             Quantity = id.Result.Quantity,
                             Price = id.Result.Price
                         };
+                        db.Orders.Update(orders);
+                        db.OrderItems.Update(item);
                         db.SaveChanges();
                     }
                     response.StatusCode = StatusCodes.Status200OK;
