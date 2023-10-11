@@ -229,6 +229,51 @@ public static class Product{
             }
         });
 
+        group.MapDelete("/{ProductID}/cart", (HttpContext http) =>
+        {
+            var (request, response) = (http.Request, http.Response);
+            var db = http.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+            var id = request.ReadFromJsonAsync<OrderClass>();
+            var verified = id.Result.Users;
+
+            if (verified != null)
+            {
+                var items = (from o in db.Orders
+                             where o.OrderID.Equals(id.Result.OrderID)
+                             select o).FirstOrDefault();
+                try
+                {
+                    if (items != null) {
+                        var orders = new Order
+                        {
+                            OrderDate = id.Result.OrderDate,
+                            Customer = id.Result.Users,
+                            Discount = id.Result.Discounts,
+                            OrderID = id.Result.OrderID
+                        };
+                        var item = new OrderItem
+                        {
+                            Product = id.Result.Products,
+                            Order = orders,
+                            Quantity = id.Result.Quantity,
+                            Price = id.Result.Price
+                        };
+                        db.SaveChanges();
+                    }
+                    response.StatusCode = StatusCodes.Status200OK;
+                    response.WriteAsJsonAsync(id);
+                }
+                catch (Exception)
+                {
+                    response.StatusCode = StatusCodes.Status500InternalServerError;
+                    response.WriteAsync("Could not delete products");
+                }
+                
+
+            }
+
+        });
+
         return group;
     }
 
