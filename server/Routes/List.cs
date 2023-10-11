@@ -228,6 +228,33 @@ public static class List
             }
         });
 
+        
+        // Get all the list owned by a specific user
+        group.MapGet("/", (HttpContext context) => {
+            var (Request, Response) = (context.Request, context.Response);
+
+            try {
+                Models.User? User = context.Items["User"] as Models.User;
+
+                if (User == null) {
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Response.WriteAsync("Only logged-in users can retrieve their lists");
+                }
+
+                var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+
+                // Get all lists owned by the specific user
+                List<Models.List> userLists = DB.Lists.Where(list => list.UserID == User.UserID).ToList();
+
+
+                return Response.WriteAsJsonAsync(userLists.Select(List => List.ResponseObj(context)));
+            } catch (Exception e) {
+                Console.WriteLine(e.Message);
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                return Response.WriteAsync("Something went wrong with the server");
+            }
+        });
+
 
         //Delete list
         return group;
