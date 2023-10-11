@@ -89,4 +89,23 @@ public static class APIResponse
     {
         return $"/assets/products/{File.FileKey}";
     }
+
+    // List
+    public static object ResponseObj(this Models.List List, HttpContext context){
+        var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+
+        List<Models.ListItem> listItems = DB.ListItems.Where(li => li.ListID == List.ListID).ToList();
+        
+        return new {
+                    ListID = List.ListID,
+                    Name = List.Name,
+                    CreatedOn = List.CreatedOn,
+                    LastUpdate = List.LastUpdate,
+                    Items = listItems.Select(Item => 
+                        DB.Products
+                        .FirstOrDefault(Product => Product.ProductID == Item.ProductID)
+                        .ResponseObj(context)
+                        )
+                };
+    }
 }

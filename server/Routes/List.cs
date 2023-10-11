@@ -70,7 +70,7 @@ public static class List
                 DB.SaveChanges();
 
                 Response.StatusCode = StatusCodes.Status201Created;
-                return Response.WriteAsync("Product added to wishlist");
+                return Response.WriteAsJsonAsync(wishlist.ResponseObj(context));
             } catch (Exception e) {
                 Console.WriteLine(e.Message);
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
@@ -126,7 +126,7 @@ public static class List
                     DB.SaveChanges();
 
                     Response.StatusCode = StatusCodes.Status204NoContent;
-                    return Response.WriteAsync("Product removed from wishlist");
+                    return Response.WriteAsJsonAsync(wishlist.ResponseObj(context));
                 } else {
                     Response.StatusCode = StatusCodes.Status404NotFound;
                     return Response.WriteAsync("Product not found in the wishlist");
@@ -137,22 +137,6 @@ public static class List
                 return Response.WriteAsync("Something went wrong with the server");
             }
         });
-
-
-        //retrieve list
-        // group.MapGet("/{ListID}", (HttpContext context) =>{
-        //     // todo: get user from the context items
-
-        //     // todo: check if the user is not null (signed in)
-
-        //     // todo: get the List based on the ListID
-
-        //     // todo: Check if the user owns the List
-
-        //     // todo: get the ListItems based on the ListID
-
-        //     // todo: return the List & List Items (call me)
-        // });
 
         // Retrieve a user's wishlist
         group.MapGet("/{ListID}", (HttpContext context) => {
@@ -188,19 +172,7 @@ public static class List
                 List<Models.ListItem> listItems = DB.ListItems.Where(li => li.ListID == listId).ToList();
 
                 // Return the wishlist and its items
-                var wishlistResponse = new {
-                    ListID = wishlist.ListID,
-                    Name = wishlist.Name,
-                    CreatedOn = wishlist.CreatedOn,
-                    LastUpdate = wishlist.LastUpdate,
-                    Items = listItems.Select(Item => 
-                        DB.Products
-                        .FirstOrDefault(Product => Product.ProductID == Item.ProductID)
-                        .ResponseObj(context)
-                        )
-                };
-
-                return Response.WriteAsJsonAsync(wishlistResponse);
+                return Response.WriteAsJsonAsync(wishlist.ResponseObj(context));
             } catch (Exception e) {
                 Console.WriteLine(e.Message);
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
@@ -208,8 +180,74 @@ public static class List
             }
         });
 
+        // group.MapPost("/", (HttpContext context) => {
+        //     // todo: check if user is logged in
+
+        //     // todo: get the Name from the form data
+
+        //     /* 
+        //         todo: Make a new Models.List object that has
+        //         - Name
+        //         - UserID
+        //         - CreatedOn
+        //         - LastUpdate
+        //     */
+
+        //     // todo: add to the DB Context
+
+        //     // todo: save changes in the DB
+
+        //     // todo: rerturn the list the way we returned the list in the get (checkout the MapGet endpoint)
+        // });
 
         //make lists(create)
+        group.MapPost("/", (HttpContext context) => {
+            var (Request, Response) = (context.Request, context.Response);
+
+            try {
+                Models.User? User = context.Items["User"] as Models.User;
+
+                if (User == null) {
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Response.WriteAsync("Only logged-in users can create lists");
+                }
+
+                var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+
+                // Get the name of the list from the form data
+                string? listName = Convert.ToString(Request.Form["name"]).Trim();
+
+                if (string.IsNullOrEmpty(listName)) {
+                    Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                    return Response.WriteAsync("You need to provide a name for the list");
+                }
+
+                // Create a new list (could be a wishlist or any other type of list)
+                Models.List newList = new Models.List
+                {
+                    Name = listName,
+                    UserID = User.UserID,
+                    CreatedOn = DateTime.Now,
+                    LastUpdate = DateTime.Now
+                };
+
+                // Add the list to the DB Context
+                DB.Lists.Add(newList);
+                DB.SaveChanges();
+
+                // Return the created list
+                var listResponse = new {
+                    List = newList
+                };
+
+                return Response.WriteAsJsonAsync(newList.ResponseObj(context));
+            } catch (Exception e) {
+                Console.WriteLine(e.Message);
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                return Response.WriteAsync("Something went wrong with the server");
+            }
+        });
+
 
         //Delete list
         return group;
