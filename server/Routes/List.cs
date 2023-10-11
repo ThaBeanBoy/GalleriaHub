@@ -13,12 +13,12 @@ namespace Routes;
 
 public static class List
 {
-    public static string RouterPrefix = "/wishlists";
+    public static string RouterPrefix = "/lists";
 
     public static RouteGroupBuilder ListEndpoints(this RouteGroupBuilder group)
     {
         
-        // Add a product to a user's wishlist
+        //Add a product to a user's wishlist
         group.MapPost("/{ListID}/{productId}", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
 
@@ -78,7 +78,7 @@ public static class List
             }
         });
 
-        // Delete a product from a user's wishlist
+        //Delete a product from a user's wishlist
         group.MapDelete("/{ListID}/{productId}", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
 
@@ -138,7 +138,7 @@ public static class List
             }
         });
 
-        // Retrieve a user's wishlist
+        //Retrieve a user's wishlist
         group.MapGet("/{ListID}", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
 
@@ -229,7 +229,7 @@ public static class List
         });
 
         
-        // Get all the list owned by a specific user
+        //Get all the lists owned by a specific user
         group.MapGet("/", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
 
@@ -257,6 +257,48 @@ public static class List
 
 
         //Delete list
+        group.MapDelete("/{ListID}", (HttpContext context) => {
+            var (Request, Response) = (context.Request, context.Response);
+
+            try {
+                Models.User? User = context.Items["User"] as Models.User;
+
+                if (User == null) {
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Response.WriteAsync("Only logged-in users can delete their lists");
+                }
+
+                var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+                int listId = int.Parse(context.GetRouteValue("ListID") as string ?? "0");
+                
+                //Getting all lists owned by the specific user
+                Models.List? ListToRemove = DB.Lists.FirstOrDefault(list => list.ListID == listId);
+
+                if(ListToRemove == null){
+                    Response.StatusCode = StatusCodes.Status404NotFound;
+                    return Response.WriteAsync("List not found");
+                }
+
+                //Removing list items from DB
+                var listItemsToDelete = DB.ListItems.Where(li => li.ListID == ListToRemove.ListID);
+                DB.ListItems.RemoveRange(listItemsToDelete);
+
+                //Removing the list
+                DB.Lists.Remove(ListToRemove);
+
+                DB.SaveChanges();
+
+                //Successful deletion
+                Response.StatusCode = StatusCodes.Status204NoContent;
+                return Response.WriteAsync("Lists and list items deleted");
+            } catch (Exception e) {
+                Console.WriteLine(e.Message);
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                return Response.WriteAsync("Something went wrong with the server");
+            }
+        });
+
+
         return group;
     }
 }
