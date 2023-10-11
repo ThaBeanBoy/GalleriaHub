@@ -10,7 +10,6 @@ public class GalleriaHubDBContext : DbContext
     public GalleriaHubDBContext(DbContextOptions options) : base(options) { }
 
     public DbSet<User> Users { get; set; } = null!;
-    public DbSet<UserList> UserLists { get; set; } = null!;
     public DbSet<Verifier> Verifiers { get; set; } = null!;
     public DbSet<ArtistVerification> ArtistVerifications { get; set; } = null!;
     public DbSet<Product> Products { get; set; } = null!;
@@ -42,11 +41,6 @@ public class GalleriaHubDBContext : DbContext
         builder.Entity<User>()
             .HasIndex(U => U.Username)
             .IsUnique();
-
-        builder.Entity<User>()
-            .HasOne(U => U.WishList)
-            .WithMany()
-            .HasForeignKey(U => U.ListID);
 
         builder.Entity<User>()
             .HasIndex(U => U.PhoneNumber)

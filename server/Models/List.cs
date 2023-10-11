@@ -18,6 +18,9 @@ public class List : IDateTime, IList<ListItem>
 {
     public int ListID { get; set; }
 
+    public string Name {get; set; } = null!;
+    public int UserID {get; set;}
+    public User User { get; set; } = null!;
     public DateTime CreatedOn { get; set; }
     
     public DateTime LastUpdate { get; set; }

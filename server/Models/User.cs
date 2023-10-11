@@ -39,10 +39,6 @@ public class User : IDateTime
     // Can be null
     public string? Location { get; set; } = null!;
 
-    // Foreign Keys
-    public int ListID { get; set; }
-    public List WishList { get; set; } = null!;
-
     [ForeignKey("ProfilePicture")]
     public int? ProfilePictureFileID { get; set; }
     public File? ProfilePicture { get; set; } = null!;
@@ -51,56 +47,7 @@ public class User : IDateTime
     public int? CoverPictureFileID { get; set; }
 
     public File? CoverPicture { get; set; }
-
-    // Utility methods
-    public void NewList(DbSet<UserList> UserListSet, UserList NewList)
-    {
-        throw new NotImplementedException();
-    }
-
-    public UserList[] GetLists(DbSet<UserList> UserListSet)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void DeleteList(DbSet<UserList> UserListSet, UserList NewList)
-    {
-        throw new NotImplementedException();
-    }
-
-    // Products CRUD
-    public void NewProduct(DbSet<Product> ProductSet, Product Product)
-    {
-        throw new NotImplementedException();
-    }
-
-    // RETRIEVE - getting products
-    public Product[] GetProducts(DbSet<Product> ProductSet)
-    {
-        throw new NotImplementedException();
-    }
-
-    // DELETE - delete products
-    public void DeleteProduct(DbSet<Product> ProductSet, Product Product)
-    {
-        throw new NotImplementedException();
-    }
 }
-
-[PrimaryKey(nameof(UserID), nameof(ListID))]
-public class UserList
-{
-    public int UserID { get; set; }
-    public User User { get; set; } = null!;
-    public string ListName { get; set; } = null!;
-
-    // public int FileID { get; set; }
-    // public File File { get; set; } = null!;
-
-    public int ListID { get; set; }
-    public List List { get; set; } = null!;
-}
-
 
 public class Verifier
 {

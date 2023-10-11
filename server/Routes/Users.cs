@@ -68,9 +68,6 @@ public static class User
                     throw new UsernameAlreadyTakenException(UserName);
 
                 // Attempting save in DB
-                List NewUserWishList = new List();
-                DB.Lists.Add(NewUserWishList);
-
                 Models.User NewUser = new Models.User()
                 {
                     Email = Email,
@@ -79,8 +76,16 @@ public static class User
                     Public = true,
                     CreatedOn = DateTime.Now,
                     LastUpdate = DateTime.Now,
-                    WishList = NewUserWishList
                 };
+
+                Models.List NewUserWishList = new Models.List{
+                    UserID = NewUser.UserID,
+                    CreatedOn = DateTime.Now,
+                    LastUpdate = DateTime.Now,
+                    Name = "Wish List"
+                };
+                DB.Lists.Add(NewUserWishList);
+
                 DB.Users.Add(NewUser);
 
                 DB.SaveChanges();
