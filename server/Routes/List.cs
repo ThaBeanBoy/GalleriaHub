@@ -180,26 +180,6 @@ public static class List
             }
         });
 
-        // group.MapPost("/", (HttpContext context) => {
-        //     // todo: check if user is logged in
-
-        //     // todo: get the Name from the form data
-
-        //     /* 
-        //         todo: Make a new Models.List object that has
-        //         - Name
-        //         - UserID
-        //         - CreatedOn
-        //         - LastUpdate
-        //     */
-
-        //     // todo: add to the DB Context
-
-        //     // todo: save changes in the DB
-
-        //     // todo: rerturn the list the way we returned the list in the get (checkout the MapGet endpoint)
-        // });
-
         //make lists(create)
         group.MapPost("/", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
