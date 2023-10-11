@@ -66,6 +66,8 @@ public static class List
                     ListID = wishlist.ListID,
                 };
 
+                wishlist.LastUpdate = DateTime.Now;
+
                 DB.ListItems.Add(wishlistItem);
                 DB.SaveChanges();
 
@@ -123,6 +125,9 @@ public static class List
                 if (wishlistItem != null) {
                     // Remove the product from the user's wishlist
                     DB.ListItems.Remove(wishlistItem);
+
+                    wishlist.LastUpdate = DateTime.Now;
+
                     DB.SaveChanges();
 
                     Response.StatusCode = StatusCodes.Status204NoContent;
