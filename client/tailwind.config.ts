@@ -28,6 +28,10 @@ const config: Config = {
     },
 
     extend: {
+      gridTemplateRows: {
+        4: "repeat(auto-fit, minmax(292px, 1fr))",
+      },
+
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
