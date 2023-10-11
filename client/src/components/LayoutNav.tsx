@@ -31,8 +31,7 @@ export default function Navigation() {
     },
     {
       title: "shop",
-      href: "/",
-      children: <div>Hello</div>,
+      href: "/shop",
     },
     {
       title: "categories",

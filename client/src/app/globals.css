@@ -35,3 +35,7 @@ a,
   font-family: "poppins", sans-serif;
   @apply prose text-black;
 }
+
+#product-description {
+  @apply prose;
+}

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Models;
 
@@ -10,9 +11,11 @@ using Models;
 namespace backend.Migrations
 {
     [DbContext(typeof(GalleriaHubDBContext))]
-    partial class GalleriaHubDBContextModelSnapshot : ModelSnapshot
+    [Migration("20231011164833_CartMigrations")]
+    partial class CartMigrations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.11");
@@ -162,17 +165,14 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("Pending")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("UserID")
+                    b.Property<int>("User")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("OrderID");
 
                     b.HasIndex("DiscountID");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("User");
 
                     b.ToTable("Orders");
                 });
@@ -469,15 +469,15 @@ namespace backend.Migrations
                         .WithMany()
                         .HasForeignKey("DiscountID");
 
-                    b.HasOne("Models.User", "User")
+                    b.HasOne("Models.User", "Customer")
                         .WithMany()
-                        .HasForeignKey("UserID")
+                        .HasForeignKey("User")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Discount");
+                    b.Navigation("Customer");
 
-                    b.Navigation("User");
+                    b.Navigation("Discount");
                 });
 
             modelBuilder.Entity("Models.OrderItem", b =>

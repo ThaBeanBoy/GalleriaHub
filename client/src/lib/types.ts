@@ -28,3 +28,11 @@ export type ProductType = {
   seller: UserType;
   images: string[];
 };
+
+export type ListType = {
+  listID: number;
+  name: string;
+  createdOn: Date;
+  lastUpdate: Date;
+  items: ProductType[];
+};
