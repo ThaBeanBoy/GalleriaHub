@@ -11,8 +11,11 @@ namespace server.Routes;
 public static class APIResponse
 {
     // USER Response objects
-    public static object ResponseObj(this User User)
+    public static object ResponseObj(this User User, HttpContext context)
     {
+        var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+        var Order = DB.Orders.FirstOrDefault(Order => Order.UserID == User.UserID && Order.Pending);
+
         return new
         {
             userID = User.UserID,
@@ -24,7 +27,8 @@ public static class APIResponse
             name = User.Name,
             surname = User.Surname,
             phoneNumber = User.PhoneNumber,
-            location = User.Location
+            location = User.Location,
+            Cart = Order.ResponseObj(context)
         };
     }
 
@@ -37,12 +41,12 @@ public static class APIResponse
         };
     }
 
-    public static object ResponseObj(this User User, JwtSecurityToken Token)
+    public static object ResponseObj(this User User, JwtSecurityToken Token, HttpContext context)
     {
         return new
         {
             JWT = Token.ResponseObj(),
-            User = User.ResponseObj()
+            User = User.ResponseObj(context)
         };
     }
 
@@ -79,7 +83,7 @@ public static class APIResponse
             createdOn = Product.CreatedOn,
             lastUpdate = Product.LastUpdate,
             Description = Product.Description,
-            seller = ProductOwner.ResponseObj(),
+            seller = ProductOwner.ResponseObj(context),
             Images,
         };
     }
@@ -91,21 +95,38 @@ public static class APIResponse
     }
 
     // List
-    public static object ResponseObj(this Models.List List, HttpContext context){
+    public static object ResponseObj(this Models.List List, HttpContext context)
+    {
         var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
 
         List<Models.ListItem> listItems = DB.ListItems.Where(li => li.ListID == List.ListID).ToList();
-        
-        return new {
-                    ListID = List.ListID,
-                    Name = List.Name,
-                    CreatedOn = List.CreatedOn,
-                    LastUpdate = List.LastUpdate,
-                    Items = listItems.Select(Item => 
-                        DB.Products
-                        .FirstOrDefault(Product => Product.ProductID == Item.ProductID)
-                        .ResponseObj(context)
+
+        return new
+        {
+            ListID = List.ListID,
+            Name = List.Name,
+            CreatedOn = List.CreatedOn,
+            LastUpdate = List.LastUpdate,
+            Items = listItems.Select(Item =>
+                DB.Products
+                .FirstOrDefault(Product => Product.ProductID == Item.ProductID)
+                .ResponseObj(context)
                         )
-                };
+        };
+    }
+
+    public static object ResponseObj(this Models.Order Order, HttpContext context)
+    {
+        var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+
+        return DB.OrderItems
+            .Where(OrderItem => OrderItem.OrderID == Order.OrderID)
+            .Select(OrderItem => new
+            {
+                product = DB.Products
+                    .FirstOrDefault(Product => Product.ProductID == OrderItem.ProductID),
+                OrderItem.Quantity,
+                OrderItem.Price
+            });
     }
 }

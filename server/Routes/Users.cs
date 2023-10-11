@@ -81,7 +81,8 @@ public static class User
                 DB.Users.Add(NewUser);
                 DB.SaveChanges();
 
-                Models.List NewUserWishList = new Models.List{
+                Models.List NewUserWishList = new Models.List
+                {
                     UserID = NewUser.UserID,
                     CreatedOn = DateTime.Now,
                     LastUpdate = DateTime.Now,
@@ -96,7 +97,7 @@ public static class User
                 var Token = JWT.GenerateToken(NewUser);
                 // Sending response
                 Response.StatusCode = StatusCodes.Status201Created;
-                await Response.WriteAsJsonAsync(NewUser.ResponseObj(Token));
+                await Response.WriteAsJsonAsync(NewUser.ResponseObj(Token, context));
             }
             catch (EmailAlreadyRegisteredException e)
             {
@@ -150,7 +151,7 @@ public static class User
                 // Returning user object (succesful login)
                 var Token = JWT.GenerateToken(userEntity);
                 await Response.WriteAsJsonAsync(
-                    userEntity.ResponseObj(Token)
+                    userEntity.ResponseObj(Token, context)
                 );
             }
             catch (Exception e)
@@ -174,7 +175,7 @@ public static class User
                 return Response.WriteAsync("Not logged in");
             }
 
-            return Response.WriteAsJsonAsync(User.ResponseObj());
+            return Response.WriteAsJsonAsync(User.ResponseObj(context));
         });
 
         return group;

@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using server.Routes;
 
 namespace Routes;
 
@@ -75,7 +77,7 @@ public static class Order
 
 
                 Response.StatusCode = StatusCodes.Status202Accepted;
-                return Response.WriteAsync("Added to the database");
+                return Response.WriteAsJsonAsync(Order.ResponseObj(context));
             }
             catch (FormatException ex)
             {
@@ -123,13 +125,78 @@ public static class Order
                 DB.SaveChanges();
 
                 Response.StatusCode = StatusCodes.Status400BadRequest;
-                return Response.WriteAsync("Successfully removed from DB");
+                return Response.WriteAsJsonAsync(Order.ResponseObj(context));
             }
             catch (Exception)
             {
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
                 return Response.WriteAsync("Something went wrong");
             }
+        });
+
+        group.MapPut("/{ProductID}", async (HttpContext context) =>
+        {
+            var (Request, Response) = (context.Request, context.Response);
+            Models.User? User = context.Items["User"] as Models.User;
+            var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+
+            try
+            {
+                if (User == null)
+                {
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await Response.WriteAsync("Need to be logged in");
+                    return;
+                }
+
+                int productId = int.Parse(context.GetRouteValue("productId") as string ?? "0");
+                var Product = DB.Products.FirstOrDefault(Product => Product.ProductID == productId);
+
+                if (Product == null)
+                {
+                    Response.StatusCode = StatusCodes.Status404NotFound;
+                    await Response.WriteAsync("Couldnt find product");
+                    return;
+                }
+
+                var Order = DB.Orders.FirstOrDefault(Order => Order.UserID == User.UserID && Order.Pending);
+
+                var OrderItemToBeUpdated = DB.OrderItems.FirstOrDefault(OrderItem => OrderItem.OrderID == Order.OrderID && OrderItem.ProductID == Product.ProductID);
+
+                int newVal = int.Parse(Request.Query["value"]);
+
+                if (newVal < 1)
+                {
+                    Response.StatusCode = StatusCodes.Status406NotAcceptable;
+                    await Response.WriteAsync("quantity value cannot be less than 1");
+                    return;
+                }
+
+                OrderItemToBeUpdated.Quantity = newVal;
+
+                DB.OrderItems.Update(OrderItemToBeUpdated);
+
+                DB.SaveChanges();
+
+                await Response.WriteAsJsonAsync(Order.ResponseObj(context));
+            }
+            catch (ArgumentNullException)
+            {
+
+                Response.StatusCode = StatusCodes.Status400BadRequest;
+                await Response.WriteAsync("SOmething is wrong with the input");
+            }
+            catch (FormatException)
+            {
+                Response.StatusCode = StatusCodes.Status400BadRequest;
+                await Response.WriteAsync("SOmething is wrong with the input");
+            }
+            catch (Exception)
+            {
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await Response.WriteAsync("Something went wrong");
+            }
+
         });
 
         return group;

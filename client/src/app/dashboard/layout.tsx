@@ -56,16 +56,16 @@ const Navigation: { title: string; href: string; icon: React.ReactNode }[] = [
     href: "/dashboard/products",
     icon: <CiBoxes />,
   },
-  {
-    title: "verify",
-    href: "/dashboard/verify",
-    icon: <VscVerified />,
-  },
-  {
-    title: "gallery",
-    href: "/dashboard/gallery",
-    icon: <PiBuildings />,
-  },
+  // {
+  //   title: "verify",
+  //   href: "/dashboard/verify",
+  //   icon: <VscVerified />,
+  // },
+  // {
+  //   title: "gallery",
+  //   href: "/dashboard/gallery",
+  //   icon: <PiBuildings />,
+  // },
 ];
 
 export default function DashboardLayout({
