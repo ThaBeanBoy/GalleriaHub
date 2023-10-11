@@ -14,6 +14,7 @@ export type UserType = {
   surname: string | null;
   phoneNumber: string | null;
   location: string | null;
+  cart: any[];
 };
 
 export type ProductType = {

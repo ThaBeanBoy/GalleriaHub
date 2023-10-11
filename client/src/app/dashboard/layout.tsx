@@ -10,6 +10,7 @@ import {
   FiFile,
   FiClock,
   FiDollarSign,
+  FiShoppingCart,
 } from "react-icons/fi";
 
 import { BsGraphUp, BsListNested } from "react-icons/bs";
@@ -27,9 +28,9 @@ import useProtectPage from "@/lib/protectPage";
 
 const Navigation: { title: string; href: string; icon: React.ReactNode }[] = [
   {
-    title: "dashboard",
+    title: "cart",
     href: "/dashboard",
-    icon: <BsGraphUp />,
+    icon: <FiShoppingCart />,
   },
   {
     title: "my profile",
