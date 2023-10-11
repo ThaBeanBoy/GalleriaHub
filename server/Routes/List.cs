@@ -140,6 +140,74 @@ public static class List
 
 
         //retrieve list
+        // group.MapGet("/{ListID}", (HttpContext context) =>{
+        //     // todo: get user from the context items
+
+        //     // todo: check if the user is not null (signed in)
+
+        //     // todo: get the List based on the ListID
+
+        //     // todo: Check if the user owns the List
+
+        //     // todo: get the ListItems based on the ListID
+
+        //     // todo: return the List & List Items (call me)
+        // });
+
+        // Retrieve a user's wishlist
+        group.MapGet("/{ListID}", (HttpContext context) => {
+            var (Request, Response) = (context.Request, context.Response);
+
+            try {
+                Models.User? User = context.Items["User"] as Models.User;
+
+                if (User == null) {
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Response.WriteAsync("Only logged-in users can access wishlists");
+                }
+
+                var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+
+                // Parse the `ListID` from the route
+                int listId = int.Parse(context.GetRouteValue("ListID") as string ?? "0");
+
+                // Find the user's wishlist based on `ListID`
+                Models.List? wishlist = DB.Lists.FirstOrDefault(w => w.ListID == listId);
+
+                if (wishlist == null) {
+                    Response.StatusCode = StatusCodes.Status404NotFound;
+                    return Response.WriteAsync("Wishlist not found");
+                }
+
+                if (wishlist.UserID != User.UserID) {
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Response.WriteAsync("You don't own the wishlist");
+                }
+
+                // Get the list items based on the `ListID`
+                List<Models.ListItem> listItems = DB.ListItems.Where(li => li.ListID == listId).ToList();
+
+                // Return the wishlist and its items
+                var wishlistResponse = new {
+                    ListID = wishlist.ListID,
+                    Name = wishlist.Name,
+                    CreatedOn = wishlist.CreatedOn,
+                    LastUpdate = wishlist.LastUpdate,
+                    Items = listItems.Select(Item => 
+                        DB.Products
+                        .FirstOrDefault(Product => Product.ProductID == Item.ProductID)
+                        .ResponseObj(context)
+                        )
+                };
+
+                return Response.WriteAsJsonAsync(wishlistResponse);
+            } catch (Exception e) {
+                Console.WriteLine(e.Message);
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                return Response.WriteAsync("Something went wrong with the server");
+            }
+        });
+
 
         //make lists(create)
 
