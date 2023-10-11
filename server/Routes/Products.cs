@@ -1,6 +1,9 @@
 using System.Reflection.Metadata;
 using Microsoft.AspNetCore.Http.Extensions;
 using Models;
+using Microsoft.AspNetCore.Authentication;
+using Cart;
+using Galleria.Middleware;
 
 namespace Routes;
 
@@ -184,6 +187,46 @@ public static class Product{
             
             Response.StatusCode = StatusCodes.Status501NotImplemented;
             Response.WriteAsync("Not implmeneted yet");
+        });
+
+        group.MapPost("/{ProductID}/cart", (HttpContext context) => {
+            var (request, response) = (context.Request, context.Response);
+            var db = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+
+            
+            dynamic id = request.ReadFromJsonAsync<OrderClass>();
+            var verified = id.Result.Users;
+
+            if (verified != null) {
+                try
+                {
+                    var orders = new Order
+                    {
+                        OrderDate = id.Result.OrderDate,
+                        Customer = id.Result.Users,
+                        Discount = id.Result.Discounts,
+                        OrderID = id.Result.OrderID
+                    };
+                    var item = new OrderItem
+                    {
+                        Product = id.Result.Products,
+                        Order = orders,
+                        Quantity = id.Result.Quantity,
+                        Price = id.Result.Price
+                    };
+                    
+                    db.Orders.Add(orders);
+                    db.OrderItems.Add(item);
+                    db.SaveChanges();
+                    response.StatusCode = StatusCodes.Status200OK;
+                    response.WriteAsJsonAsync(orders);
+                }
+                catch (Exception)
+                {
+                    response.StatusCode = StatusCodes.Status400BadRequest;
+                    response.WriteAsync("No order found");
+                }
+            }
         });
 
         return group;
