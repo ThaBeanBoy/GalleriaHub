@@ -51,6 +51,7 @@ export default function ProductEditorPage({
   const productNameTextField = useInput();
   const priceTextField = useInput();
   const stockField = useInput();
+  const [publicField, setPublicField] = useState(false);
 
   // fetching data
   useEffect(() => {
@@ -80,6 +81,7 @@ export default function ProductEditorPage({
     productNameTextField.set(product.productName);
     priceTextField.set(product.price.toString());
     stockField.set(product.stockQuantity.toString());
+    setPublicField(product.Public);
 
     // setting description
     setDescription(product.description || "");
@@ -91,8 +93,8 @@ export default function ProductEditorPage({
     // Product info update
     const pairings: {
       postField: string;
-      updatedValue: string;
-      productValue: string;
+      updatedValue: any;
+      productValue: any;
     }[] = [
       {
         postField: "productName",
@@ -113,6 +115,11 @@ export default function ProductEditorPage({
         postField: "description",
         updatedValue: description,
         productValue: product.description || "",
+      },
+      {
+        postField: "Public",
+        updatedValue: publicField,
+        productValue: product.Public,
       },
     ];
 
@@ -325,7 +332,8 @@ export default function ProductEditorPage({
                 priceTextField.value === product.price.toString() &&
                 stockField.value === product.stockQuantity.toString() &&
                 description === product.description &&
-                ununploadedAssets.length === 0
+                ununploadedAssets.length === 0 &&
+                publicField === product.Public
               }
             />
           </div>
@@ -341,7 +349,12 @@ export default function ProductEditorPage({
           <div className="mb-4 flex gap-3">
             <Input label="price" type="number" {...priceTextField.inputProps} />
             <Input label="stock" type="number" {...stockField.inputProps} />
-            <Switch label="Public" className="flex-col text-sm" />
+            <Switch
+              label="Public"
+              className="flex-col text-sm"
+              checked={publicField}
+              onCheckedChange={setPublicField}
+            />
           </div>
 
           <label className="mb-4 pl-4 text-xs">Description</label>
