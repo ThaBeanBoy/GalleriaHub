@@ -19,7 +19,7 @@ public static class List
     {
         
         // Add a product to a user's wishlist
-        group.MapPost("/wishlist/add-item/{productId}", (HttpContext context) => {
+        group.MapPost("/{ListID}/{productId}", (HttpContext context) => {
             var (Request, Response) = (context.Request, context.Response);
 
             try {
@@ -34,37 +34,40 @@ public static class List
 
                 // Parse the product ID from the route
                 int productId = int.Parse(context.GetRouteValue("productId") as string ?? "0");
+                int ListId = int.Parse(context.GetRouteValue("ListID") as string ?? "0");
 
                 // Find the product with the specified ID
-                Models.Product product = DB.Products.FirstOrDefault(p => p.ProductID == productId);
+                Models.Product? product = DB.Products.FirstOrDefault(p => p.ProductID == productId);
 
                 if (product == null) {
                     Response.StatusCode = StatusCodes.Status404NotFound;
+                    Console.WriteLine("product not found");
                     return Response.WriteAsync("Product not found");
                 }
 
-                // Check if the user already has a wishlist; create one if they don't
-                // Models.List wishlist = DB.Wishlists.FirstOrDefault(w => w.UserId == User.UserID);
+                //Check if the user already has a wishlist; create one if they don't
+                Models.List? wishlist = DB.Lists.FirstOrDefault(w => w.ListID == ListId);
 
-                // if (wishlist == null) {
-                //     wishlist = new Models.List
-                //     {
-                //         UserId = User.UserID,
-                //         // Set other wishlist properties
-                //     };
-                //     DB.Wishlists.Add(wishlist);
-                // }
+                if (wishlist == null) {
+                    Response.StatusCode = StatusCodes.Status404NotFound;
+                    Console.WriteLine("List not found");
+                    return Response.WriteAsync("Could not find list");
+                }
 
-                // // Add the product to the user's wishlist
-                // Models.WishlistItem wishlistItem = new Models.WishlistItem
-                // {
-                //     WishlistId = wishlist.WishlistId,
-                //     ProductId = product.ProductID,
-                //     Quantity = 1 // You can adjust the quantity as needed
-                // };
+                if(wishlist.UserID != User.UserID){
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    Response.WriteAsync("Don't own the list");
+                }
 
-                // DB.WishlistItems.Add(wishlistItem);
-                // DB.SaveChanges();
+                // Add the product to the user's wishlist
+                Models.ListItem wishlistItem = new Models.ListItem
+                {
+                    ProductID = product.ProductID,
+                    ListID = wishlist.ListID,
+                };
+
+                DB.ListItems.Add(wishlistItem);
+                DB.SaveChanges();
 
                 Response.StatusCode = StatusCodes.Status201Created;
                 return Response.WriteAsync("Product added to wishlist");

@@ -78,16 +78,17 @@ public static class User
                     LastUpdate = DateTime.Now,
                 };
 
+                DB.Users.Add(NewUser);
+                DB.SaveChanges();
+
                 Models.List NewUserWishList = new Models.List{
                     UserID = NewUser.UserID,
                     CreatedOn = DateTime.Now,
                     LastUpdate = DateTime.Now,
                     Name = "Wish List"
                 };
+
                 DB.Lists.Add(NewUserWishList);
-
-                DB.Users.Add(NewUser);
-
                 DB.SaveChanges();
 
                 // Signing user in

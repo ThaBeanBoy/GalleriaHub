@@ -125,6 +125,9 @@ app.MapGroup(Routes.Product.RouterPrefix)
 app.MapGroup(AssetsEndpoints.RouterPrefix)
     .AssetEndpoints();
 
+app.MapGroup(Routes.List.RouterPrefix)
+    .ListEndpoints();
+
 app.Run();
 
 class PutModel
