@@ -2,10 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Client",
+            "cwd": "${workspaceFolder}/client",
+            "command": "npm run dev",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
             // Use IntelliSense to find out which attributes exist for C# debugging
             // Use hover for the description of the existing attributes
             // For further information visit https://github.com/dotnet/vscode-csharp/blob/main/debugger-launchjson.md.
-            "name": ".NET Core Launch (web)",
+            "name": "Server",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
