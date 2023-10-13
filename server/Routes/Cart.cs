@@ -15,9 +15,33 @@ public static class Cart
     {
 
         // READ
+        group.MapGet("/", async (HttpContext context) =>
+        {
+            var (Request, Response) = (context.Request, context.Response);
+            var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+            var User = context.Items["User"] as Models.User;
+
+            try
+            {
+                if (User == null)
+                {
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await Response.WriteAsync("Need to be logged in");
+                    return;
+                }
+
+                List<UserCartItem> Cart = DB.UserCartItems.Where(CartItem => CartItem.UserID == User.UserID).ToList();
+
+                await Response.WriteAsJsonAsync(Cart.ResponseObj(context));
+            }
+            catch (Exception)
+            {
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await Response.WriteAsync("Something went wrong");
+            }
+        });
 
         // UPDATE
-
         // Add to cart
         group.MapPut("/add", async (HttpContext context) =>
         {
@@ -169,7 +193,58 @@ public static class Cart
         });
 
         // remove from cart
+        group.MapDelete("/delete", async (HttpContext context) =>
+        {
+            var (Request, Response) = (context.Request, context.Response);
+            var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+            var User = context.Items["User"] as Models.User;
 
+            try
+            {
+                // Check if user is logged in
+                if (User == null)
+                {
+                    Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    await Response.WriteAsync("Need to be logged in");
+                    return;
+                }
+
+                CartQueryParams Params = new(Request.Query);
+
+                Models.Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == Params.ProductID);
+
+                // Check for product
+                if (Product == null)
+                {
+                    Response.StatusCode = StatusCodes.Status404NotFound;
+                    await Response.WriteAsync("Product not found");
+                    return;
+                }
+
+                UserCartItem? CartItem = DB.UserCartItems.FirstOrDefault(CartItem => CartItem.UserID == User.UserID && CartItem.ProductID == Product.ProductID);
+
+                var Cart = DB.UserCartItems.Where(UserCartItems => UserCartItems.UserID == User.UserID).ToList();
+
+                // Check if the product is in cart
+                if (CartItem == null)
+                {
+                    await Response.WriteAsJsonAsync(Cart.ResponseObj(context));
+                    return;
+                }
+
+                DB.UserCartItems.Remove(CartItem);
+                DB.SaveChanges();
+
+                Cart = DB.UserCartItems.Where(UserCartItems => UserCartItems.UserID == User.UserID).ToList();
+
+                await Response.WriteAsJsonAsync(Cart.ResponseObj(context));
+            }
+            catch (Exception)
+            {
+                Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await Response.WriteAsync("Something went wrong");
+            }
+        });
 
         return group;
     }
