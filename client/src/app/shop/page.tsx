@@ -1,5 +1,8 @@
+"use client";
+
 import Button from "@/components/Button";
 import Grid, { ProductGrid } from "@/components/Grid";
+import ProductCard from "@/components/ProductCard";
 import { ProductType } from "@/lib/types";
 import axios from "axios";
 import Link from "next/link";
@@ -14,7 +17,11 @@ export default async function Shop() {
 
   return (
     <main>
-      <ProductGrid products={data} />
+      <Grid className="grid-4 group">
+        {data.map((product, key) => (
+          <ProductCard key={key} {...product} />
+        ))}
+      </Grid>
     </main>
   );
 }

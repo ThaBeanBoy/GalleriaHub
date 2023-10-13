@@ -2,9 +2,10 @@ import { ProductType } from "@/lib/types";
 import Link from "next/link";
 import Button from "./Button";
 import { BsCartPlus, BsPlus } from "react-icons/bs";
-import { ReactNode } from "react";
+import { ReactNode, useContext } from "react";
 import Tooltip from "./Tooltip";
 import { SlOptionsVertical } from "react-icons/sl";
+import { UserContext } from "@/contexts/auth";
 
 export default function ProductCard({
   productID,
@@ -13,12 +14,15 @@ export default function ProductCard({
   price,
   tooltip,
 }: { tooltip?: ReactNode } & ProductType) {
+  const Auth = useContext(UserContext);
+
   return (
     <div key={productID} className="group relative">
       <Link
         href={`/shop/${productID}`}
         className="group flex h-full w-full flex-col justify-between rounded-lg bg-white pb-2 drop-shadow"
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={images.length > 0 ? images[0] : ""}
           alt={`${productName} image`}
@@ -38,17 +42,20 @@ export default function ProductCard({
       </Link>
 
       {/* user actions */}
-      <div className="absolute left-[50%] top-[50%] hidden w-[90%] translate-x-[-50%] translate-y-[-50%] gap-2 rounded-xl bg-white px-3 py-2 drop-shadow-xl group-hover:flex">
-        <Button
-          // label="Add to cart"
-          className="p-0 text-sm"
-          label="Add to cart"
-          icon={<BsCartPlus />}
-          variant="flat"
-        />
+      {Auth?.auth?.user && (
+        <div className="absolute left-[50%] top-[50%] hidden w-[90%] translate-x-[-50%] translate-y-[-50%] gap-2 rounded-xl bg-white px-3 py-2 drop-shadow-xl group-hover:flex">
+          <Button
+            // label="Add to cart"
+            className="p-0 text-sm"
+            label="Add to cart"
+            icon={<BsCartPlus />}
+            onClick={() => Auth.AddToCartHandler(productID)}
+            variant="flat"
+          />
 
-        <Button icon={<BsPlus />} variant="flat" />
-      </div>
+          <Button icon={<BsPlus />} variant="flat" />
+        </div>
+      )}
 
       {/* {tooltip && (
         <Tooltip
