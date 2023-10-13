@@ -131,6 +131,9 @@ app.MapGroup(Routes.List.RouterPrefix)
 app.MapGroup(Routes.Order.RouterPrefix)
     .OrderEndpoints();
 
+app.MapGroup(Cart.RouterPrefix)
+.CartEndpoints();
+
 app.Run();
 
 class PutModel

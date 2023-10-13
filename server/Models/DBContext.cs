@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Models;
 
-public class GalleriaHubDBContext : DbContext 
+public class GalleriaHubDBContext : DbContext
 {
     // private readonly bool ProductionEnv;
 
@@ -14,6 +14,7 @@ public class GalleriaHubDBContext : DbContext
     public DbSet<ArtistVerification> ArtistVerifications { get; set; } = null!;
     public DbSet<Product> Products { get; set; } = null!;
     public DbSet<ProductFile> ProductFiles { get; set; } = null!;
+    public DbSet<UserCartItem> UserCartItems { get; set; }
     public DbSet<ProductVerification> ProductVerifications { get; set; } = null!;
     public DbSet<Review> Reviews { get; set; } = null!;
     public DbSet<Order> Orders { get; set; } = null!;
@@ -25,7 +26,8 @@ public class GalleriaHubDBContext : DbContext
     public DbSet<ListItem> ListItems { get; set; } = null!;
     public DbSet<File> Files { get; set; } = null!;
 
-    protected override void OnModelCreating(ModelBuilder builder){
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
         /*
         User Table
 
@@ -65,13 +67,13 @@ public class GalleriaHubDBContext : DbContext
             .HasOne(u => u.ProfilePicture)
             .WithMany() // Assuming File has no navigation property back to User
             .HasForeignKey(u => u.ProfilePictureFileID);
-            // .OnDelete(DeleteBehavior.Restrict);
+        // .OnDelete(DeleteBehavior.Restrict);
 
         // builder.Entity<User>()
         //     .HasOne(u => u.CoverPicture)
         //     .WithMany() // Assuming File has no navigation property back to User
         //     .HasForeignKey(u => u.CoverPictureFileID);
-            // .OnDelete(DeleteBehavior.Restrict);
+        // .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<User>()
             .HasOne<File>(U => U.CoverPicture)

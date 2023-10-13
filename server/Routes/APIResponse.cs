@@ -95,7 +95,7 @@ public static class APIResponse
     }
 
     // List
-    public static object ResponseObj(this Models.List List, HttpContext context)
+    public static object ResponseObj(this List List, HttpContext context)
     {
         var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
 
@@ -115,7 +115,7 @@ public static class APIResponse
         };
     }
 
-    public static object ResponseObj(this Models.Order Order, HttpContext context)
+    public static object ResponseObj(this Order Order, HttpContext context)
     {
         var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
 
@@ -128,5 +128,24 @@ public static class APIResponse
                 OrderItem.Quantity,
                 OrderItem.Price
             });
+    }
+
+    // Cart
+    public static object ResponseObj(this List<UserCartItem> Cart, HttpContext context)
+    {
+
+        return Cart.Select(CartItem =>
+        {
+            // Getting the product from the db
+            var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+            Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == CartItem.ProductID);
+
+            return new
+            {
+                CartItem.Quantity,
+                product = Product.ResponseObj(context)
+            };
+        }
+            );
     }
 }
