@@ -1,0 +1,58 @@
+<> Filter Component (front end)
+    <> Filter
+        <> Public
+        <> Dates
+            <> From
+            <> To
+            <> Asc/Desc
+        <> Price
+            <> From
+            <> To
+            <> Asc/Desc
+
+
+<> Product Editor
+    <> Fix public button
+    <> Filter
+    <> Tooltip
+        <> Fix outer click
+        <> General info
+    <> Make responsive
+
+<> Products Page 
+    <> Filter
+    <> Infinite scroll
+    <> Staggered grid
+    <> Make responsive
+    <> Quantity if in cart
+    <> Make responsive
+
+<> About Product
+    <> Add to cart button
+
+    <> Lists
+        <> Make use of params
+
+    <> Fix description
+
+
+<> Cart
+    <> Make cart display the updated total in the aside
+    <> Make the cart display in the nav
+    <> Make the cart look better
+    <> Filter
+
+<> Invoice
+    <> Make endpoint for creating order from user's cart
+    <> display in table
+        <> Filter
+            <> Dates
+            <> Price
+            <> Username/email
+    
+<> Sales
+    <> display in table
+        <> Filter
+            <> Dates
+            <> Price
+            <> Username/email
