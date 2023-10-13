@@ -40,9 +40,13 @@ export type UserContextType = {
 
   // Cart
   cart: CartType;
-  AddToCartHandler: (ProductID: number) => void;
-  DeleteFromCartHandler: (ProductID: number) => void;
-  UpdateCartHandler: (ProductID: number, Quantity: number) => void;
+  AddToCartHandler: (ProductID: number, Toast?: boolean) => void;
+  DeleteFromCartHandler: (ProductID: number, Toast?: boolean) => void;
+  UpdateCartHandler: (
+    ProductID: number,
+    Quantity: number,
+    Toast?: boolean,
+  ) => void;
 };
 
 export const UserContext = createContext<UserContextType | null>(null);
@@ -140,12 +144,14 @@ export default function AuthProvider({
 
   const ViewCartCompontent = <Link href="/cart">View Cart</Link>;
 
-  const AddToCartHandler = async (ProductID: number) => {
+  const AddToCartHandler = async (ProductID: number, Toast: boolean = true) => {
     try {
-      toast({
-        title: "Cart",
-        description: "Attempting to add to cart",
-      });
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Attempting to add to cart",
+        });
+      }
 
       const { data } = await axios<CartType>({
         method: "put",
@@ -162,28 +168,35 @@ export default function AuthProvider({
 
       setCart(data);
 
-      toast({
-        title: "Cart",
-        description: "Added to cart",
-        action: ViewCartCompontent,
-      });
-
-      console.log(data);
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Added to cart",
+          action: ViewCartCompontent,
+        });
+      }
     } catch (error: any) {
-      toast({
-        title: "Cart",
-        description: "Something went wrong",
-        variant: "destructive",
-      });
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Something went wrong",
+          variant: "destructive",
+        });
+      }
     }
   };
 
-  const DeleteFromCartHandler = async (ProductID: number) => {
+  const DeleteFromCartHandler = async (
+    ProductID: number,
+    Toast: boolean = true,
+  ) => {
     try {
-      toast({
-        title: "Cart",
-        description: "Attempting to add to cart",
-      });
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Attempting to add to cart",
+        });
+      }
 
       const { data } = await axios<CartType>({
         method: "delete",
@@ -200,28 +213,38 @@ export default function AuthProvider({
 
       setCart(data);
 
-      toast({
-        title: "Cart",
-        description: "Deleted from the cart",
-        action: ViewCartCompontent,
-      });
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Deleted from the cart",
+          action: ViewCartCompontent,
+        });
+      }
     } catch (error: any) {
-      toast({
-        title: "Cart",
-        description: "Something went wrong",
-        variant: "destructive",
-      });
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Something went wrong",
+          variant: "destructive",
+        });
+      }
     }
   };
 
-  const UpdateCartHandler = async (ProductID: number, Quantity: number) => {
+  const UpdateCartHandler = async (
+    ProductID: number,
+    Quantity: number,
+    Toast: boolean = true,
+  ) => {
     try {
-      toast({
-        title: "Cart",
-        description: "Updating Cart Item",
-      });
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Updating Cart Item",
+        });
+      }
 
-      const { data } = await axios({
+      const { data } = await axios<CartType>({
         method: "put",
         url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart/update`,
 
@@ -235,13 +258,22 @@ export default function AuthProvider({
         },
       });
 
-      console.log(data);
+      setCart(data);
+
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Successfully updated",
+        });
+      }
     } catch (error) {
-      console.log(error),
+      console.log(error);
+      if (Toast) {
         toast({
           title: "Toast",
           description: "Something went wrong",
         });
+      }
     }
   };
 

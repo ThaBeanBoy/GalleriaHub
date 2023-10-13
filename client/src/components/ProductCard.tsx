@@ -21,11 +21,14 @@ export default function ProductCard({
   const [inCart, setIntCart] = useState(false);
 
   useEffect(() => {
-    console.log(Auth?.cart);
-    setIntCart(
-      Auth?.cart.some((CartItem) => CartItem.product.productID === productID) ||
-        false,
-    );
+    if (Auth) {
+      console.log(Auth?.cart);
+      setIntCart(
+        Auth?.cart.some(
+          (CartItem) => CartItem.product.productID === productID,
+        ) || false,
+      );
+    }
   }, [Auth?.cart, productID]);
 
   return (

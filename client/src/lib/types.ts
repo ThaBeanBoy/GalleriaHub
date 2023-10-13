@@ -38,7 +38,7 @@ export type ListType = {
   items: ProductType[];
 };
 
-export type CartType = {
+export type CartItemType = {
   quantity: number;
   product: {
     productID: number;
@@ -50,4 +50,6 @@ export type CartType = {
       username: string;
     };
   };
-}[];
+};
+
+export type CartType = CartItemType[];
