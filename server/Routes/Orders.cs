@@ -77,7 +77,7 @@ public static class Order
 
 
                 Response.StatusCode = StatusCodes.Status202Accepted;
-                return Response.WriteAsJsonAsync(Order.ResponseObj(context));
+                return Response.WriteAsJsonAsync("Added to order");
             }
             catch (FormatException ex)
             {
@@ -125,7 +125,7 @@ public static class Order
                 DB.SaveChanges();
 
                 Response.StatusCode = StatusCodes.Status400BadRequest;
-                return Response.WriteAsJsonAsync(Order.ResponseObj(context));
+                return Response.WriteAsJsonAsync("delete");
             }
             catch (Exception)
             {
@@ -178,7 +178,7 @@ public static class Order
 
                 DB.SaveChanges();
 
-                await Response.WriteAsJsonAsync(Order.ResponseObj(context));
+                await Response.WriteAsJsonAsync("added to order");
             }
             catch (ArgumentNullException)
             {
