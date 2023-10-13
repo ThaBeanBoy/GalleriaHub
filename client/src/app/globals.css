@@ -16,3 +16,26 @@ a,
 .prose a {
   @apply text-active no-underline;
 }
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ql-editor {
+  font-size: 16px;
+  font-family: "poppins", sans-serif;
+  @apply prose text-black;
+}
+
+#product-description {
+  @apply prose;
+}

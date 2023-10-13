@@ -89,17 +89,18 @@ namespace backend.Migrations
             modelBuilder.Entity("Models.GalleryFile", b =>
                 {
                     b.Property<int>("GalleryID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("FileID")
+                    b.Property<int>("GalleryID1")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("Public")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("GalleryID", "FileID");
+                    b.HasKey("GalleryID");
 
-                    b.HasIndex("FileID");
+                    b.HasIndex("GalleryID1");
 
                     b.ToTable("GalleryFiles");
                 });
@@ -113,10 +114,22 @@ namespace backend.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("LastUpdate")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UserID")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("ListID");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("Lists");
                 });
@@ -145,17 +158,21 @@ namespace backend.Migrations
                     b.Property<int?>("DiscountID")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("OrderDate")
+                    b.Property<DateTime?>("OrderDate")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("User")
+                    b.Property<bool>("Pending")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserID")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("OrderID");
 
                     b.HasIndex("DiscountID");
 
-                    b.HasIndex("User");
+                    b.HasIndex("UserID");
 
                     b.ToTable("Orders");
                 });
@@ -190,8 +207,9 @@ namespace backend.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("FileID")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("LastUpdate")
                         .HasColumnType("TEXT");
@@ -214,8 +232,6 @@ namespace backend.Migrations
 
                     b.HasKey("ProductID");
 
-                    b.HasIndex("FileID");
-
                     b.HasIndex("UserID");
 
                     b.ToTable("Products");
@@ -223,18 +239,23 @@ namespace backend.Migrations
 
             modelBuilder.Entity("Models.ProductFile", b =>
                 {
-                    b.Property<int>("ProductID")
+                    b.Property<int>("ProductFileID")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("FileID")
+                    b.Property<string>("FileKey")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProductID")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("Public")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("ProductID", "FileID");
+                    b.HasKey("ProductFileID");
 
-                    b.HasIndex("FileID");
+                    b.HasIndex("ProductID");
 
                     b.ToTable("ProductFiles");
                 });
@@ -311,9 +332,6 @@ namespace backend.Migrations
                     b.Property<DateTime>("LastUpdate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ListID")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Location")
                         .HasColumnType("TEXT");
 
@@ -344,8 +362,6 @@ namespace backend.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.HasIndex("ListID");
-
                     b.HasIndex("PhoneNumber")
                         .IsUnique();
 
@@ -355,30 +371,6 @@ namespace backend.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Models.UserList", b =>
-                {
-                    b.Property<int>("UserID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ListID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("FileID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ListName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("UserID", "ListID");
-
-                    b.HasIndex("FileID");
-
-                    b.HasIndex("ListID");
-
-                    b.ToTable("UserLists");
                 });
 
             modelBuilder.Entity("Models.Verifier", b =>
@@ -432,21 +424,24 @@ namespace backend.Migrations
 
             modelBuilder.Entity("Models.GalleryFile", b =>
                 {
-                    b.HasOne("Models.File", "File")
-                        .WithMany()
-                        .HasForeignKey("FileID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Models.Gallery", "Gallery")
                         .WithMany()
-                        .HasForeignKey("GalleryID")
+                        .HasForeignKey("GalleryID1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("File");
-
                     b.Navigation("Gallery");
+                });
+
+            modelBuilder.Entity("Models.List", b =>
+                {
+                    b.HasOne("Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Models.ListItem", b =>
@@ -474,15 +469,15 @@ namespace backend.Migrations
                         .WithMany()
                         .HasForeignKey("DiscountID");
 
-                    b.HasOne("Models.User", "Customer")
+                    b.HasOne("Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("User")
+                        .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Customer");
-
                     b.Navigation("Discount");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Models.OrderItem", b =>
@@ -506,36 +501,22 @@ namespace backend.Migrations
 
             modelBuilder.Entity("Models.Product", b =>
                 {
-                    b.HasOne("Models.File", "File")
-                        .WithMany()
-                        .HasForeignKey("FileID");
-
                     b.HasOne("Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("File");
-
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("Models.ProductFile", b =>
                 {
-                    b.HasOne("Models.File", "File")
-                        .WithMany()
-                        .HasForeignKey("FileID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Models.Product", "Product")
                         .WithMany()
                         .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("File");
 
                     b.Navigation("Product");
                 });
@@ -580,46 +561,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("Models.User", b =>
                 {
-                    b.HasOne("Models.List", "WishList")
-                        .WithMany()
-                        .HasForeignKey("ListID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Models.File", "ProfilePicture")
                         .WithMany()
                         .HasForeignKey("ProfilePictureFileID");
 
                     b.Navigation("ProfilePicture");
-
-                    b.Navigation("WishList");
-                });
-
-            modelBuilder.Entity("Models.UserList", b =>
-                {
-                    b.HasOne("Models.File", "File")
-                        .WithMany()
-                        .HasForeignKey("FileID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Models.List", "List")
-                        .WithMany()
-                        .HasForeignKey("ListID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("File");
-
-                    b.Navigation("List");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Models.Verifier", b =>

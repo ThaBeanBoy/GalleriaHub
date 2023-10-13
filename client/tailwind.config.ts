@@ -1,13 +1,24 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  mode: 'jit',
+  mode: "jit",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    typography: {
+      DEFAULT: {
+        css: {
+          color: "#475569",
+          a: {
+            color: "#3667DC",
+          },
+        },
+      },
+    },
+
     container: {
       center: true,
       padding: "2rem",
@@ -17,6 +28,10 @@ const config: Config = {
     },
 
     extend: {
+      gridTemplateRows: {
+        4: "repeat(auto-fit, minmax(292px, 1fr))",
+      },
+
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
@@ -24,7 +39,7 @@ const config: Config = {
       },
 
       colors: {
-        white: "#FFFAF5",
+        white: "#ffffff",
         black: {
           DEFAULT: "#475569",
           x2: "#27313F",
@@ -106,7 +121,7 @@ const config: Config = {
   plugins: [
     require("@tailwindcss/typography"),
     require("tailwindcss-animate"),
-    require('@kamona/tailwindcss-perspective'),
+    require("@kamona/tailwindcss-perspective"),
   ],
 };
 export default config;

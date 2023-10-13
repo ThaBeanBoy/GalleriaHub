@@ -4,42 +4,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Models;
 
-public class Order : IList<OrderItem>
+public class Order
 {
-    public int OrderID {get; set;}
+    public int OrderID { get; set; }
 
     [Required]
-    public DateTime OrderDate {get; set;}
+    public DateTime? OrderDate { get; set; }
 
-    [Required, ForeignKey("User")]
-    public required User Customer {get; set;}
+    public User User { get; set; } = null!;
+    public int UserID { get; set; }
 
     public int? DiscountID { get; set; }
     public Discount? Discount { get; set; }
-
-    public void AddItem(DbSet<OrderItem> ListItemSet, OrderItem NewItem)
-    {
-        throw new NotImplementedException();
-    }
-
-    public OrderItem[] GetItems(DbSet<OrderItem> ListItemSet)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void RemoveItem(DbSet<OrderItem> ListItemSet, OrderItem NewItem)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void UpdateOrderItem(DbSet<OrderItem> ListItemSet, OrderItem NewItem)
-    {
-        throw new NotImplementedException();
-    }
+    public bool Pending { get; set; }
 }
 
 [PrimaryKey(nameof(OrderID), nameof(ProductID))]
-public class OrderItem 
+public class OrderItem
 {
     public int ProductID { get; set; }
     public Product Product { get; set; } = null!;

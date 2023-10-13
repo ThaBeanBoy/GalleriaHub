@@ -5,23 +5,7 @@ import { createContext, useEffect, useState } from "react";
 
 import { useToast } from "@/components/ui/use-toast";
 
-type JwtType = {
-  token: string;
-  expiryDate: Date;
-};
-
-type UserType = {
-  userID: number;
-  email: string;
-  username: string;
-  createdOn: Date;
-  lastUpdate: Date;
-  profilePicture: string | null;
-  name: string | null;
-  surname: string | null;
-  phoneNumber: string | null;
-  location: string | null;
-};
+import { JwtType, UserType } from "@/lib/types";
 
 export type AuthType = {
   jwt: JwtType;
@@ -132,7 +116,7 @@ export default function AuthProvider({
   const logoutHandler = () => {
     //make the user object null
     // remove the jwt token from the cookies/internal storage
-    sessionStorage.removeItem("jwt");
+    localStorage.removeItem("jwt");
 
     setAuth(undefined);
 
@@ -147,12 +131,12 @@ export default function AuthProvider({
 
     if (auth) {
       // handling the expirations
-      sessionStorage.setItem("jwt", JSON.stringify(auth.jwt));
+      localStorage.setItem("jwt", JSON.stringify(auth.jwt));
 
       setTimeout(() => {
         alert("Authentication token expired, please login again");
         // removing token from storage
-        sessionStorage.removeItem("jwt");
+        localStorage.removeItem("jwt");
 
         // setting auth to null
         setAuth(undefined);
@@ -163,7 +147,7 @@ export default function AuthProvider({
     } else {
       // handling retrieving token from memory
       try {
-        const JwtInStorage = sessionStorage.getItem("jwt");
+        const JwtInStorage = localStorage.getItem("jwt");
 
         if (!JwtInStorage) {
           throw new Error("JWT Token not in storage");
@@ -174,7 +158,7 @@ export default function AuthProvider({
 
         if (JwtExpired(jwt)) {
           // Removing from session storage
-          sessionStorage.removeItem("jwt");
+          localStorage.removeItem("jwt");
           throw new Error("Web token expired");
         }
 

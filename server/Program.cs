@@ -11,6 +11,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
 using Galleria.Services;
+using server.Routes;
 
 var builder = WebApplication.CreateBuilder(args);
 // builder.Services.AddDbContext<GalleriaHubDBContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("Lite")));
@@ -18,22 +19,26 @@ builder.Services.AddSqlite<GalleriaHubDBContext>(builder.Configuration.GetConnec
 
 // CORS
 string ClientOrigins = "_ClientOrigins";
-builder.Services.AddCors(options =>{
-    options.AddPolicy( 
-        name: ClientOrigins, 
-        policy => {
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        name: ClientOrigins,
+        policy =>
+        {
             policy
             .WithOrigins("http://localhost:3000")
             .AllowAnyHeader()
-            .AllowAnyMethod();            
+            .AllowAnyMethod();
         });
 });
 
 string DevelopmentCORS = "_DevModeCors";
-builder.Services.AddCors(options => {
+builder.Services.AddCors(options =>
+{
     options.AddPolicy(
-        name: DevelopmentCORS ,
-        policy => {
+        name: DevelopmentCORS,
+        policy =>
+        {
             policy
             .AllowAnyOrigin()
             .AllowAnyHeader()
@@ -50,8 +55,10 @@ var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var key = Encoding.ASCII.GetBytes(jwtSettings["key"]);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options => {
-        options.TokenValidationParameters = new TokenValidationParameters{
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
@@ -64,6 +71,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // Adding custom JWT Service
 builder.Services.AddGalleriaJWT(jwtSettings);
+
+// Adding custom Amazon S3 Bucket service
+builder.Services.AddS3Bucket(jwtSettings);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -78,11 +88,28 @@ app.UseUserMiddleware();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.MapGet("/", ()=> "Hello World");
+app.MapGet("/", () => "Hello World");
 
-app.MapGet("/db-connected", (HttpContext context) => {
+app.MapGet("/db-connected", (HttpContext context) =>
+{
     var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
     return Results.Ok(DB != null);
+});
+
+app.MapPut("/put-expriment", async (HttpContext context) =>
+{
+    var (Request, Response) = (context.Request, context.Response);
+
+    var Body = await Request.ReadFromJsonAsync<PutModel>();
+
+    // await Response.WriteAsJsonAsync(Request.Form);
+});
+
+app.MapPost("/upload-img", (HttpContext context) =>
+{
+    var Files = context.Request.Form.Files;
+
+    context.Response.WriteAsync($"Uploaded {Files.Count}");
 });
 
 app.MapGroup(Developers.RouterPrefix)
@@ -90,9 +117,25 @@ app.MapGroup(Developers.RouterPrefix)
 
 app.MapGroup(Routes.User.RouterPrefix)
     .UserEndpoints(jwtSettings);//.WithMetadata(new EnableCorsAttribute(ClientOrigins));
-    // .RequireAuthorization();
+                                // .RequireAuthorization();
 
 app.MapGroup(Routes.Product.RouterPrefix)
     .ProductEndpoints();
 
+app.MapGroup(AssetsEndpoints.RouterPrefix)
+    .AssetEndpoints();
+
+app.MapGroup(Routes.List.RouterPrefix)
+    .ListEndpoints();
+
+app.MapGroup(Routes.Order.RouterPrefix)
+    .OrderEndpoints();
+
 app.Run();
+
+class PutModel
+{
+    public string? Name { get; set; }
+    public string? Age { get; set; }
+    public IFormFile[]? File { get; set; }
+}
