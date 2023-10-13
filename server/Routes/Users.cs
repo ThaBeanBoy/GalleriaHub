@@ -181,47 +181,7 @@ public static class User
         return group;
     }
 
-
-    // private static object TokenResponse
-    // private static class APIResponse
-    // {
-    //     public static object User(Models.User User)
-    //     {
-    //         return new 
-    //         {
-    //             userID = User.UserID,
-    //             email = User.Email,
-    //             username = User.Username,
-    //             createdOn = User.CreatedOn,
-    //             lastUpdate = User.LastUpdate,
-    //             profilePicture = User.ProfilePictureFileID,
-    //             name = User.Name,
-    //             surname = User.Surname,
-    //             phoneNumber = User.PhoneNumber,
-    //             location = User.Location
-    //         };
-    //     }
-
-    //     public static object JWTToken(JwtSecurityToken Token)
-    //     {
-    //         return new 
-    //         {
-    //             token = JWTService.TokenString(Token),
-    //             expiryDate = Token.ValidTo
-    //         };
-    //     }
-
-    //     public static object Authentication(Models.User User, JwtSecurityToken Token)
-    //     {
-    //         return new {
-    //             JWT = JWTToken(Token),
-    //             User = APIResponse.User(User)
-    //         };
-    //     }
-    // }
-
     // Exceptions
-
     public class EmailAlreadyRegisteredException : Exception
     {
         public EmailAlreadyRegisteredException(string Email) : base($"email {Email} has already been registered") { }

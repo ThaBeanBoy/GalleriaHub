@@ -14,7 +14,21 @@ public static class APIResponse
     public static object ResponseObj(this User User, HttpContext context)
     {
         var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
-        var Order = DB.Orders.FirstOrDefault(Order => Order.UserID == User.UserID && Order.Pending);
+        var Cart = DB.UserCartItems.Where(CartItem => CartItem.UserID == User.UserID).ToList();
+
+        Cart.Select(CartItem =>
+            {
+                // Getting the product from the db
+                var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+                Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == CartItem.ProductID);
+
+                return new
+                {
+                    CartItem.Quantity,
+                    product = Product.ResponseObj(context)
+                };
+            }
+        );
 
         return new
         {
@@ -28,7 +42,7 @@ public static class APIResponse
             surname = User.Surname,
             phoneNumber = User.PhoneNumber,
             location = User.Location,
-            Cart = Order.ResponseObj(context)
+            Cart
         };
     }
 
