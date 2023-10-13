@@ -5,7 +5,7 @@ import { createContext, useEffect, useState } from "react";
 
 import { useToast } from "@/components/ui/use-toast";
 
-import { JwtType, UserType } from "@/lib/types";
+import { CartType, JwtType, UserType } from "@/lib/types";
 import Link from "next/link";
 
 export type AuthType = {
@@ -39,6 +39,7 @@ export type UserContextType = {
   logoutHandler: () => void;
 
   // Cart
+  cart: CartType;
   AddToCartHandler: (ProductID: number) => void;
   DeleteFromCartHandler: (ProductID: number) => void;
   UpdateCartHandler: (ProductID: number, Quantity: number) => void;
@@ -53,6 +54,8 @@ export default function AuthProvider({
 }) {
   const pathname = usePathname();
   const [auth, setAuth] = useState<userContextAuthType>(undefined);
+
+  const [cart, setCart] = useState<CartType>([]);
 
   const { toast } = useToast();
 
@@ -74,6 +77,7 @@ export default function AuthProvider({
       });
 
       setAuth(ResponseDataToAuthType(data));
+      setCart(data.user.cart);
 
       toast({
         title: "Login",
@@ -101,13 +105,14 @@ export default function AuthProvider({
       formData.append("password", password);
       formData.append("confirm-password", confirmPassword);
 
-      const { data } = await axios({
+      const { data } = await axios<AuthType>({
         method: "post",
         url: `${process.env.NEXT_PUBLIC_SERVER_URL}/authentication/sign-up`,
         data: formData,
       });
 
       setAuth(ResponseDataToAuthType(data));
+      setCart(data.user.cart);
 
       toast({
         title: "Login",
@@ -142,7 +147,7 @@ export default function AuthProvider({
         description: "Attempting to add to cart",
       });
 
-      const { data } = await axios({
+      const { data } = await axios<CartType>({
         method: "put",
         url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart/add`,
 
@@ -154,6 +159,8 @@ export default function AuthProvider({
           productID: ProductID,
         },
       });
+
+      setCart(data);
 
       toast({
         title: "Cart",
@@ -178,7 +185,7 @@ export default function AuthProvider({
         description: "Attempting to add to cart",
       });
 
-      const { data } = await axios({
+      const { data } = await axios<CartType>({
         method: "delete",
         url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart/delete`,
 
@@ -191,7 +198,7 @@ export default function AuthProvider({
         },
       });
 
-      console.log(data);
+      setCart(data);
 
       toast({
         title: "Cart",
@@ -284,6 +291,7 @@ export default function AuthProvider({
         })
           .then(({ data }) => {
             setAuth(ResponseDataToAuthType({ jwt, user: data }));
+            setCart(data.cart);
           })
           .catch((error) => {
             console.log(error);
@@ -302,6 +310,7 @@ export default function AuthProvider({
         loginHandler,
         signUpHandler,
         logoutHandler,
+        cart,
         AddToCartHandler,
         DeleteFromCartHandler,
         UpdateCartHandler,

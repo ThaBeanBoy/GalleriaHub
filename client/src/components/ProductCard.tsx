@@ -1,12 +1,14 @@
+"use client";
+
 import { ProductType } from "@/lib/types";
 import Link from "next/link";
 import Button from "./Button";
-import { BsCartPlus, BsPlus } from "react-icons/bs";
-import { ReactNode, useContext } from "react";
+import { BsCartPlus } from "react-icons/bs";
+import { ReactNode, useContext, useEffect, useState } from "react";
 import Tooltip from "./Tooltip";
 import { SlOptionsVertical } from "react-icons/sl";
 import { UserContext } from "@/contexts/auth";
-
+import { BsBookmarks } from "react-icons/bs";
 export default function ProductCard({
   productID,
   productName,
@@ -15,6 +17,16 @@ export default function ProductCard({
   tooltip,
 }: { tooltip?: ReactNode } & ProductType) {
   const Auth = useContext(UserContext);
+
+  const [inCart, setIntCart] = useState(false);
+
+  useEffect(() => {
+    console.log(Auth?.cart);
+    setIntCart(
+      Auth?.cart.some((CartItem) => CartItem.product.productID === productID) ||
+        false,
+    );
+  }, [Auth?.cart, productID]);
 
   return (
     <div key={productID} className="group relative">
@@ -43,17 +55,27 @@ export default function ProductCard({
 
       {/* user actions */}
       {Auth?.auth?.user && (
-        <div className="absolute left-[50%] top-[50%] hidden w-[90%] translate-x-[-50%] translate-y-[-50%] gap-2 rounded-xl bg-white px-3 py-2 drop-shadow-xl group-hover:flex">
-          <Button
-            // label="Add to cart"
-            className="p-0 text-sm"
-            label="Add to cart"
-            icon={<BsCartPlus />}
-            onClick={() => Auth.AddToCartHandler(productID)}
-            variant="flat"
-          />
+        <div className="absolute left-[50%] top-[50%] hidden w-[90%] translate-x-[-50%] translate-y-[-50%] justify-between gap-2 rounded-xl bg-white px-3 py-2 drop-shadow-xl group-hover:flex">
+          {!inCart ? (
+            <Button
+              // label="Add to cart"
+              className="p-0 text-sm"
+              label="Add to cart"
+              icon={<BsCartPlus />}
+              onClick={() => Auth.AddToCartHandler(productID)}
+              variant="flat"
+            />
+          ) : (
+            <Button
+              className="p-0 text-sm"
+              label="Remove from cart"
+              variant="flat"
+              onClick={() => Auth.DeleteFromCartHandler(productID)}
+              desctructive
+            />
+          )}
 
-          <Button icon={<BsPlus />} variant="flat" />
+          <Button icon={<BsBookmarks />} variant="flat" />
         </div>
       )}
 

@@ -16,20 +16,6 @@ public static class APIResponse
         var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
         var Cart = DB.UserCartItems.Where(CartItem => CartItem.UserID == User.UserID).ToList();
 
-        Cart.Select(CartItem =>
-            {
-                // Getting the product from the db
-                var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
-                Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == CartItem.ProductID);
-
-                return new
-                {
-                    CartItem.Quantity,
-                    product = Product.ResponseObj(context)
-                };
-            }
-        );
-
         return new
         {
             userID = User.UserID,
@@ -42,7 +28,7 @@ public static class APIResponse
             surname = User.Surname,
             phoneNumber = User.PhoneNumber,
             location = User.Location,
-            Cart
+            cart = Cart.ResponseObj(context)
         };
     }
 
@@ -153,11 +139,23 @@ public static class APIResponse
             // Getting the product from the db
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
             Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == CartItem.ProductID);
+            var Seller = DB.Users.FirstOrDefault(User => User.UserID == Product.UserID);
 
             return new
             {
-                CartItem.Quantity,
-                product = Product.ResponseObj(context)
+                quantity = CartItem.Quantity,
+                product = new
+                {
+                    productID = Product.ProductID,
+                    productName = Product.ProductName,
+                    price = Product.Price,
+
+                    seller = new
+                    {
+                        userID = Seller.UserID,
+                        username = Seller.Username
+                    }
+                }
             };
         }
             );
