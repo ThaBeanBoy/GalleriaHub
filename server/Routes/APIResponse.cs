@@ -163,4 +163,30 @@ public static class APIResponse
         }
             );
     }
+
+    // Order
+
+    public static object UserOrderResponse(this HttpContext context, User User)
+    {
+        var (Request, Response) = (context.Request, context.Response);
+        var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+
+        return DB.Orders
+            .Where(Order => Order.UserID == User.UserID)
+            .ToList()
+            .Select(Order =>
+            {
+                var OrderItems = DB.OrderItems.Where(OrderItem => OrderItem.OrderID == Order.OrderID);
+
+                var OrderTitle = OrderItems.ToList().Select(OrderItem => OrderItem.Quantity * OrderItem.Price).Sum();
+
+                return new
+                {
+                    Order.OrderID,
+                    Order.OrderDate,
+                    Total = OrderTitle,
+                    Order.Tax,
+                };
+            });
+    }
 }

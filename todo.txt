@@ -19,6 +19,9 @@
         <> General info
     <> Make responsive
 
+    <> Delete
+        <> Delete from lists & cart
+
 <> Products Page 
     <> Filter
     <> Infinite scroll
@@ -44,6 +47,10 @@
 
 <> Invoice
     <> Make endpoint for creating order from user's cart
+        <> Get from the user's cart
+
+        <> Clear the user's cart
+        
     <> display in table
         <> Filter
             <> Dates
