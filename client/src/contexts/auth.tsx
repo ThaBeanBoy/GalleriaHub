@@ -6,6 +6,7 @@ import { createContext, useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
 import { JwtType, UserType } from "@/lib/types";
+import Link from "next/link";
 
 export type AuthType = {
   jwt: JwtType;
@@ -32,9 +33,15 @@ type userContextAuthType = AuthType | undefined;
 
 export type UserContextType = {
   auth: userContextAuthType;
+  // Authentication
   loginHandler: (loginDetails: loginProps) => void;
   signUpHandler: (signUpDetails: signUpProps) => void;
   logoutHandler: () => void;
+
+  // Cart
+  AddToCartHandler: (ProductID: number) => void;
+  DeleteFromCartHandler: (ProductID: number) => void;
+  UpdateCartHandler: (ProductID: number, Quantity: number) => void;
 };
 
 export const UserContext = createContext<UserContextType | null>(null);
@@ -126,6 +133,111 @@ export default function AuthProvider({
     });
   };
 
+  const ViewCartCompontent = <Link href="/cart">View Cart</Link>;
+
+  const AddToCartHandler = async (ProductID: number) => {
+    try {
+      toast({
+        title: "Cart",
+        description: "Attempting to add to cart",
+      });
+
+      const { data } = await axios({
+        method: "put",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart/add`,
+
+        headers: {
+          Authorization: `Bearer ${auth?.jwt.token}`,
+        },
+
+        params: {
+          productID: ProductID,
+        },
+      });
+
+      toast({
+        title: "Cart",
+        description: "Added to cart",
+        action: ViewCartCompontent,
+      });
+
+      console.log(data);
+    } catch (error: any) {
+      toast({
+        title: "Cart",
+        description: "Something went wrong",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const DeleteFromCartHandler = async (ProductID: number) => {
+    try {
+      toast({
+        title: "Cart",
+        description: "Attempting to add to cart",
+      });
+
+      const { data } = await axios({
+        method: "delete",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart/delete`,
+
+        headers: {
+          Authorization: `Bearer ${auth?.jwt.token}`,
+        },
+
+        params: {
+          productID: ProductID,
+        },
+      });
+
+      console.log(data);
+
+      toast({
+        title: "Cart",
+        description: "Deleted from the cart",
+        action: ViewCartCompontent,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Cart",
+        description: "Something went wrong",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const UpdateCartHandler = async (ProductID: number, Quantity: number) => {
+    try {
+      toast({
+        title: "Cart",
+        description: "Updating Cart Item",
+      });
+
+      const { data } = await axios({
+        method: "put",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart/update`,
+
+        headers: {
+          Authorization: `Bearer ${auth?.jwt.token}`,
+        },
+
+        params: {
+          productID: ProductID,
+          quantity: Quantity,
+        },
+      });
+
+      console.log(data);
+    } catch (error) {
+      console.log(error),
+        toast({
+          title: "Toast",
+          description: "Something went wrong",
+        });
+    }
+  };
+
   useEffect(() => {
     console.log(auth);
 
@@ -185,7 +297,15 @@ export default function AuthProvider({
 
   return (
     <UserContext.Provider
-      value={{ auth, loginHandler, signUpHandler, logoutHandler }}
+      value={{
+        auth,
+        loginHandler,
+        signUpHandler,
+        logoutHandler,
+        AddToCartHandler,
+        DeleteFromCartHandler,
+        UpdateCartHandler,
+      }}
     >
       {children}
     </UserContext.Provider>
