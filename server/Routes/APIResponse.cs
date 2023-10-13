@@ -141,6 +141,8 @@ public static class APIResponse
             Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == CartItem.ProductID);
             var Seller = DB.Users.FirstOrDefault(User => User.UserID == Product.UserID);
 
+            var ProductImage = DB.ProductFiles.FirstOrDefault(ProductFile => ProductFile.ProductID == Product.ProductID);
+
             return new
             {
                 quantity = CartItem.Quantity,
@@ -149,6 +151,7 @@ public static class APIResponse
                     productID = Product.ProductID,
                     productName = Product.ProductName,
                     price = Product.Price,
+                    coverImage = ProductImage.FileKey,
 
                     seller = new
                     {

@@ -14,7 +14,7 @@ import { useContext } from "react";
 import { UserContext } from "@/contexts/auth";
 
 type navLinkProps = {
-  title: string;
+  title: React.ReactNode;
   href: string;
   children?: React.ReactNode;
   display?: "authenticated" | "unauthenticated";
@@ -32,6 +32,18 @@ export default function Navigation() {
     {
       title: "shop",
       href: "/shop",
+    },
+    {
+      title: (
+        <div className="relative">
+          cart{" "}
+          <span className="absolute right-[-10px] top-[-8px] flex h-[12px] w-[12px] items-center justify-center rounded-full bg-red-500 p-2 text-[10px] text-white">
+            {Auth?.cart.length}
+          </span>
+        </div>
+      ),
+      children: <div>hello</div>,
+      href: "/cart",
     },
     {
       title: "categories",
@@ -144,7 +156,7 @@ function NavItem({ title, href, children }: navLinkProps) {
   return children ? (
     <Nav.Item className="relative">
       <Nav.Trigger asChild>{link}</Nav.Trigger>
-      <Nav.Content className="data-[motion=from-start]:animate-enterFromLeft data-[motion=from-end]:animate-enterFromRight data-[motion=to-start]:animate-exitToLeft data-[motion=to-end]:animate-exitToRight absolute left-0 top-0 w-full bg-white shadow-xl sm:w-auto">
+      <Nav.Content className="absolute left-0 top-0 w-full bg-white shadow-xl sm:w-auto">
         {children}
       </Nav.Content>
     </Nav.Item>

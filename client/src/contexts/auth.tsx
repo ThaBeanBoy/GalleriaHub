@@ -258,6 +258,7 @@ export default function AuthProvider({
         },
       });
 
+      console.log(data);
       setCart(data);
 
       if (Toast) {

@@ -44,6 +44,7 @@ export type CartItemType = {
     productID: number;
     productName: string;
     price: number;
+    coverImage: string;
 
     seller: {
       userID: number;

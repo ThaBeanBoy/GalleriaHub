@@ -42,7 +42,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             (desctructive && variant === "hollow") ||
             (variant === "flat" && desctructive),
 
-          "cursor-none brightness-75": disabled,
+          "brightness-75": disabled,
         },
         className,
       )}
