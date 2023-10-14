@@ -8,6 +8,8 @@ import axios from "axios";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import StackGrid from "react-stack-grid";
+
 import { BsCartPlus, BsPlus } from "react-icons/bs";
 
 export default function Shop() {
@@ -24,11 +26,13 @@ export default function Shop() {
 
   return (
     <main>
-      <Grid className="grid-4 group">
+      <StackGrid columnWidth={300 - 16} gutterWidth={16} gutterHeight={16}>
         {products.map((product, key) => (
           <ProductCard key={key} {...product} />
         ))}
-      </Grid>
+      </StackGrid>
+      {/* <Grid className="grid-4 group">
+      </Grid> */}
     </main>
   );
 }

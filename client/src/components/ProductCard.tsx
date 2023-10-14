@@ -9,12 +9,14 @@ import Tooltip from "./Menubar";
 import { SlOptionsVertical } from "react-icons/sl";
 import { UserContext } from "@/contexts/auth";
 import { BsBookmarks } from "react-icons/bs";
+import Avatar from "./Avatar";
 export default function ProductCard({
   productID,
   productName,
   images,
   price,
   tooltip,
+  seller,
 }: { tooltip?: ReactNode } & ProductType) {
   const Auth = useContext(UserContext);
 
@@ -35,7 +37,7 @@ export default function ProductCard({
     <div key={productID} className="group relative">
       <Link
         href={`/shop/${productID}`}
-        className="group flex h-full w-full flex-col justify-between rounded-lg bg-white pb-2 drop-shadow"
+        className="group flex h-full w-full flex-col justify-between rounded-lg drop-shadow"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -43,57 +45,57 @@ export default function ProductCard({
           alt={`${productName} image`}
           width="284"
           height="284"
+          className="rounded-[inherit] duration-300 group-hover:brightness-50"
         />
-
-        {/* Product information */}
-        <div className="mt-3 flex justify-between px-3 text-black">
-          <span className="group-hover:text-active text-sm text-black">
-            {productName}
-          </span>
-          <span className="rounded-full bg-gray-300 px-2 py-1 text-xs font-semibold">
-            R{price}
-          </span>
-        </div>
       </Link>
+
+      {/* Artist */}
+      <Tooltip
+        trigger={
+          <Avatar
+            src=""
+            alt={seller.username}
+            fallback="ar"
+            className="absolute left-2 top-2 hidden group-hover:block"
+          />
+        }
+      >
+        Hello
+      </Tooltip>
+
+      {/* Product information */}
+      <div className="absolute bottom-3 left-2 mt-3 hidden flex-col justify-between px-3 text-white group-hover:flex">
+        <p className="text-sm font-semibold">R{price}</p>
+        <h3 className="text-lg font-bold text-white">{productName}</h3>
+      </div>
 
       {/* user actions */}
       {Auth?.auth?.user && (
-        <div className="absolute left-[50%] top-[50%] hidden w-[90%] translate-x-[-50%] translate-y-[-50%] justify-between gap-2 rounded-xl bg-white px-3 py-2 drop-shadow-xl group-hover:flex">
+        <div className="absolute right-2 top-2 hidden group-hover:flex">
           {!inCart ? (
             <Button
               // label="Add to cart"
-              className="p-0 text-sm"
+              className="rounded-r-[0] py-0.5 text-xs leading-none"
               label="Add to cart"
               icon={<BsCartPlus />}
               onClick={() => Auth.AddToCartHandler(productID)}
-              variant="flat"
             />
           ) : (
             <Button
-              className="p-0 text-sm"
+              className="rounded-r-[0] py-0.5 text-xs leading-none"
               label="Remove from cart"
-              variant="flat"
+              icon={<BsCartPlus />}
               onClick={() => Auth.DeleteFromCartHandler(productID)}
               desctructive
             />
           )}
 
-          <Button icon={<BsBookmarks />} variant="flat" />
+          <Button
+            icon={<BsBookmarks />}
+            className="rounded-l-[0] py-0.5 text-sm"
+          />
         </div>
       )}
-
-      {/* {tooltip && (
-        <Tooltip
-          trigger={
-            <Button
-              className="absolute left-2 right-[4px] top-2 hidden hover:block group-hover:block"
-              icon={<SlOptionsVertical />}
-            />
-          }
-        >
-          {tooltip}
-        </Tooltip>
-      )} */}
     </div>
   );
 }
