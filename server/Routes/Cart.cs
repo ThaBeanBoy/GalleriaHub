@@ -263,7 +263,6 @@ public static class Cart
 
         return group;
     }
-
     private class CartQueryParams
     {
         public int? ProductID { get; }
