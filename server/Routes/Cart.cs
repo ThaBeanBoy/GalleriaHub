@@ -72,7 +72,14 @@ public static class Cart
                 if (Product == null)
                 {
                     Response.StatusCode = StatusCodes.Status404NotFound;
-                    await Response.WriteAsync("Product no found");
+                    await Response.WriteAsync("Product not found");
+                    return;
+                }
+
+                if (Product.StockQuantity < 1)
+                {
+                    Response.StatusCode = StatusCodes.Status400BadRequest;
+                    await Response.WriteAsync("Can't add a product with a quantity less than 1");
                     return;
                 }
 
@@ -145,6 +152,14 @@ public static class Cart
                 {
                     Response.StatusCode = StatusCodes.Status400BadRequest;
                     await Response.WriteAsync("Need an update quantity");
+                    return;
+                }
+
+                // Checking the product's stock
+                if (Params.Quantity > Product.StockQuantity)
+                {
+                    Response.StatusCode = StatusCodes.Status405MethodNotAllowed;
+                    await Response.WriteAsync("Quantity can't exceed the stock");
                     return;
                 }
 

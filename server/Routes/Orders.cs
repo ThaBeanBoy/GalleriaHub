@@ -41,20 +41,44 @@ public static class Order
                     return;
                 }
 
+                // checking quantity exceeding stock
+                bool QuantityExceedFlag = false;
+                Cart.ToList().ForEach(async (CartItem) =>
+                {
+                    Models.Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == CartItem.ProductID);
+
+                    if (Product == null)
+                    {
+                        throw new Exception("Something went wrong in the quantity exceeding checker");
+                    }
+
+                    if (CartItem.Quantity > Product.StockQuantity)
+                    {
+                        QuantityExceedFlag = true;
+                        Response.StatusCode = StatusCodes.Status405MethodNotAllowed;
+                        await Response.WriteAsync($"your quantity of ${CartItem.Quantity} cannot exceed '{Product.ProductName}' stock");
+                    }
+                });
+
+                if (QuantityExceedFlag) return;
+
                 // Making a new Order
                 Models.Order NewOrder = new Models.Order
                 {
                     OrderDate = DateTime.Now,
                     UserID = User.UserID,
-                    Tax = new decimal(Order.TaxRate)
+                    Tax = new decimal(TaxRate)
                 };
 
                 DB.Orders.Add(NewOrder);
+
                 DB.SaveChanges();
 
                 DB.OrderItems.AddRange(Cart.ToList().Select(CartItem =>
                 {
                     Models.Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == CartItem.ProductID);
+
+                    if (Product == null) throw new Exception("Something went wrong when making Order Items");
 
                     return new OrderItem
                     {
@@ -67,11 +91,24 @@ public static class Order
 
                 DB.SaveChanges();
 
-                // Removing from products' stock
+                // updated product qunatity
+                DB.Products.UpdateRange(Cart.ToList().Select(CartItem =>
+                {
+                    Models.Product? Product = DB.Products.FirstOrDefault(Product => CartItem.ProductID == Product.ProductID);
+
+                    if (Product == null) throw new Exception("Something went wrong when updating the product quantity");
+
+                    Product.StockQuantity -= CartItem.Quantity;
+
+                    return Product;
+                }));
+
+                DB.SaveChanges();
 
                 // Removing from cart
                 DB.UserCartItems.RemoveRange(Cart.ToList());
 
+                // Saving DB Changes
                 DB.SaveChanges();
 
                 // Response
