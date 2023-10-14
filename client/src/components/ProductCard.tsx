@@ -5,7 +5,7 @@ import Link from "next/link";
 import Button from "./Button";
 import { BsCartPlus } from "react-icons/bs";
 import { ReactNode, useContext, useEffect, useState } from "react";
-import Tooltip from "./Tooltip";
+import Tooltip from "./Menubar";
 import { SlOptionsVertical } from "react-icons/sl";
 import { UserContext } from "@/contexts/auth";
 import { BsBookmarks } from "react-icons/bs";

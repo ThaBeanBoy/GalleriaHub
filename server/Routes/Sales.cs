@@ -36,15 +36,22 @@ public static class Sales
                 {
                     // Getting order
                     Models.Order? Order = DB.Orders.FirstOrDefault(Order => Order.OrderID == OrderItem.OrderID);
+                    Models.Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == OrderItem.ProductID);
+                    string DisplayImage = DB.ProductFiles.FirstOrDefault(PF => PF.ProductID == Product.ProductID).FileKey;
 
                     return new
                     {
                         Order.OrderID,
                         Order.OrderDate,
 
-                        OrderItem.ProductID,
                         OrderItem.Quantity,
-                        OrderItem.Price,
+
+                        product = new
+                        {
+                            Product.ProductID,
+                            Product.ProductName,
+                            DisplayImage
+                        },
 
                         buyer = new
                         {

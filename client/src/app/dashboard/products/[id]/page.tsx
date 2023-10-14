@@ -23,7 +23,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import Input, { useInput } from "@/components/Input";
 import Button from "@/components/Button";
 import Switch from "@/components/Switch";
-import Tooltip from "@/components/Tooltip";
+import Menubar from "@/components/Menubar";
 import openFilePicker from "@/lib/filePicker";
 import { cn } from "@/lib/utils";
 import { DashboardProductsLayoutContext } from "../layout";
@@ -311,7 +311,7 @@ export default function ProductEditorPage({
             ))}
           </div>
           <div className="flex gap-2">
-            <Tooltip
+            <Menubar
               trigger={<Button icon={<SlOptionsVertical />} variant="flat" />}
             >
               <Button
@@ -322,7 +322,7 @@ export default function ProductEditorPage({
                 desctructive
                 onClick={handleDelete}
               />
-            </Tooltip>
+            </Menubar>
 
             <Button
               label="Update"
@@ -471,7 +471,7 @@ function ProductImage({
       })}
     >
       {/* Delete button */}
-      <Tooltip
+      <Menubar
         trigger={
           <Button
             icon={<SlOptionsVertical />}
@@ -488,7 +488,7 @@ function ProductImage({
           onClick={deleteImage}
           desctructive
         />
-      </Tooltip>
+      </Menubar>
 
       {/* Image */}
       <img

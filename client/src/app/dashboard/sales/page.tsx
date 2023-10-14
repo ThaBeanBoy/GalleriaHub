@@ -19,22 +19,24 @@ import Link from "next/link";
 import Button from "@/components/Button";
 
 import { BiFilter } from "react-icons/bi";
+import { SlCalender } from "react-icons/sl";
 
-export default function Invoices() {
+export default function Sales() {
   const Auth = useContext(UserContext);
 
-  const [orders, setOrders] = useState<any[]>([]);
+  const [sales, setSales] = useState<any[]>([]);
 
   useEffect(() => {
     axios({
       method: "get",
-      url: `${process.env.NEXT_PUBLIC_SERVER_URL}/orders/`,
+      url: `${process.env.NEXT_PUBLIC_SERVER_URL}/sales/`,
       headers: {
         Authorization: `Bearer ${Auth?.auth?.jwt.token}`,
       },
     })
       .then(({ data }) => {
-        setOrders(data);
+        setSales(data);
+        console.log(data);
       })
       .catch((error) => console.log(error));
   }, [Auth?.auth?.jwt.token]);
@@ -42,36 +44,42 @@ export default function Invoices() {
   return (
     <main>
       <h1 className="mb-6 text-4xl font-bold">
-        {Auth?.auth?.user.username}&apos;s Invoices
+        {Auth?.auth?.user.username}&apos;s Sales
       </h1>
+
       <Button
         label="Filters"
         icon={<BiFilter />}
         variant="flat"
         className="py-0 pr-0 text-sm"
       />
+
       <Table className="mt-4">
-        <TableCaption>Invoices</TableCaption>
+        <TableCaption>Sales</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Order ID</TableHead>
-            <TableHead>Order Date</TableHead>
-            <TableHead>Sub Total</TableHead>
-            <TableHead>Tax</TableHead>
+            <TableHead className="flex items-center gap-2">
+              <SlCalender />
+              <span>Order Date</span>
+            </TableHead>
+            <TableHead>Buyer</TableHead>
+            <TableHead>Product</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Quantity</TableHead>
             <TableHead>Total</TableHead>
-            <TableHead>Order PDF</TableHead>
+            {/* <TableHead>Status</TableHead> */}
           </TableRow>
         </TableHeader>
 
         <TableBody>
-          {orders.map(({ orderID, orderDate, subTotal, tax, total }, key) => (
-            <OrderItem
+          {sales.map(({ orderID, orderDate, buyer, product }, key) => (
+            <SaleItem
               key={key}
               orderID={orderID}
               orderDate={orderDate}
-              subTotal={subTotal}
-              tax={tax}
-              total={total}
+              product={product}
+              buyer={buyer}
             />
           ))}
         </TableBody>
@@ -80,7 +88,7 @@ export default function Invoices() {
   );
 }
 
-function OrderItem({ orderID, orderDate, subTotal, tax, total }: any) {
+function SaleItem({ orderID, orderDate, buyer, product }: any) {
   orderDate = new Date(orderDate);
 
   const [date, setDate] = useState(
@@ -95,11 +103,13 @@ function OrderItem({ orderID, orderDate, subTotal, tax, total }: any) {
     <TableRow>
       <TableCell>{orderID}</TableCell>
       <TableCell>{date}</TableCell>
-      <TableCell>{subTotal}</TableCell>
-      <TableCell>%{tax}</TableCell>
-      <TableCell>R{total}</TableCell>
       <TableCell>
-        <Link href="/">Order PDF</Link>
+        <Link href={`/users/${buyer.userID}`}>{buyer.username}</Link>
+      </TableCell>
+      <TableCell>
+        <Link href={`/dashboard/products/${product.productID}`}>
+          {product.productName}
+        </Link>
       </TableCell>
     </TableRow>
   );
