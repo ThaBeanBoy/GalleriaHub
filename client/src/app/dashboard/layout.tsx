@@ -83,7 +83,9 @@ export default function DashboardLayout({
   return (
     <div className="flex gap-4">
       <aside
-        className={cn("sticky top-0", { "w-[195px] resize-x": navExpanded })}
+        className={cn("sticky top-4 h-min", {
+          "w-[195px] resize-x": navExpanded,
+        })}
       >
         <Button
           icon={navExpanded ? <FiChevronLeft /> : <FiChevronRight />}

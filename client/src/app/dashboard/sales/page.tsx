@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import Input from "@/components/Input";
+import Input, { useInput } from "@/components/Input";
 import { formatDistance } from "date-fns";
 import Link from "next/link";
 import Button from "@/components/Button";
@@ -24,11 +24,30 @@ import { BiFilter } from "react-icons/bi";
 import { SlCalender } from "react-icons/sl";
 import Tooltip from "@/components/Tooltip";
 import { LucideLoader2 } from "lucide-react";
+import Menubar from "@/components/Menubar";
+
+import { addDays, format } from "date-fns";
+import { DateRange } from "react-day-picker";
+
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export default function Sales() {
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(2022, 0, 20),
+    to: addDays(new Date(2022, 0, 20), 20),
+  });
+
   const Auth = useContext(UserContext);
 
   const [sales, setSales] = useState<any[] | undefined>(undefined);
+
+  const OrderIDFilterField = useInput();
 
   useEffect(() => {
     axios({
@@ -53,16 +72,118 @@ export default function Sales() {
         {Auth?.auth?.user.username}&apos;s Sales
       </h1>
 
-      <Button
-        label="Filters"
-        icon={<BiFilter />}
-        variant="flat"
-        className="py-0 pr-0 text-sm"
-      />
+      <Menubar
+        trigger={
+          <Button
+            label="Filters"
+            icon={<BiFilter />}
+            variant="flat"
+            className="py-0 pr-0 text-sm"
+          />
+        }
+        className="flex flex-col gap-3 text-xs"
+      >
+        <div className="flex items-end gap-2">
+          <label htmlFor="OrderID-filter" className="pb-3">
+            Order ID
+          </label>
+          <Input
+            id="OrderID-filter"
+            placeholder="order id"
+            type="number"
+            className="rounded-none border-0 border-b px-0 text-sm"
+            {...OrderIDFilterField.inputProps}
+          />
+        </div>
+
+        <div className="flex items-end gap-2">
+          <label htmlFor="DatesFilter" className="pb-2">
+            Dates
+          </label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="DatesFilter"
+                label={
+                  date?.from ? (
+                    date.to ? (
+                      <>
+                        {format(date.from, "LLL dd, y")} -{" "}
+                        {format(date.to, "LLL dd, y")}
+                      </>
+                    ) : (
+                      format(date.from, "LLL dd, y")
+                    )
+                  ) : (
+                    <span>Pick a date</span>
+                  )
+                }
+                variant="flat"
+                className={cn(
+                  "justify-start text-left text-xs font-normal",
+                  !date && "text-muted-foreground",
+                )}
+              >
+                hello
+              </Button>
+            </PopoverTrigger>
+
+            <PopoverContent className="w-auto p-0" side="right" align="start">
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate}
+                numberOfMonths={2}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div className="flex items-end gap-2">
+          <label htmlFor="User-filter" className="pb-3">
+            User
+          </label>
+          <Input
+            id="User-filter"
+            placeholder="Username or Email"
+            type="number"
+            className="rounded-none border-0 border-b px-0 text-sm"
+          />
+        </div>
+
+        <div className="flex items-end gap-2">
+          <label htmlFor="User-filter" className="pb-3">
+            Product
+          </label>
+          <Input
+            id="User-filter"
+            placeholder="Product Name or ID"
+            type="number"
+            className="rounded-none border-0 border-b px-0 text-sm"
+          />
+        </div>
+
+        <div className="flex items-end gap-2">
+          <label className="pb-3">Price</label>
+          <Input
+            placeholder="Minimum"
+            type="number"
+            className="rounded-none border-0 border-b px-0 text-sm"
+          />
+          <Input
+            id="User-filter"
+            placeholder="Maximum"
+            type="number"
+            className="rounded-none border-0 border-b px-0 text-sm"
+          />
+        </div>
+      </Menubar>
 
       <Table className="mt-4">
         <TableCaption>Sales</TableCaption>
-        <TableHeader>
+        <TableHeader className="sticky top-4">
           <TableRow>
             <TableHead>Order ID</TableHead>
             <TableHead className="flex items-center gap-2">
@@ -79,10 +200,18 @@ export default function Sales() {
         </TableHeader>
 
         <TableBody>
-          {sales.map(
-            ({ orderID, orderDate, quantity, buyer, product }, key) => (
+          {sales
+            .filter((OrderItem) =>
+              // OrderIDFilterField.value.trim() === "" ||
+              {
+                console.log(OrderIDFilterField.value, OrderItem.orderID);
+                if (OrderIDFilterField.value.trim() === "") return true;
+                return OrderItem.orderID === Number(OrderIDFilterField.value);
+              },
+            )
+            .map(({ orderID, orderDate, quantity, buyer, product }, key) => (
               <SaleItem
-                key={key}
+                key={`${orderID}`}
                 orderID={orderID}
                 orderDate={orderDate}
                 product={product}
@@ -90,8 +219,7 @@ export default function Sales() {
                 price={product.price}
                 quantity={quantity}
               />
-            ),
-          )}
+            ))}
         </TableBody>
       </Table>
     </main>

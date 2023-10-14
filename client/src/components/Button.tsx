@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 export type ButtonProps = {
-  label?: string;
+  label?: React.ReactNode;
   icon?: React.ReactElement;
   variant?: "fill" | "hollow" | "flat";
   desctructive?: boolean;

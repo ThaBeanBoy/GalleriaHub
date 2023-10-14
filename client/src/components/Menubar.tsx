@@ -17,12 +17,12 @@ export default function Menubar({
           <RadixMenubar.Content
             {...props}
             className={cn(
-              "border-active-light rounded-lg border bg-white p-2 text-sm drop-shadow-lg",
+              "rounded-lg border border-gray-300 bg-white p-2 text-sm drop-shadow-lg",
               className,
             )}
           >
             {children}
-            <RadixMenubar.Arrow className="fill-active-light" />
+            <RadixMenubar.Arrow className="fill-gray-300" />
           </RadixMenubar.Content>
         </RadixMenubar.Portal>
       </RadixMenubar.Menu>
