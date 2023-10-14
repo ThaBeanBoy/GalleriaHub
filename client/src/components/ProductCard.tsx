@@ -66,7 +66,7 @@ export default function ProductCard({
       {/* Product information */}
       <div className="absolute bottom-3 left-2 mt-3 hidden flex-col justify-between px-3 text-white group-hover:flex">
         <p className="text-sm font-semibold">R{price}</p>
-        <h3 className="text-lg font-bold text-white">{productName}</h3>
+        <h3 className="text-2xl font-bold text-white">{productName}</h3>
       </div>
 
       {/* user actions */}
