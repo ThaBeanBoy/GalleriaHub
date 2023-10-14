@@ -4,6 +4,8 @@ import { UserContext } from "@/contexts/auth";
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 
+import Avatar from "@/components/Avatar";
+
 import {
   Table,
   TableBody,
@@ -20,11 +22,13 @@ import Button from "@/components/Button";
 
 import { BiFilter } from "react-icons/bi";
 import { SlCalender } from "react-icons/sl";
+import Tooltip from "@/components/Tooltip";
+import { LucideLoader2 } from "lucide-react";
 
 export default function Sales() {
   const Auth = useContext(UserContext);
 
-  const [sales, setSales] = useState<any[]>([]);
+  const [sales, setSales] = useState<any[] | undefined>(undefined);
 
   useEffect(() => {
     axios({
@@ -40,6 +44,8 @@ export default function Sales() {
       })
       .catch((error) => console.log(error));
   }, [Auth?.auth?.jwt.token]);
+
+  if (!sales) return <LucideLoader2 className="animate-spin" />;
 
   return (
     <main>
@@ -73,22 +79,33 @@ export default function Sales() {
         </TableHeader>
 
         <TableBody>
-          {sales.map(({ orderID, orderDate, buyer, product }, key) => (
-            <SaleItem
-              key={key}
-              orderID={orderID}
-              orderDate={orderDate}
-              product={product}
-              buyer={buyer}
-            />
-          ))}
+          {sales.map(
+            ({ orderID, orderDate, quantity, buyer, product }, key) => (
+              <SaleItem
+                key={key}
+                orderID={orderID}
+                orderDate={orderDate}
+                product={product}
+                buyer={buyer}
+                price={product.price}
+                quantity={quantity}
+              />
+            ),
+          )}
         </TableBody>
       </Table>
     </main>
   );
 }
 
-function SaleItem({ orderID, orderDate, buyer, product }: any) {
+function SaleItem({
+  orderID,
+  orderDate,
+  buyer,
+  product,
+  price,
+  quantity,
+}: any) {
   orderDate = new Date(orderDate);
 
   const [date, setDate] = useState(
@@ -104,13 +121,36 @@ function SaleItem({ orderID, orderDate, buyer, product }: any) {
       <TableCell>{orderID}</TableCell>
       <TableCell>{date}</TableCell>
       <TableCell>
-        <Link href={`/users/${buyer.userID}`}>{buyer.username}</Link>
-      </TableCell>
-      <TableCell>
-        <Link href={`/dashboard/products/${product.productID}`}>
-          {product.productName}
+        <Link
+          className="flex items-center gap-2"
+          href={`/users/${buyer.userID}`}
+        >
+          <Avatar src="" alt={product.productName} fallback="0" />
+          <span>{buyer.username}</span>
         </Link>
       </TableCell>
+      <TableCell>
+        <Tooltip
+          trigger={
+            <Link href={`/dashboard/products/${product.productID}`}>
+              {product.productName}
+            </Link>
+          }
+          side="right"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`${process.env.NEXT_PUBLIC_SERVER_URL}/assets/products/${product.productID}/${product.displayImage}`}
+            alt={product.productName}
+            width={200}
+            className="rounded-md"
+          />
+        </Tooltip>
+      </TableCell>
+
+      <TableCell>R{price}</TableCell>
+      <TableCell>{quantity}</TableCell>
+      <TableCell>R{price * quantity}</TableCell>
     </TableRow>
   );
 }

@@ -6,7 +6,7 @@ import { Poppins } from "next/font/google";
 
 import Navigation from "@/components/LayoutNav";
 import AuthProvider from "@/contexts/auth";
-
+import { TooltipProvider } from "@/components/Tooltip";
 import { Toaster } from "@/components/ui/toaster";
 
 const poppins = Poppins({
@@ -27,21 +27,23 @@ export default function RootLayout({
   return (
     <html lang="en">
       <AuthProvider>
-        <body className={`${poppins.className} `}>
-          <Navigation />
+        <TooltipProvider>
+          <body className={`${poppins.className} `}>
+            <Navigation />
 
-          <div id="page-container" className="max-width min-h-screen py-8">
-            {children}
-          </div>
+            <div id="page-container" className="max-width min-h-screen py-8">
+              {children}
+            </div>
 
-          <div id="footer-container" className="bg-grey-light py-8">
-            <footer className="max-width ">
-              <h1>Footer</h1>
-            </footer>
-          </div>
+            <div id="footer-container" className="bg-grey-light py-8">
+              <footer className="max-width ">
+                <h1>Footer</h1>
+              </footer>
+            </div>
 
-          <Toaster />
-        </body>
+            <Toaster />
+          </body>
+        </TooltipProvider>
       </AuthProvider>
     </html>
   );

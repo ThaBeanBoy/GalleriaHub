@@ -3,7 +3,8 @@
 import { usePathname } from "next/navigation";
 
 import * as Nav from "@radix-ui/react-navigation-menu";
-import * as Avatar from "@radix-ui/react-avatar";
+// import * as Avatar from "@radix-ui/react-avatar";
+import Avatar from "@/components/Avatar";
 
 import Link from "next/link";
 import { FiChevronDown } from "react-icons/fi";
@@ -103,19 +104,11 @@ export default function Navigation() {
 
               {Auth?.auth && (
                 <li>
-                  <Avatar.Root className="inline-flex h-[45px] w-[45px] select-none items-center justify-center overflow-hidden rounded-2xl bg-white align-middle shadow">
-                    <Avatar.Image
-                      src=""
-                      alt={Auth?.auth?.user.email}
-                      className="h-full w-full rounded-[inherit] object-cover"
-                    />
-                    <Avatar.Fallback
-                      delayMs={600}
-                      className="leading-1 bg-active-light flex h-full w-full items-center justify-center text-[15px] font-medium text-white"
-                    >
-                      {Auth?.auth?.user.email[0]}
-                    </Avatar.Fallback>
-                  </Avatar.Root>
+                  <Avatar
+                    src=""
+                    alt={Auth?.auth?.user.email}
+                    fallback={Auth?.auth?.user.email[0]}
+                  />
                 </li>
               )}
 

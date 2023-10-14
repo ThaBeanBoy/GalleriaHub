@@ -50,6 +50,7 @@ public static class Sales
                         {
                             Product.ProductID,
                             Product.ProductName,
+                            OrderItem.Price,
                             DisplayImage
                         },
 
