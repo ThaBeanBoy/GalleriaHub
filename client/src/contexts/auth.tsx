@@ -195,7 +195,7 @@ export default function AuthProvider({
       if (Toast) {
         toast({
           title: "Cart",
-          description: "Attempting to add to cart",
+          description: "Attempting to remove from cart",
         });
       }
 
@@ -218,7 +218,7 @@ export default function AuthProvider({
         toast({
           title: "Cart",
           description: "Deleted from the cart",
-          action: ViewCartCompontent,
+          action: data.length > 0 ? ViewCartCompontent : <></>,
         });
       }
     } catch (error: any) {

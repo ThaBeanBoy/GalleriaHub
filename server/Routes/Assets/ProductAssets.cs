@@ -129,7 +129,6 @@ public static class ProductAssets
                     return Response.WriteAsync("Need a file name");
                 }
 
-                Response.StatusCode = StatusCodes.Status501NotImplemented;
                 return Response.SendFileAsync(S3.Download(env, key));
                 // return Response.WriteAsync("Still implement");
             }

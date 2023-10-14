@@ -3,7 +3,7 @@
 import { ProductType } from "@/lib/types";
 import Link from "next/link";
 import Button from "./Button";
-import { BsCartPlus } from "react-icons/bs";
+import { BsCart2, BsCartPlus } from "react-icons/bs";
 import { ReactNode, useContext, useEffect, useState } from "react";
 import Tooltip from "./Menubar";
 import { SlOptionsVertical } from "react-icons/sl";
@@ -29,7 +29,7 @@ export default function ProductCard({
         ) || false,
       );
     }
-  }, [Auth?.cart, productID]);
+  }, [Auth, Auth?.cart, productID]);
 
   return (
     <div key={productID} className="group relative">
@@ -94,6 +94,50 @@ export default function ProductCard({
           {tooltip}
         </Tooltip>
       )} */}
+    </div>
+  );
+}
+
+export function ProductActions({ productID }: { productID: number }) {
+  const Auth = useContext(UserContext);
+
+  const [inCart, setIntCart] = useState<boolean | undefined>(undefined);
+
+  useEffect(() => {
+    if (Auth) {
+      console.log("change");
+      setIntCart(
+        Auth?.cart.some((CartItem) => {
+          console.log(CartItem.product.productID, Number(productID));
+          return CartItem.product.productID === Number(productID);
+        }) || false,
+      );
+    }
+
+    // console.log(inCart);
+  }, [Auth, Auth?.cart, productID]);
+
+  if (!Auth) {
+    return <Link href="/authentication/login">Login</Link>;
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      {inCart ? (
+        <Button
+          label="remove from cart"
+          variant="flat"
+          desctructive
+          onClick={() => Auth.DeleteFromCartHandler(productID)}
+        />
+      ) : (
+        <Button
+          label="Add to cart"
+          icon={<BsCart2 />}
+          onClick={() => Auth.AddToCartHandler(productID)}
+        />
+      )}
+      <Button icon={<BsBookmarks />} variant="hollow" />
     </div>
   );
 }

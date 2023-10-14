@@ -3,14 +3,32 @@ import { ProductType } from "@/lib/types";
 import axios from "axios";
 import Link from "next/link";
 
-import { BsCart2 } from "react-icons/bs";
+import { BsBookmarks, BsCart2 } from "react-icons/bs";
 import { AiOutlinePlus } from "react-icons/ai";
+import { useContext, useEffect, useState } from "react";
+import { UserContext } from "@/contexts/auth";
+import { ProductActions } from "@/components/ProductCard";
 
 export default async function ProductPage({
   params,
 }: {
   params: { id: number };
 }) {
+  // const Auth = useContext(UserContext);
+
+  // const [inCart, setIntCart] = useState(false);
+
+  // useEffect(() => {
+  //   if (Auth) {
+  //     console.log(Auth?.cart);
+  //     setIntCart(
+  //       Auth?.cart.some(
+  //         (CartItem) => CartItem.product.productID === params.id,
+  //       ) || false,
+  //     );
+  //   }
+  // }, [Auth, Auth?.cart, params.id]);
+
   const { data } = await axios<ProductType>({
     method: "get",
     url: `${process.env.NEXT_PUBLIC_SERVER_URL}/products/${params.id}`,
@@ -18,6 +36,7 @@ export default async function ProductPage({
 
   return (
     <main className="flex gap-4">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={data.images.length > 0 ? data.images[0] : ""}
         alt={`${data.productName} image`}
@@ -35,10 +54,7 @@ export default async function ProductPage({
         <div className="flex items-center gap-4">
           <h2 className="text-3xl font-bold">R{data.price}</h2>
 
-          <div className="flex items-center gap-2">
-            <Button label="Add to cart" icon={<BsCart2 />} />
-            <Button icon={<BsCart2 />} variant="hollow" />
-          </div>
+          <ProductActions productID={params.id} />
         </div>
 
         {/* Categories */}

@@ -13,7 +13,7 @@ import {
   FiShoppingCart,
 } from "react-icons/fi";
 
-import { BsGraphUp, BsListNested } from "react-icons/bs";
+import { BsGraphUp, BsBookmarks } from "react-icons/bs";
 
 import { VscVerified } from "react-icons/vsc";
 import { PiBuildings } from "react-icons/pi";
@@ -40,7 +40,7 @@ const Navigation: { title: string; href: string; icon: React.ReactNode }[] = [
   {
     title: "lists",
     href: "/dashboard/lists",
-    icon: <BsListNested />,
+    icon: <BsBookmarks />,
   },
   {
     title: "invoices",
