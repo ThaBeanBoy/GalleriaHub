@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Models;
+using server.Routes;
 
 namespace Routes;
 
@@ -26,8 +27,37 @@ public static class Sales
                     return Response.WriteAsync("Need to log in");
                 }
 
-                Response.StatusCode = StatusCodes.Status501NotImplemented;
-                return Response.WriteAsync("Not implemented");
+                // Getting every product owned by user
+
+                // Getting order items
+                var OrderItems = DB.OrderItems.Where(OrderItem => OrderItem.Product.UserID == User.UserID);
+
+                return Response.WriteAsJsonAsync(OrderItems.ToList().Select(OrderItem =>
+                {
+                    // Getting order
+                    Models.Order? Order = DB.Orders.FirstOrDefault(Order => Order.OrderID == OrderItem.OrderID);
+
+                    return new
+                    {
+                        Order.OrderID,
+                        Order.OrderDate,
+
+                        OrderItem.ProductID,
+                        OrderItem.Quantity,
+                        OrderItem.Price,
+
+                        buyer = new
+                        {
+                            Order.User.UserID,
+                            Order.User.Email,
+                            Order.User.Username,
+
+                            Order.User.Public,
+                            Order.User.CreatedOn,
+                            Order.User.LastUpdate
+                        },
+                    };
+                }));
             }
             catch (Exception)
             {
