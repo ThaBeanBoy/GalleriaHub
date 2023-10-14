@@ -132,7 +132,10 @@ app.MapGroup(Routes.Order.RouterPrefix)
     .OrderEndpoints();
 
 app.MapGroup(Cart.RouterPrefix)
-.CartEndpoints();
+    .CartEndpoints();
+
+app.MapGroup(Sales.RouterPrefix)
+    .SalesEndpoints();
 
 app.Run();
 
