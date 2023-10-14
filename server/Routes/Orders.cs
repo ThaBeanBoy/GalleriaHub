@@ -67,6 +67,8 @@ public static class Order
 
                 DB.SaveChanges();
 
+                // Removing from products' stock
+
                 // Removing from cart
                 DB.UserCartItems.RemoveRange(Cart.ToList());
 
@@ -124,14 +126,15 @@ public static class Order
                         {
                             var OrderItems = DB.OrderItems.Where(OrderItem => OrderItem.OrderID == Order.OrderID);
 
-                            var OrderTitle = OrderItems.ToList().Select(OrderItem => OrderItem.Quantity * OrderItem.Price).Sum();
+                            var OrderSubTotal = OrderItems.ToList().Select(OrderItem => OrderItem.Quantity * OrderItem.Price).Sum();
 
                             return new
                             {
                                 Order.OrderID,
                                 Order.OrderDate,
-                                Total = OrderTitle,
-                                Tax = Order.Tax,
+                                SubTotal = OrderSubTotal,
+                                Order.Tax,
+                                Total = Convert.ToDouble(OrderSubTotal) * ((100 + Routes.Order.TaxRate) / 100)
                             };
                         })
                     );

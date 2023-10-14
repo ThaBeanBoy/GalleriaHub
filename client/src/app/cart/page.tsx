@@ -114,6 +114,7 @@ export default function Cart() {
           className="mt-2 w-full text-sm"
           label={`Pay R${total}`}
           disabled={total === 0}
+          onClick={() => Auth.PayHandler(true)}
         />
       </aside>
     </main>

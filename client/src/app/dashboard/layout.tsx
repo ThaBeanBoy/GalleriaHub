@@ -49,7 +49,7 @@ const Navigation: { title: string; href: string; icon: React.ReactNode }[] = [
   },
   {
     title: "sales",
-    href: "/dashboard/invoices",
+    href: "/dashboard/sales",
     icon: <GiReceiveMoney />,
   },
   {

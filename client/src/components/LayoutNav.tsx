@@ -37,13 +37,16 @@ export default function Navigation() {
       title: (
         <div className="relative">
           cart{" "}
-          <span className="absolute right-[-10px] top-[-8px] flex h-[12px] w-[12px] items-center justify-center rounded-full bg-red-500 p-2 text-[10px] text-white">
-            {Auth?.cart.length}
-          </span>
+          {Auth && Auth?.cart.length > 0 && (
+            <span className="absolute right-[-10px] top-[-8px] flex h-[12px] w-[12px] items-center justify-center rounded-full bg-red-500 p-2 text-[10px] text-white">
+              {Auth?.cart.length}
+            </span>
+          )}
         </div>
       ),
       children: <div>hello</div>,
       href: "/cart",
+      display: "authenticated",
     },
     {
       title: "categories",

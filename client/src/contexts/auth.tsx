@@ -47,6 +47,7 @@ export type UserContextType = {
     Quantity: number,
     Toast?: boolean,
   ) => void;
+  PayHandler: (Toast: boolean) => void;
 };
 
 export const UserContext = createContext<UserContextType | null>(null);
@@ -278,6 +279,42 @@ export default function AuthProvider({
     }
   };
 
+  const PayHandler = async (Toast: boolean = true) => {
+    try {
+      if (Toast) {
+        toast({ title: "Purchase", description: "Processing payment" });
+      }
+
+      await axios({
+        method: "put",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/orders/`,
+        headers: {
+          Authorization: `Bearer ${auth?.jwt.token}`,
+        },
+      });
+
+      setCart([]);
+
+      if (Toast) {
+        toast({
+          title: "Purchase",
+          description: "Successfully purchase",
+          action: <Link href="/dashboard/invoices"></Link>,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+
+      if (Toast) {
+        toast({
+          title: "Purchase",
+          description: "Something went wrong",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     console.log(auth);
 
@@ -347,6 +384,7 @@ export default function AuthProvider({
         AddToCartHandler,
         DeleteFromCartHandler,
         UpdateCartHandler,
+        PayHandler,
       }}
     >
       {children}
