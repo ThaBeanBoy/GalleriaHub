@@ -16,7 +16,7 @@ public class Order
 
     public int? DiscountID { get; set; }
     public Discount? Discount { get; set; }
-    public bool Pending { get; set; }
+    public decimal Tax { get; set; }
 }
 
 [PrimaryKey(nameof(OrderID), nameof(ProductID))]

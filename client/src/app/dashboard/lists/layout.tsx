@@ -3,7 +3,7 @@
 import Button from "@/components/Button";
 import Form from "@/components/Form";
 import Input, { useInput } from "@/components/Input";
-import Tooltip from "@/components/Tooltip";
+import Menubar from "@/components/Menubar";
 import { UserContext } from "@/contexts/auth";
 import { ListType } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -144,7 +144,7 @@ function ListSidebarItem({ List }: { List: ListType }) {
       >
         {List.name}
       </Link>
-      <Tooltip
+      <Menubar
         trigger={
           <Button
             className="absolute right-[4px] top-[50%] translate-y-[-50%]"
@@ -161,7 +161,7 @@ function ListSidebarItem({ List }: { List: ListType }) {
           // onClick={handleDelete}
           desctructive
         />
-      </Tooltip>
+      </Menubar>
     </li>
   );
 }

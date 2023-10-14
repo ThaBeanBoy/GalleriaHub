@@ -3,7 +3,8 @@
 import { usePathname } from "next/navigation";
 
 import * as Nav from "@radix-ui/react-navigation-menu";
-import * as Avatar from "@radix-ui/react-avatar";
+// import * as Avatar from "@radix-ui/react-avatar";
+import Avatar from "@/components/Avatar";
 
 import Link from "next/link";
 import { FiChevronDown } from "react-icons/fi";
@@ -14,7 +15,7 @@ import { useContext } from "react";
 import { UserContext } from "@/contexts/auth";
 
 type navLinkProps = {
-  title: string;
+  title: React.ReactNode;
   href: string;
   children?: React.ReactNode;
   display?: "authenticated" | "unauthenticated";
@@ -32,6 +33,21 @@ export default function Navigation() {
     {
       title: "shop",
       href: "/shop",
+    },
+    {
+      title: (
+        <div className="relative">
+          cart{" "}
+          {Auth && Auth?.cart.length > 0 && (
+            <span className="absolute right-[-10px] top-[-8px] flex h-[12px] w-[12px] items-center justify-center rounded-full bg-red-500 p-2 text-[10px] text-white">
+              {Auth?.cart.length}
+            </span>
+          )}
+        </div>
+      ),
+      children: <div>hello</div>,
+      href: "/cart",
+      display: "authenticated",
     },
     {
       title: "categories",
@@ -88,19 +104,11 @@ export default function Navigation() {
 
               {Auth?.auth && (
                 <li>
-                  <Avatar.Root className="inline-flex h-[45px] w-[45px] select-none items-center justify-center overflow-hidden rounded-2xl bg-white align-middle shadow">
-                    <Avatar.Image
-                      src=""
-                      alt={Auth?.auth?.user.email}
-                      className="h-full w-full rounded-[inherit] object-cover"
-                    />
-                    <Avatar.Fallback
-                      delayMs={600}
-                      className="leading-1 bg-active-light flex h-full w-full items-center justify-center text-[15px] font-medium text-white"
-                    >
-                      {Auth?.auth?.user.email[0]}
-                    </Avatar.Fallback>
-                  </Avatar.Root>
+                  <Avatar
+                    src=""
+                    alt={Auth?.auth?.user.email}
+                    fallback={Auth?.auth?.user.email[0]}
+                  />
                 </li>
               )}
 
@@ -144,7 +152,7 @@ function NavItem({ title, href, children }: navLinkProps) {
   return children ? (
     <Nav.Item className="relative">
       <Nav.Trigger asChild>{link}</Nav.Trigger>
-      <Nav.Content className="data-[motion=from-start]:animate-enterFromLeft data-[motion=from-end]:animate-enterFromRight data-[motion=to-start]:animate-exitToLeft data-[motion=to-end]:animate-exitToRight absolute left-0 top-0 w-full bg-white shadow-xl sm:w-auto">
+      <Nav.Content className="absolute left-0 top-0 w-full bg-white shadow-xl sm:w-auto">
         {children}
       </Nav.Content>
     </Nav.Item>

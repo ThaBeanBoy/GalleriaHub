@@ -14,7 +14,7 @@ public static class APIResponse
     public static object ResponseObj(this User User, HttpContext context)
     {
         var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
-        var Order = DB.Orders.FirstOrDefault(Order => Order.UserID == User.UserID && Order.Pending);
+        var Cart = DB.UserCartItems.Where(CartItem => CartItem.UserID == User.UserID).ToList();
 
         return new
         {
@@ -28,7 +28,7 @@ public static class APIResponse
             surname = User.Surname,
             phoneNumber = User.PhoneNumber,
             location = User.Location,
-            Cart = Order.ResponseObj(context)
+            cart = Cart.ResponseObj(context)
         };
     }
 
@@ -95,7 +95,7 @@ public static class APIResponse
     }
 
     // List
-    public static object ResponseObj(this Models.List List, HttpContext context)
+    public static object ResponseObj(this List List, HttpContext context)
     {
         var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
 
@@ -115,7 +115,7 @@ public static class APIResponse
         };
     }
 
-    public static object ResponseObj(this Models.Order Order, HttpContext context)
+    public static object ResponseObj(this Order Order, HttpContext context)
     {
         var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
 
@@ -127,6 +127,66 @@ public static class APIResponse
                     .FirstOrDefault(Product => Product.ProductID == OrderItem.ProductID),
                 OrderItem.Quantity,
                 OrderItem.Price
+            });
+    }
+
+    // Cart
+    public static object ResponseObj(this List<UserCartItem> Cart, HttpContext context)
+    {
+
+        return Cart.Select(CartItem =>
+        {
+            // Getting the product from the db
+            var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+            Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == CartItem.ProductID);
+            var Seller = DB.Users.FirstOrDefault(User => User.UserID == Product.UserID);
+
+            var ProductImage = DB.ProductFiles.FirstOrDefault(ProductFile => ProductFile.ProductID == Product.ProductID);
+
+            return new
+            {
+                quantity = CartItem.Quantity,
+                product = new
+                {
+                    productID = Product.ProductID,
+                    productName = Product.ProductName,
+                    price = Product.Price,
+                    coverImage = ProductImage.FileKey,
+
+                    seller = new
+                    {
+                        userID = Seller.UserID,
+                        username = Seller.Username
+                    }
+                }
+            };
+        }
+            );
+    }
+
+    // Order
+
+    public static object UserOrderResponse(this HttpContext context, User User)
+    {
+        var (Request, Response) = (context.Request, context.Response);
+        var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
+
+        return DB.Orders
+            .Where(Order => Order.UserID == User.UserID)
+            .ToList()
+            .Select(Order =>
+            {
+                var OrderItems = DB.OrderItems.Where(OrderItem => OrderItem.OrderID == Order.OrderID);
+
+                var OrderTitle = OrderItems.ToList().Select(OrderItem => OrderItem.Quantity * OrderItem.Price).Sum();
+
+                return new
+                {
+                    Order.OrderID,
+                    Order.OrderDate,
+                    Total = OrderTitle,
+                    Order.Tax,
+                };
             });
     }
 }

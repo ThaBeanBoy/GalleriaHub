@@ -1,31 +1,34 @@
 import { cn } from "@/lib/utils";
-import * as Dropdown from "@radix-ui/react-dropdown-menu";
-import * as Menubar from "@radix-ui/react-menubar";
+import * as RadixTooltip from "@radix-ui/react-tooltip";
 
 export default function Tooltip({
   trigger,
-  children,
   className,
+  children,
   ...props
-}: { trigger: React.ReactNode } & Menubar.MenuContentProps) {
+}: { trigger: React.ReactNode } & RadixTooltip.TooltipContentProps) {
   return (
-    <Menubar.Root>
-      <Menubar.Menu>
-        <Menubar.Trigger asChild>{trigger}</Menubar.Trigger>
+    <RadixTooltip.Root>
+      <RadixTooltip.Trigger asChild>{trigger}</RadixTooltip.Trigger>
 
-        <Menubar.Portal>
-          <Menubar.Content
-            {...props}
-            className={cn(
-              "border-active-light rounded-lg border bg-white p-2 text-sm drop-shadow-lg",
-              className,
-            )}
-          >
-            {children}
-            <Menubar.Arrow className="fill-active-light" />
-          </Menubar.Content>
-        </Menubar.Portal>
-      </Menubar.Menu>
-    </Menubar.Root>
+      <RadixTooltip.Portal>
+        <RadixTooltip.Content
+          className={cn(
+            "data-[state=delayed-open]:data-[side=top]:animate-slideDownAndFade data-[state=delayed-open]:data-[side=right]:animate-slideLeftAndFade data-[state=delayed-open]:data-[side=left]:animate-slideRightAndFade data-[state=delayed-open]:data-[side=bottom]:animate-slideUpAndFade text-violet11 select-none rounded-xl border border-gray-300 bg-white p-2 text-[15px] text-xs leading-none shadow-lg will-change-[transform,opacity]",
+            className,
+          )}
+          {...props}
+        >
+          {children}
+          <RadixTooltip.Arrow className="fill-gray-300" />
+        </RadixTooltip.Content>
+      </RadixTooltip.Portal>
+    </RadixTooltip.Root>
   );
+}
+
+export function TooltipProvider({
+  ...props
+}: RadixTooltip.TooltipProviderProps) {
+  return <RadixTooltip.Provider {...props} />;
 }

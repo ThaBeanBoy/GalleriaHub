@@ -13,9 +13,11 @@ public static class Order
 {
     public static string RouterPrefix = "/orders";
 
+    public static double TaxRate = 15;
+
     public static RouteGroupBuilder OrderEndpoints(this RouteGroupBuilder group)
     {
-        group.MapPost("/{ProductID}", (HttpContext context) =>
+        group.MapPut("/", async (HttpContext context) =>
         {
             var (Request, Response) = (context.Request, context.Response);
             Models.User? User = context.Items["User"] as Models.User;
@@ -23,59 +25,62 @@ public static class Order
 
             try
             {
-                // Checking if user is logged in
                 if (User == null)
                 {
                     Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return Response.WriteAsync("Need to be logged in");
+                    await Response.WriteAsync("Need to be logged in");
+                    return;
                 }
 
-                // Getting the product ID
-                int productId = int.Parse(context.GetRouteValue("productId") as string ?? "0");
-                Models.Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == productId);
+                var Cart = DB.UserCartItems.Where(CartItem => CartItem.UserID == User.UserID);
 
-                if (Product == null)
+                if (Cart.ToList().Count == 0)
                 {
-                    Response.StatusCode = StatusCodes.Status404NotFound;
-                    return Response.WriteAsync("Product not found");
+                    Response.StatusCode = StatusCodes.Status400BadRequest;
+                    await Response.WriteAsync("Cart is empty");
+                    return;
                 }
 
-                // looking for the Order in the DB
-                Models.Order? Order = DB.Orders.FirstOrDefault(Order => Order.UserID == User.UserID && Order.Pending);
-
-                // Creating the Order if it doesn't exist
-                if (Order == null)
+                // checking quantity exceeding stock
+                bool QuantityExceedFlag = false;
+                Cart.ToList().ForEach(async (CartItem) =>
                 {
-                    Models.Order NewOrder = new Models.Order
+                    Models.Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == CartItem.ProductID);
+
+                    if (Product == null)
                     {
-                        UserID = User.UserID,
-                        OrderDate = DateTime.Now,
-                        Pending = true
-                    };
-                    DB.Orders.Add(NewOrder);
+                        throw new Exception("Something went wrong in the quantity exceeding checker");
+                    }
 
-                    DB.SaveChanges();
-                    Order = NewOrder;
-                }
-
-                try
-                {
-                    DB.OrderItems.Add(new OrderItem
+                    if (CartItem.Quantity > Product.StockQuantity)
                     {
-                        ProductID = Product.ProductID,
-                        OrderID = Order.OrderID,
-                        Quantity = 1,
-                        Price = Product.Price,
-                    });
+                        QuantityExceedFlag = true;
+                        Response.StatusCode = StatusCodes.Status405MethodNotAllowed;
+                        await Response.WriteAsync($"your quantity of ${CartItem.Quantity} cannot exceed '{Product.ProductName}' stock");
+                    }
+                });
 
-                    DB.SaveChanges();
-                }
-                catch (Exception)
+                if (QuantityExceedFlag) return;
+
+                // Making a new Order
+                Models.Order NewOrder = new Models.Order
                 {
-                    // Do nothing
-                }
+                    OrderDate = DateTime.Now,
+                    UserID = User.UserID,
+                    Tax = new decimal(TaxRate)
+                };
 
+                DB.Orders.Add(NewOrder);
 
+                DB.SaveChanges();
+
+                DB.OrderItems.AddRange(Cart.ToList().Select(CartItem =>
+                {
+                    Models.Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == CartItem.ProductID);
+
+                    if (Product == null) throw new Exception("Something went wrong when making Order Items");
+
+<<<<<<< HEAD
                 Response.StatusCode = StatusCodes.Status202Accepted;
                 return Response.WriteAsJsonAsync("Added to order");
             }
@@ -90,56 +95,81 @@ public static class Order
                 return Response.WriteAsync("Something went wrong");
             }
         });
+=======
+                    return new OrderItem
+                    {
+                        ProductID = Product.ProductID,
+                        OrderID = NewOrder.OrderID,
+                        Quantity = CartItem.Quantity,
+                        Price = Product.Price,
+                    };
+                }));
+>>>>>>> master
 
-        group.MapDelete("/{ProductID}", (HttpContext context) =>
-        {
-            var (Request, Response) = (context.Request, context.Response);
-            Models.User? User = context.Items["User"] as Models.User;
-            var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
-
-            try
-            {
-                if (User == null)
-                {
-                    Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return Response.WriteAsync("Need to be logged in");
-                }
-
-                // Getting the product ID
-                int productId = int.Parse(context.GetRouteValue("productId") as string ?? "0");
-                Models.Product? Product = DB.Products.FirstOrDefault(Product => Product.ProductID == productId);
-
-                if (Product == null)
-                {
-                    Response.StatusCode = StatusCodes.Status404NotFound;
-                    return Response.WriteAsync("Product not found");
-                }
-
-                Models.Order? Order = DB.Orders.FirstOrDefault(Order => Order.UserID == User.UserID && Order.Pending);
-                if (Order == null) throw new Exception();
-
-                OrderItem? OrderItemToBeDeleteted = DB.OrderItems.FirstOrDefault(OrderItem => OrderItem.OrderID == Order.OrderID && OrderItem.ProductID == Product.ProductID);
-                if (OrderItemToBeDeleteted == null) throw new Exception();
-
-                DB.OrderItems.Remove(OrderItemToBeDeleteted);
                 DB.SaveChanges();
 
+                // updated product qunatity
+                DB.Products.UpdateRange(Cart.ToList().Select(CartItem =>
+                {
+                    Models.Product? Product = DB.Products.FirstOrDefault(Product => CartItem.ProductID == Product.ProductID);
+
+                    if (Product == null) throw new Exception("Something went wrong when updating the product quantity");
+
+                    Product.StockQuantity -= CartItem.Quantity;
+
+                    return Product;
+                }));
+
+                DB.SaveChanges();
+
+                // Removing from cart
+                DB.UserCartItems.RemoveRange(Cart.ToList());
+
+                // Saving DB Changes
+                DB.SaveChanges();
+
+<<<<<<< HEAD
                 Response.StatusCode = StatusCodes.Status400BadRequest;
                 return Response.WriteAsJsonAsync("delete");
+=======
+                // Response
+                await Response.
+                    WriteAsJsonAsync(
+                        DB.Orders
+                        .Where(Order => Order.UserID == User.UserID)
+                        .ToList()
+                        .Select(Order =>
+                        {
+                            var OrderItems = DB.OrderItems.Where(OrderItem => OrderItem.OrderID == Order.OrderID);
+
+                            var OrderTitle = OrderItems.ToList().Select(OrderItem => OrderItem.Quantity * OrderItem.Price).Sum();
+
+                            return new
+                            {
+                                Order.OrderID,
+                                Order.OrderDate,
+                                Total = OrderTitle,
+                                Tax = Order.Tax,
+                            };
+                        })
+                    );
+>>>>>>> master
             }
             catch (Exception)
             {
                 Response.StatusCode = StatusCodes.Status500InternalServerError;
-                return Response.WriteAsync("Something went wrong");
+                await Response.WriteAsync("Something went wrong");
             }
+
         });
 
-        group.MapPut("/{ProductID}", async (HttpContext context) =>
+        group.MapGet("/", async (HttpContext context) =>
         {
             var (Request, Response) = (context.Request, context.Response);
             Models.User? User = context.Items["User"] as Models.User;
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
 
+<<<<<<< HEAD
             try
             {
                 if (User == null)
@@ -187,16 +217,36 @@ public static class Order
                 await Response.WriteAsync("SOmething is wrong with the input");
             }
             catch (FormatException)
+=======
+            if (User == null)
+>>>>>>> master
             {
-                Response.StatusCode = StatusCodes.Status400BadRequest;
-                await Response.WriteAsync("SOmething is wrong with the input");
-            }
-            catch (Exception)
-            {
-                Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await Response.WriteAsync("Something went wrong");
+                Response.StatusCode = StatusCodes.Status401Unauthorized;
+                await Response.WriteAsync("Need to be logged in");
+                return;
             }
 
+            await Response.
+                    WriteAsJsonAsync(
+                        DB.Orders
+                        .Where(Order => Order.UserID == User.UserID)
+                        .ToList()
+                        .Select(Order =>
+                        {
+                            var OrderItems = DB.OrderItems.Where(OrderItem => OrderItem.OrderID == Order.OrderID);
+
+                            var OrderSubTotal = OrderItems.ToList().Select(OrderItem => OrderItem.Quantity * OrderItem.Price).Sum();
+
+                            return new
+                            {
+                                Order.OrderID,
+                                Order.OrderDate,
+                                SubTotal = OrderSubTotal,
+                                Order.Tax,
+                                Total = Convert.ToDouble(OrderSubTotal) * ((100 + Routes.Order.TaxRate) / 100)
+                            };
+                        })
+                    );
         });
 
         return group;

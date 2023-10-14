@@ -14,7 +14,7 @@ export type UserType = {
   surname: string | null;
   phoneNumber: string | null;
   location: string | null;
-  cart: any[];
+  cart: CartType;
 };
 
 export type ProductType = {
@@ -37,3 +37,20 @@ export type ListType = {
   lastUpdate: Date;
   items: ProductType[];
 };
+
+export type CartItemType = {
+  quantity: number;
+  product: {
+    productID: number;
+    productName: string;
+    price: number;
+    coverImage: string;
+
+    seller: {
+      userID: number;
+      username: string;
+    };
+  };
+};
+
+export type CartType = CartItemType[];

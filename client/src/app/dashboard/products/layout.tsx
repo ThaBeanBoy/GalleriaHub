@@ -33,7 +33,7 @@ import { EyeIcon, EyeOff, LucideLoader2 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { SlOptionsVertical } from "react-icons/sl";
-import Tooltip from "@/components/Tooltip";
+import Menubar from "@/components/Menubar";
 import { FiTrash } from "react-icons/fi";
 
 export type DashboardProductsLayoutType = {
@@ -320,7 +320,7 @@ function ProductItem({
       )}
       href={href}
     >
-      <Tooltip
+      <Menubar
         trigger={
           <Button
             icon={<SlOptionsVertical />}
@@ -337,7 +337,7 @@ function ProductItem({
           onClick={handleDelete}
           desctructive
         />
-      </Tooltip>
+      </Menubar>
 
       <h3 className="mb-1 font-semibold">{productName}</h3>
       <p className="text-xs">

@@ -13,7 +13,7 @@ import {
   FiShoppingCart,
 } from "react-icons/fi";
 
-import { BsGraphUp, BsListNested } from "react-icons/bs";
+import { BsGraphUp, BsBookmarks } from "react-icons/bs";
 
 import { VscVerified } from "react-icons/vsc";
 import { PiBuildings } from "react-icons/pi";
@@ -40,7 +40,7 @@ const Navigation: { title: string; href: string; icon: React.ReactNode }[] = [
   {
     title: "lists",
     href: "/dashboard/lists",
-    icon: <BsListNested />,
+    icon: <BsBookmarks />,
   },
   {
     title: "invoices",
@@ -49,7 +49,7 @@ const Navigation: { title: string; href: string; icon: React.ReactNode }[] = [
   },
   {
     title: "sales",
-    href: "/dashboard/invoices",
+    href: "/dashboard/sales",
     icon: <GiReceiveMoney />,
   },
   {
@@ -83,7 +83,9 @@ export default function DashboardLayout({
   return (
     <div className="flex gap-4">
       <aside
-        className={cn("sticky top-0", { "w-[195px] resize-x": navExpanded })}
+        className={cn("sticky top-4 h-min", {
+          "w-[195px] resize-x": navExpanded,
+        })}
       >
         <Button
           icon={navExpanded ? <FiChevronLeft /> : <FiChevronRight />}
@@ -100,7 +102,7 @@ export default function DashboardLayout({
                 <Link
                   href={href}
                   className={cn(
-                    "hover:text-active-light flex h-[50px] items-center gap-3 rounded-xl rounded-r-none border-r-2 px-4 py-3 font-medium capitalize text-black",
+                    "hover:text-active-light flex h-[47.2px] items-center gap-3 rounded-xl rounded-r-none border-r-2 px-4 py-3 text-sm font-medium capitalize text-black",
                     { "text-active border-2 border-r-0": active },
                   )}
                 >

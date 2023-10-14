@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 export type ButtonProps = {
-  label?: string;
+  label?: React.ReactNode;
   icon?: React.ReactElement;
   variant?: "fill" | "hollow" | "flat";
   desctructive?: boolean;
@@ -42,7 +42,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             (desctructive && variant === "hollow") ||
             (variant === "flat" && desctructive),
 
-          "cursor-none brightness-75": disabled,
+          "brightness-75": disabled,
         },
         className,
       )}

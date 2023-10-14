@@ -5,7 +5,8 @@ import { createContext, useEffect, useState } from "react";
 
 import { useToast } from "@/components/ui/use-toast";
 
-import { JwtType, UserType } from "@/lib/types";
+import { CartType, JwtType, UserType } from "@/lib/types";
+import Link from "next/link";
 
 export type AuthType = {
   jwt: JwtType;
@@ -32,9 +33,21 @@ type userContextAuthType = AuthType | undefined;
 
 export type UserContextType = {
   auth: userContextAuthType;
+  // Authentication
   loginHandler: (loginDetails: loginProps) => void;
   signUpHandler: (signUpDetails: signUpProps) => void;
   logoutHandler: () => void;
+
+  // Cart
+  cart: CartType;
+  AddToCartHandler: (ProductID: number, Toast?: boolean) => void;
+  DeleteFromCartHandler: (ProductID: number, Toast?: boolean) => void;
+  UpdateCartHandler: (
+    ProductID: number,
+    Quantity: number,
+    Toast?: boolean,
+  ) => void;
+  PayHandler: (Toast: boolean) => void;
 };
 
 export const UserContext = createContext<UserContextType | null>(null);
@@ -46,6 +59,8 @@ export default function AuthProvider({
 }) {
   const pathname = usePathname();
   const [auth, setAuth] = useState<userContextAuthType>(undefined);
+
+  const [cart, setCart] = useState<CartType>([]);
 
   const { toast } = useToast();
 
@@ -67,6 +82,7 @@ export default function AuthProvider({
       });
 
       setAuth(ResponseDataToAuthType(data));
+      setCart(data.user.cart);
 
       toast({
         title: "Login",
@@ -94,13 +110,14 @@ export default function AuthProvider({
       formData.append("password", password);
       formData.append("confirm-password", confirmPassword);
 
-      const { data } = await axios({
+      const { data } = await axios<AuthType>({
         method: "post",
         url: `${process.env.NEXT_PUBLIC_SERVER_URL}/authentication/sign-up`,
         data: formData,
       });
 
       setAuth(ResponseDataToAuthType(data));
+      setCart(data.user.cart);
 
       toast({
         title: "Login",
@@ -124,6 +141,178 @@ export default function AuthProvider({
       title: "Logout",
       description: "Successfully logged out",
     });
+  };
+
+  const ViewCartCompontent = <Link href="/cart">View Cart</Link>;
+
+  const AddToCartHandler = async (ProductID: number, Toast: boolean = true) => {
+    try {
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Attempting to add to cart",
+        });
+      }
+
+      const { data } = await axios<CartType>({
+        method: "put",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart/add`,
+
+        headers: {
+          Authorization: `Bearer ${auth?.jwt.token}`,
+        },
+
+        params: {
+          productID: ProductID,
+        },
+      });
+
+      setCart(data);
+
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Added to cart",
+          action: ViewCartCompontent,
+        });
+      }
+    } catch (error: any) {
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Something went wrong",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const DeleteFromCartHandler = async (
+    ProductID: number,
+    Toast: boolean = true,
+  ) => {
+    try {
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Attempting to remove from cart",
+        });
+      }
+
+      const { data } = await axios<CartType>({
+        method: "delete",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart/delete`,
+
+        headers: {
+          Authorization: `Bearer ${auth?.jwt.token}`,
+        },
+
+        params: {
+          productID: ProductID,
+        },
+      });
+
+      setCart(data);
+
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Deleted from the cart",
+          action: data.length > 0 ? ViewCartCompontent : <></>,
+        });
+      }
+    } catch (error: any) {
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Something went wrong",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const UpdateCartHandler = async (
+    ProductID: number,
+    Quantity: number,
+    Toast: boolean = true,
+  ) => {
+    try {
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Updating Cart Item",
+        });
+      }
+
+      const { data } = await axios<CartType>({
+        method: "put",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/cart/update`,
+
+        headers: {
+          Authorization: `Bearer ${auth?.jwt.token}`,
+        },
+
+        params: {
+          productID: ProductID,
+          quantity: Quantity,
+        },
+      });
+
+      console.log(data);
+      setCart(data);
+
+      if (Toast) {
+        toast({
+          title: "Cart",
+          description: "Successfully updated",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      if (Toast) {
+        toast({
+          title: "Toast",
+          description: "Something went wrong",
+        });
+      }
+    }
+  };
+
+  const PayHandler = async (Toast: boolean = true) => {
+    try {
+      if (Toast) {
+        toast({ title: "Purchase", description: "Processing payment" });
+      }
+
+      await axios({
+        method: "put",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/orders/`,
+        headers: {
+          Authorization: `Bearer ${auth?.jwt.token}`,
+        },
+      });
+
+      setCart([]);
+
+      if (Toast) {
+        toast({
+          title: "Purchase",
+          description: "Successfully purchase",
+          action: <Link href="/dashboard/invoices"></Link>,
+        });
+      }
+    } catch (error) {
+      console.log(error);
+
+      if (Toast) {
+        toast({
+          title: "Purchase",
+          description: "Something went wrong",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   useEffect(() => {
@@ -172,6 +361,7 @@ export default function AuthProvider({
         })
           .then(({ data }) => {
             setAuth(ResponseDataToAuthType({ jwt, user: data }));
+            setCart(data.cart);
           })
           .catch((error) => {
             console.log(error);
@@ -185,7 +375,17 @@ export default function AuthProvider({
 
   return (
     <UserContext.Provider
-      value={{ auth, loginHandler, signUpHandler, logoutHandler }}
+      value={{
+        auth,
+        loginHandler,
+        signUpHandler,
+        logoutHandler,
+        cart,
+        AddToCartHandler,
+        DeleteFromCartHandler,
+        UpdateCartHandler,
+        PayHandler,
+      }}
     >
       {children}
     </UserContext.Provider>
