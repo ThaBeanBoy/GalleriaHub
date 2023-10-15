@@ -3,13 +3,15 @@
 import { ProductType } from "@/lib/types";
 import Link from "next/link";
 import Button from "./Button";
-import { BsCart2, BsCartPlus } from "react-icons/bs";
+import { BsCart2, BsCartPlus, BsPlus } from "react-icons/bs";
 import { ReactNode, useContext, useEffect, useState } from "react";
 import Tooltip from "./Menubar";
 import { SlOptionsVertical } from "react-icons/sl";
 import { UserContext } from "@/contexts/auth";
 import { BsBookmarks } from "react-icons/bs";
 import Avatar from "./Avatar";
+import Menubar from "./Menubar";
+import { cn } from "@/lib/utils";
 export default function ProductCard({
   productID,
   productName,
@@ -24,7 +26,6 @@ export default function ProductCard({
 
   useEffect(() => {
     if (Auth) {
-      console.log(Auth?.cart);
       setIntCart(
         Auth?.cart.some(
           (CartItem) => CartItem.product.productID === productID,
@@ -59,6 +60,7 @@ export default function ProductCard({
             className="absolute left-2 top-2 hidden group-hover:block"
           />
         }
+        className="z-40"
       >
         Hello
       </Tooltip>
@@ -71,52 +73,37 @@ export default function ProductCard({
 
       {/* user actions */}
       {Auth?.auth?.user && (
-        <div className="absolute right-2 top-2 hidden group-hover:flex">
-          {!inCart ? (
-            <Button
-              // label="Add to cart"
-              className="rounded-r-[0] py-0.5 text-xs leading-none"
-              label="Add to cart"
-              icon={<BsCartPlus />}
-              onClick={() => Auth.AddToCartHandler(productID)}
-            />
-          ) : (
-            <Button
-              className="rounded-r-[0] py-0.5 text-xs leading-none"
-              label="Remove from cart"
-              icon={<BsCartPlus />}
-              onClick={() => Auth.DeleteFromCartHandler(productID)}
-              desctructive
-            />
-          )}
-
-          <Button
-            icon={<BsBookmarks />}
-            className="rounded-l-[0] py-0.5 text-sm"
-          />
-        </div>
+        <ProductActions
+          productID={productID}
+          className="absolute right-2 top-2 hidden group-hover:flex"
+          buttonClassName="rounded-r-[0] py-0.5 text-xs leading-none"
+        />
       )}
     </div>
   );
 }
 
-export function ProductActions({ productID }: { productID: number }) {
+export function ProductActions({
+  productID,
+  className,
+  buttonClassName,
+}: {
+  productID: number;
+  className?: string;
+  buttonClassName?: string;
+}) {
   const Auth = useContext(UserContext);
 
   const [inCart, setIntCart] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
     if (Auth) {
-      console.log("change");
       setIntCart(
         Auth?.cart.some((CartItem) => {
-          console.log(CartItem.product.productID, Number(productID));
           return CartItem.product.productID === Number(productID);
         }) || false,
       );
     }
-
-    // console.log(inCart);
   }, [Auth, Auth?.cart, productID]);
 
   if (!Auth) {
@@ -124,22 +111,45 @@ export function ProductActions({ productID }: { productID: number }) {
   }
 
   return (
-    <div className="flex items-center gap-2">
-      {inCart ? (
+    <div className={cn("flex", className)}>
+      {
         <Button
-          label="remove from cart"
-          variant="flat"
-          desctructive
-          onClick={() => Auth.DeleteFromCartHandler(productID)}
+          // label="Add to cart"
+          className={cn("rounded-r-[0]", buttonClassName)}
+          label={!inCart ? "Add to cart" : "Remove from cart"}
+          icon={<BsCartPlus />}
+          onClick={() =>
+            !inCart
+              ? Auth.AddToCartHandler(productID)
+              : Auth.DeleteFromCartHandler(productID)
+          }
+          desctructive={inCart}
         />
-      ) : (
-        <Button
-          label="Add to cart"
-          icon={<BsCart2 />}
-          onClick={() => Auth.AddToCartHandler(productID)}
-        />
-      )}
-      <Button icon={<BsBookmarks />} variant="hollow" />
+      }
+      <Tooltip
+        trigger={
+          <Button
+            icon={<BsBookmarks />}
+            className="rounded-l-[0] py-0.5 text-sm"
+          />
+        }
+        className="z-40"
+        align="end"
+      >
+        {Auth.lists.map((list) => (
+          <Button
+            label={
+              <>
+                <BsPlus /> {list.name}
+              </>
+            }
+            className="mb-2 p-0 text-xs last:mb-0"
+            variant="flat"
+            key={`${productID}-${list.listID}`}
+            onClick={() => Auth.AddToListHandler(list.listID, productID)}
+          />
+        ))}
+      </Tooltip>
     </div>
   );
 }

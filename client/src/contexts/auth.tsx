@@ -8,6 +8,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { CartType, JwtType, UserType } from "@/lib/types";
 import Link from "next/link";
 
+import * as Toast from "@radix-ui/react-toast";
+
 export type AuthType = {
   jwt: JwtType;
   user: UserType;
@@ -48,6 +50,10 @@ export type UserContextType = {
     Toast?: boolean,
   ) => void;
   PayHandler: (Toast: boolean) => void;
+
+  // Lists
+  lists: any[];
+  AddToListHandler: (listID: number, productID: number) => void;
 };
 
 export const UserContext = createContext<UserContextType | null>(null);
@@ -61,6 +67,7 @@ export default function AuthProvider({
   const [auth, setAuth] = useState<userContextAuthType>(undefined);
 
   const [cart, setCart] = useState<CartType>([]);
+  const [lists, setLists] = useState<any[]>([]);
 
   const { toast } = useToast();
 
@@ -315,6 +322,28 @@ export default function AuthProvider({
     }
   };
 
+  const AddToListHandler = async (listID: number, productID: number) => {
+    try {
+      toast({
+        title: "Lists",
+        description: "Adding product to list",
+      });
+
+      await axios({
+        method: "post",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/lists/${listID}/${productID}`,
+        headers: {
+          Authorization: `Bearer ${auth?.jwt.token}`,
+        },
+      });
+    } catch (error) {
+      toast({
+        title: "Lists",
+      });
+    }
+  };
+
+  // Auth use effect
   useEffect(() => {
     console.log(auth);
 
@@ -373,6 +402,20 @@ export default function AuthProvider({
     }
   }, [auth, pathname]);
 
+  useEffect(() => {
+    if (auth) {
+      axios({
+        method: "get",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/lists/`,
+        headers: {
+          Authorization: `Bearer ${auth?.jwt.token}`,
+        },
+      })
+        .then(({ data }) => setLists(data))
+        .catch((error) => console.log(error));
+    }
+  }, [auth, auth?.jwt.token]);
+
   return (
     <UserContext.Provider
       value={{
@@ -380,11 +423,15 @@ export default function AuthProvider({
         loginHandler,
         signUpHandler,
         logoutHandler,
+
         cart,
         AddToCartHandler,
         DeleteFromCartHandler,
         UpdateCartHandler,
         PayHandler,
+
+        lists,
+        AddToListHandler,
       }}
     >
       {children}

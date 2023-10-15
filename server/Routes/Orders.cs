@@ -80,22 +80,6 @@ public static class Order
 
                     if (Product == null) throw new Exception("Something went wrong when making Order Items");
 
-<<<<<<< HEAD
-                Response.StatusCode = StatusCodes.Status202Accepted;
-                return Response.WriteAsJsonAsync("Added to order");
-            }
-            catch (FormatException ex)
-            {
-                Response.StatusCode = StatusCodes.Status406NotAcceptable;
-                return Response.WriteAsync(ex.Message);
-            }
-            catch (Exception)
-            {
-                Response.StatusCode = StatusCodes.Status500InternalServerError;
-                return Response.WriteAsync("Something went wrong");
-            }
-        });
-=======
                     return new OrderItem
                     {
                         ProductID = Product.ProductID,
@@ -104,7 +88,6 @@ public static class Order
                         Price = Product.Price,
                     };
                 }));
->>>>>>> master
 
                 DB.SaveChanges();
 
@@ -128,10 +111,6 @@ public static class Order
                 // Saving DB Changes
                 DB.SaveChanges();
 
-<<<<<<< HEAD
-                Response.StatusCode = StatusCodes.Status400BadRequest;
-                return Response.WriteAsJsonAsync("delete");
-=======
                 // Response
                 await Response.
                     WriteAsJsonAsync(
@@ -153,7 +132,6 @@ public static class Order
                             };
                         })
                     );
->>>>>>> master
             }
             catch (Exception)
             {
@@ -169,57 +147,7 @@ public static class Order
             Models.User? User = context.Items["User"] as Models.User;
             var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
 
-<<<<<<< HEAD
-            try
-            {
-                if (User == null)
-                {
-                    Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    await Response.WriteAsync("Need to be logged in");
-                    return;
-                }
-
-                int productId = int.Parse(context.GetRouteValue("productId") as string ?? "0");
-                var Product = DB.Products.FirstOrDefault(Product => Product.ProductID == productId);
-
-                if (Product == null)
-                {
-                    Response.StatusCode = StatusCodes.Status404NotFound;
-                    await Response.WriteAsync("Couldnt find product");
-                    return;
-                }
-
-                var Order = DB.Orders.FirstOrDefault(Order => Order.UserID == User.UserID && Order.Pending);
-
-                var OrderItemToBeUpdated = DB.OrderItems.FirstOrDefault(OrderItem => OrderItem.OrderID == Order.OrderID && OrderItem.ProductID == Product.ProductID);
-
-                int newVal = int.Parse(Request.Query["value"]);
-
-                if (newVal < 1)
-                {
-                    Response.StatusCode = StatusCodes.Status406NotAcceptable;
-                    await Response.WriteAsync("quantity value cannot be less than 1");
-                    return;
-                }
-
-                OrderItemToBeUpdated.Quantity = newVal;
-
-                DB.OrderItems.Update(OrderItemToBeUpdated);
-
-                DB.SaveChanges();
-
-                await Response.WriteAsJsonAsync("added to order");
-            }
-            catch (ArgumentNullException)
-            {
-
-                Response.StatusCode = StatusCodes.Status400BadRequest;
-                await Response.WriteAsync("SOmething is wrong with the input");
-            }
-            catch (FormatException)
-=======
             if (User == null)
->>>>>>> master
             {
                 Response.StatusCode = StatusCodes.Status401Unauthorized;
                 await Response.WriteAsync("Need to be logged in");
