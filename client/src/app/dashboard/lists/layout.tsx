@@ -4,6 +4,7 @@ import Button from "@/components/Button";
 import Form from "@/components/Form";
 import Input, { useInput } from "@/components/Input";
 import Menubar from "@/components/Menubar";
+import { DialogClose, useDialog } from "@/contexts/Dialog";
 import { UserContext } from "@/contexts/auth";
 import { ListType } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -56,6 +57,8 @@ export default function ListsLayout({
       .catch((error) => console.log(error));
   }, [Auth?.auth?.jwt.token]);
 
+  const newListHandler = useNewListDailog();
+
   return (
     <div className="flex gap-4">
       <aside>
@@ -66,41 +69,7 @@ export default function ListsLayout({
             {...searchField.inputProps}
           />
 
-          <Dialog.Root>
-            <Dialog.Trigger asChild>
-              <Button icon={<BsPlus />} />
-            </Dialog.Trigger>
-
-            <Dialog.Portal>
-              <Dialog.Overlay className="data-[state=open]:animate-overlayShow fixed inset-0 bg-black opacity-60" />
-
-              <Dialog.Content className="data-[state=open]:animate-contentShow fixed left-[50%] top-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-3xl bg-white p-[25px] shadow-lg">
-                <h2 className="text-xl font-semibold">New Product</h2>
-
-                <hr className="my-2" />
-
-                <Form /* onSubmit={handleNewProduct} */>
-                  <Input label="product title" wrapperClassName="col-span-2" />
-
-                  <div className="col-span-2 flex gap-2">
-                    <Dialog.Close asChild>
-                      <Button
-                        label="Cancel"
-                        variant="hollow"
-                        className="flex-1"
-                      />
-                    </Dialog.Close>
-
-                    <Button
-                      label="Make Product"
-                      className="flex-1"
-                      type="submit"
-                    />
-                  </div>
-                </Form>
-              </Dialog.Content>
-            </Dialog.Portal>
-          </Dialog.Root>
+          <Button icon={<BsPlus />} onClick={newListHandler} />
         </div>
 
         <ul>
@@ -164,4 +133,25 @@ function ListSidebarItem({ List }: { List: ListType }) {
       </Menubar>
     </li>
   );
+}
+
+export function useNewListDailog() {
+  const Dialogs = useDialog();
+
+  return () => {
+    Dialogs?.FormDialog({
+      title: "New List",
+      description: "Description text",
+      // className: "flex flex-col",
+      children: (
+        <>
+          <Input label="List Name" wrapperClassName="col-span-2" />
+          <DialogClose asChild>
+            <Button label="Cancel" variant="hollow" />
+          </DialogClose>
+          <Button label="Create" type="submit" />
+        </>
+      ),
+    });
+  };
 }

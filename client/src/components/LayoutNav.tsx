@@ -59,7 +59,20 @@ export default function Navigation() {
       href: `/authentication/login?callback=${pathname}`,
       display: "unauthenticated",
     },
+    {
+      title: (
+        <Button
+          label="logout"
+          variant="flat"
+          className="m-0 p-0 font-normal"
+          onClick={() => Auth?.logoutHandler()}
+        />
+      ),
+      href: `/authentication/login?callback=${pathname}`,
+      display: "authenticated",
+    },
   ];
+
   return (
     <>
       <div id="header-container" className="z-50 bg-white">

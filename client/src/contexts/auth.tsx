@@ -20,6 +20,9 @@ import Button from "@/components/Button";
 import { BsBookmarks, BsPlus } from "react-icons/bs";
 
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { useDialog } from "./Dialog";
+
+import { useRouter } from "next/navigation";
 
 export type AuthType = {
   jwt: JwtType;
@@ -81,6 +84,9 @@ export default function AuthProvider({
 }: {
   children: React.ReactNode;
 }) {
+  // const router = useRouter();
+
+  const Dialogs = useDialog();
   const pathname = usePathname();
   const [auth, setAuth] = useState<userContextAuthType>(undefined);
 
@@ -166,6 +172,8 @@ export default function AuthProvider({
       title: "Logout",
       description: "Successfully logged out",
     });
+
+    redirect("/authentication/login");
   };
 
   const ViewCartCompontent = <Link href="/cart">View Cart</Link>;

@@ -134,6 +134,16 @@ const config: Config = {
         from: { transform: "translateX(var(--radix-toast-swipe-end-x))" },
         to: { transform: "translateX(calc(100% + var(--viewport-padding)))" },
       },
+
+      // Dialog keyframes
+      overlayShow: {
+        from: { opacity: "0" },
+        to: { opacity: "1" },
+      },
+      contentShow: {
+        from: { opacity: "0", transform: "translate(-50%, -48%) scale(0.96)" },
+        to: { opacity: "1", transform: "translate(-50%, -50%) scale(1)" },
+      },
     },
     animation: {
       "accordion-down": "accordion-down 0.2s ease-out",
@@ -160,6 +170,9 @@ const config: Config = {
       hide: "hide 100ms ease-in",
       slideIn: "slideIn 150ms cubic-bezier(0.16, 1, 0.3, 1)",
       swipeOut: "swipeOut 100ms ease-out",
+
+      overlayShow: "overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1)",
+      contentShow: "contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1)",
     },
   },
   plugins: [

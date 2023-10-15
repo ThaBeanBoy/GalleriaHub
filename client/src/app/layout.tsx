@@ -9,6 +9,7 @@ import AuthProvider from "@/contexts/auth";
 import { TooltipProvider } from "@/components/Tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import Footer from "@/components/Footer";
+import DialogProvider from "@/contexts/Dialog";
 
 const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -27,21 +28,23 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <AuthProvider>
-        <TooltipProvider>
-          <body className={`${poppins.className} `}>
-            <Navigation />
+      <DialogProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <body className={`${poppins.className} `}>
+              <Navigation />
 
-            <div id="page-container" className="min-h-screen py-8">
-              {children}
-            </div>
+              <div id="page-container" className="min-h-screen py-8">
+                {children}
+              </div>
 
-            <Footer />
+              <Footer />
 
-            <Toaster />
-          </body>
-        </TooltipProvider>
-      </AuthProvider>
+              <Toaster />
+            </body>
+          </TooltipProvider>
+        </AuthProvider>
+      </DialogProvider>
     </html>
   );
 }

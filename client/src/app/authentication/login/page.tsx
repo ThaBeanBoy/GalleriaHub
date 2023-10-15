@@ -29,13 +29,6 @@ export default function Login() {
     authContext?.loginHandler({
       username: EmailUsernameRef.current?.value || "",
       password: PasswordRef.current?.value || "",
-      success(data) {
-        alert(`logged in`);
-
-        // const callBack = searchParams?.get("callback") ?? "/";
-        // console.log(`going to ${callBack}`);
-        // redirect(callBack);
-      },
       failed(error) {
         console.log(error);
       },

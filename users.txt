@@ -1,0 +1,67 @@
+NB: Passwords are Username
+
+>< Username: MikeJohnson7, Email: mikejohnson7@example.com
+>< Username: EmilyBrown99, Email: emilybrown99@example.com
+>< Username: DavidWilson45, Email: davidwilson45@example.com
+>< Username: LisaTaylor18, Email: lisataylor18@example.com
+>< Username: RobertClark3, Email: robertclark3@example.com
+>< Username: JenniferLee55, Email: jenniferlee55@example.com
+>< Username: ChrisMartin88, Email: chrismartin88@example.com
+>< Username: AmandaWhite14, Email: amandawhite14@example.com
+>< Username: MarkDavis29, Email: markdavis29@example.com
+>< Username: JessicaAllen61, Email: jessicaallen61@example.com
+>< Username: DanielHarris27, Email: danielharris27@example.com
+>< Username: AshleyJohnson66, Email: ashleyjohnson66@example.com
+>< Username: WilliamSmith12, Email: williamsmith12@example.com
+>< Username: SamanthaBrown73, Email: samanthabrown73@example.com
+>< Username: JamesWilson91, Email: jameswilson91@example.com
+>< Username: OliviaThomas57, Email: oliviathomas57@example.com
+>< Username: RichardAnderson8, Email: richardanderson8@example.com
+>< Username: MeganTaylor44, Email: megantaylor44@example.com
+>< Username: BrianMiller5, Email: brianmiller5@example.com
+>< Username: NatalieJones77, Email: nataliejones77@example.com
+>< Username: MichaelParker23, Email: michaelparker23@example.com
+>< Username: LaurenBrown39, Email: laurenbrown39@example.com
+>< Username: KevinGreen72, Email: kevingreen72@example.com
+>< Username: ElizabethDavis6, Email: elizabethdavis6@example.com
+>< Username: ThomasMoore50, Email: thomasmoore50@example.com
+>< Username: GraceJohnson25, Email: gracejohnson25@example.com
+>< Username: ChristopherWhite16, Email: christopherwhite16@example.com
+>< Username: VictoriaWilson83, Email: victoriawilson83@example.com
+>< Username: CharlesLee10, Email: charleslee10@example.com
+>< Username: RachelAnderson33, Email: rachelanderson33@example.com
+>< Username: AndrewHarris78, Email: andrewharris78@example.com
+>< Username: KimberlySmith11, Email: kimberlysmith11@example.com
+>< Username: PatrickTaylor47, Email: patricktaylor47@example.com
+
+Artists
+
+>< Username: ArtisticBrush123, Email: artisticbrush123@example.com
+    - Paintings
+
+>< Username: CanvasCreator22, Email: canvascreator22@example.com
+    - Gaming
+
+>< Username: PalettePainter7, Email: palettepainter7@example.com
+    - NFT
+
+>< Username: SculptureSculptor99, Email: sculpturesculptor99@example.com
+    - Sculptures
+
+>< Username: ArtisticVisions45, Email: artisticvisions45@example.com
+    - Portraits
+
+>< Username: ClayMaster18, Email: claymaster18@example.com
+    - Gaming
+
+>< Username: InkedIllustrator3, Email: inkedillustrator3@example.com
+    - Graffiti
+
+>< Username: ArtisticSoul55, Email: artisticsoul55@example.com
+    - Paintings
+
+>< Username: GalleryGazer88, Email: gallerygazer88@example.com
+    - Gaming
+
+>< Username: MuralMagic14, Email: muralmagic14@example.com
+    - NFT

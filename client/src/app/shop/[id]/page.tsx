@@ -40,7 +40,7 @@ export default async function ProductPage({
       <img
         src={data.images.length > 0 ? data.images[0] : ""}
         alt={`${data.productName} image`}
-        className="max-w-[582px] rounded-2xl drop-shadow-lg"
+        className="sticky top-4 h-min max-w-[582px] rounded-2xl drop-shadow-lg"
       />
 
       {/* Product info */}
