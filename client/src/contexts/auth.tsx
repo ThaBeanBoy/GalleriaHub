@@ -5,10 +5,21 @@ import { createContext, useEffect, useState } from "react";
 
 import { useToast } from "@/components/ui/use-toast";
 
-import { CartType, JwtType, UserType } from "@/lib/types";
+import {
+  CartType,
+  JwtType,
+  ListType,
+  ProductType,
+  UserType,
+} from "@/lib/types";
 import Link from "next/link";
 
 import * as Toast from "@radix-ui/react-toast";
+import Input from "@/components/Input";
+import Button from "@/components/Button";
+import { BsBookmarks, BsPlus } from "react-icons/bs";
+
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 export type AuthType = {
   jwt: JwtType;
@@ -50,10 +61,17 @@ export type UserContextType = {
     Toast?: boolean,
   ) => void;
   PayHandler: (Toast: boolean) => void;
+  InCart: (ProductID: number) => boolean;
 
   // Lists
   lists: any[];
-  AddToListHandler: (listID: number, productID: number) => void;
+  AddToListHandler: (listID: number, productID: number, Toast: boolean) => void;
+  RemoveFromListHandler: (
+    listID: number,
+    productID: number,
+    Toast: boolean,
+  ) => void;
+  OpenListEditor: (Product: ProductType) => void;
 };
 
 export const UserContext = createContext<UserContextType | null>(null);
@@ -67,7 +85,7 @@ export default function AuthProvider({
   const [auth, setAuth] = useState<userContextAuthType>(undefined);
 
   const [cart, setCart] = useState<CartType>([]);
-  const [lists, setLists] = useState<any[]>([]);
+  const [lists, setLists] = useState<ListType[]>([]);
 
   const { toast } = useToast();
 
@@ -93,7 +111,7 @@ export default function AuthProvider({
 
       toast({
         title: "Login",
-        description: `Successfully logged in as ${auth?.user.username}`,
+        description: `Successfully signed up as ${auth?.user.username}`,
       });
 
       if (success) success(data);
@@ -322,25 +340,158 @@ export default function AuthProvider({
     }
   };
 
-  const AddToListHandler = async (listID: number, productID: number) => {
+  const AddToListHandler = async (
+    listID: number,
+    productID: number,
+    Toast: boolean,
+  ) => {
     try {
-      toast({
-        title: "Lists",
-        description: "Adding product to list",
-      });
+      if (Toast) {
+        toast({
+          title: "Lists",
+          description: "Adding product to list",
+        });
+      }
 
-      await axios({
+      const { data } = await axios<ListType>({
         method: "post",
         url: `${process.env.NEXT_PUBLIC_SERVER_URL}/lists/${listID}/${productID}`,
         headers: {
           Authorization: `Bearer ${auth?.jwt.token}`,
         },
       });
+
+      data.createdOn = new Date(data.createdOn);
+      data.lastUpdate = new Date(data.lastUpdate);
+
+      // updating the list type
+      const tempIndx = lists.map((list) => list.listID).indexOf(data.listID);
+      const tempLists = lists;
+      tempLists[tempIndx] = data;
+
+      setLists(tempLists);
+
+      if (Toast) {
+        toast({
+          title: "Lists",
+          description: "Added to list",
+        });
+      }
     } catch (error) {
-      toast({
-        title: "Lists",
-      });
+      if (Toast) {
+        toast({
+          title: "Lists",
+        });
+      }
     }
+  };
+
+  const RemoveFromListHandler = async (
+    listID: number,
+    productID: number,
+    Toast: boolean,
+  ) => {
+    try {
+      if (Toast) {
+        toast({ title: "Lists", description: "Removing from list" });
+      }
+
+      const { data } = await axios<ListType>({
+        method: "delete",
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/lists/${listID}/${productID}`,
+        headers: {
+          Authorization: `Bearer ${auth?.jwt.token}`,
+        },
+      });
+
+      data.createdOn = new Date(data.createdOn);
+      data.lastUpdate = new Date(data.lastUpdate);
+
+      // updating the list type
+      const tempIndx = lists.map((list) => list.listID).indexOf(data.listID);
+      const tempLists = lists;
+      tempLists[tempIndx] = data;
+
+      if (Toast) {
+        toast({ title: "List", description: "Removed from list" });
+      }
+    } catch (error: any) {
+      console.log(error);
+      if (Toast) {
+        toast({
+          title: "Lists",
+          description: "Something went wrong",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const InCart = (ProductID: number) => {
+    return cart.some((CartItem) => {
+      return CartItem.product.productID === Number(ProductID);
+    });
+  };
+
+  const OpenListEditor = (Product: ProductType) => {
+    // setListToastOpen(true);
+    toast({
+      duration: 15000,
+      description: (
+        <div className="max-h-11 w-full overflow-scroll">
+          <h4 className="flex items-center gap-2 pl-4 font-semibold">
+            {auth?.user.username}&apos;s lists <BsBookmarks />
+          </h4>
+
+          <hr className="my-2" />
+
+          <div className="mb-2 w-[64px] overflow-hidden">
+            <AspectRatio ratio={1}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={Product.images[0]}
+                alt={Product.productName}
+                // width="75"
+                // height={"76"}
+                className="h-full w-full rounded-md object-cover"
+              />
+            </AspectRatio>
+          </div>
+
+          <div className="mb-3 flex">
+            <Input placeholder="search lists" className="rounded-r-[0]" />
+            <Button icon={<BsPlus />} className="rounded-l-[0]" />
+          </div>
+
+          <ul>
+            {lists.map(({ listID, name, items }, key) => {
+              const inList = items.some(
+                (product) => product.productID === Product.productID,
+              );
+
+              return (
+                <li
+                  key={`user-list-toast-list-${key}`}
+                  className="mb-3 last:mb-0"
+                >
+                  <Button
+                    label={`${inList ? "Remove from" : "Add to"} "${name}"`}
+                    className="m-0 p-0 pl-4"
+                    variant="flat"
+                    desctructive={inList}
+                    onClick={() =>
+                      inList
+                        ? RemoveFromListHandler(listID, Product.productID, true)
+                        : AddToListHandler(listID, Product.productID, true)
+                    }
+                  />
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ),
+    });
   };
 
   // Auth use effect
@@ -404,38 +555,50 @@ export default function AuthProvider({
 
   useEffect(() => {
     if (auth) {
-      axios({
+      axios<ListType[]>({
         method: "get",
         url: `${process.env.NEXT_PUBLIC_SERVER_URL}/lists/`,
         headers: {
           Authorization: `Bearer ${auth?.jwt.token}`,
         },
       })
-        .then(({ data }) => setLists(data))
+        .then(({ data }) => {
+          data = data.map((temp) => {
+            temp.createdOn = new Date(temp.createdOn);
+            temp.lastUpdate = new Date(temp.lastUpdate);
+            return temp;
+          });
+          setLists(data);
+        })
         .catch((error) => console.log(error));
     }
   }, [auth, auth?.jwt.token]);
 
   return (
-    <UserContext.Provider
-      value={{
-        auth,
-        loginHandler,
-        signUpHandler,
-        logoutHandler,
+    <>
+      <UserContext.Provider
+        value={{
+          auth,
+          loginHandler,
+          signUpHandler,
+          logoutHandler,
 
-        cart,
-        AddToCartHandler,
-        DeleteFromCartHandler,
-        UpdateCartHandler,
-        PayHandler,
+          cart,
+          AddToCartHandler,
+          DeleteFromCartHandler,
+          UpdateCartHandler,
+          PayHandler,
+          InCart,
 
-        lists,
-        AddToListHandler,
-      }}
-    >
-      {children}
-    </UserContext.Provider>
+          lists,
+          AddToListHandler,
+          OpenListEditor,
+          RemoveFromListHandler,
+        }}
+      >
+        {children}
+      </UserContext.Provider>
+    </>
   );
 }
 

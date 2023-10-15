@@ -38,6 +38,7 @@ import { FiTrash } from "react-icons/fi";
 
 export type DashboardProductsLayoutType = {
   products: ProductType[] | undefined;
+  search: string;
   setProducts: Dispatch<SetStateAction<ProductType[] | undefined>>;
 };
 export const DashboardProductsLayoutContext =
@@ -146,10 +147,22 @@ export default /* async */ function Products({
       .catch((error) => console.log(error));
   }, [Auth?.auth?.jwt.token, Auth?.auth?.user.userID]);
 
+  const filteredProducts = products
+    ? products.filter(
+        (product) =>
+          search.trim() === "" ||
+          product.productName
+            .toLowerCase()
+            .includes(search.toLowerCase().trim()),
+      )
+    : [];
+
   return (
-    <DashboardProductsLayoutContext.Provider value={{ products, setProducts }}>
+    <DashboardProductsLayoutContext.Provider
+      value={{ products: filteredProducts, search, setProducts }}
+    >
       <div className="flex gap-4">
-        <aside className="sticky top-3 resize-x">
+        <aside className="sticky top-4 h-min resize-x">
           <div id="top" className="mb-4 flex items-end gap-2">
             <Input
               placeholder="search"
@@ -165,9 +178,9 @@ export default /* async */ function Products({
               </Dialog.Trigger>
 
               <Dialog.Portal>
-                <Dialog.Overlay className="data-[state=open]:animate-overlayShow fixed inset-0 bg-black opacity-60" />
+                <Dialog.Overlay className="data-[state=open]:animate-overlayShow fixed inset-0 z-40 bg-black opacity-60" />
 
-                <Dialog.Content className="data-[state=open]:animate-contentShow fixed left-[50%] top-[50%] max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-3xl bg-white p-[25px] shadow-lg">
+                <Dialog.Content className="data-[state=open]:animate-contentShow fixed left-[50%] top-[50%] z-50 max-h-[85vh] w-[90vw] max-w-[450px] translate-x-[-50%] translate-y-[-50%] rounded-3xl bg-white p-[25px] shadow-lg">
                   <h2 className="text-xl font-semibold">New Product</h2>
 
                   <hr className="my-2" />
@@ -215,19 +228,11 @@ export default /* async */ function Products({
           {/* User products */}
           <ul>
             {products ? (
-              products
-                .filter(
-                  (product) =>
-                    search.trim() === "" ||
-                    product.productName
-                      .toLowerCase()
-                      .includes(search.toLowerCase().trim()),
-                )
-                .map((product, key) => (
-                  <li key={key}>
-                    <ProductItem {...product} />
-                  </li>
-                ))
+              filteredProducts.map((product, key) => (
+                <li key={key}>
+                  <ProductItem {...product} />
+                </li>
+              ))
             ) : (
               <p className="flex items-center gap-2">
                 <LucideLoader2 className="animate-spin" />
@@ -237,7 +242,7 @@ export default /* async */ function Products({
           </ul>
         </aside>
 
-        <div>{children}</div>
+        <div className="flex-1">{children}</div>
       </div>
     </DashboardProductsLayoutContext.Provider>
   );

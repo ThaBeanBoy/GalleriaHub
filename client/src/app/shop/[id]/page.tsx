@@ -54,7 +54,7 @@ export default async function ProductPage({
         <div className="flex items-center gap-4">
           <h2 className="text-3xl font-bold">R{data.price}</h2>
 
-          <ProductActions productID={params.id} />
+          <ProductActions {...data} />
         </div>
 
         {/* Categories */}

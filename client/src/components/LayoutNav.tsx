@@ -9,7 +9,7 @@ import Avatar from "@/components/Avatar";
 import Link from "next/link";
 import { FiChevronDown } from "react-icons/fi";
 import { MenuSquareIcon } from "lucide-react";
-
+import { HiMenuAlt3 } from "react-icons/hi";
 import Button from "@/components/Button";
 import { useContext } from "react";
 import { UserContext } from "@/contexts/auth";
@@ -59,19 +59,15 @@ export default function Navigation() {
       href: `/authentication/login?callback=${pathname}`,
       display: "unauthenticated",
     },
-    {
-      title: "dashboard",
-      href: `/dashboard`,
-      display: "authenticated",
-      children: <div>Dash Children</div>,
-    },
   ];
   return (
     <>
       <div id="header-container" className="z-50 bg-white">
         <header className="max-width flex items-center justify-between border-b py-5">
-          <Link href="/">
-            <p>logo</p>
+          <Link href="/" className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.svg" alt="logo" width="16" height="16" />
+            GalleriaHub
           </Link>
 
           <Nav.Root className="hidden md:block">
@@ -103,13 +99,20 @@ export default function Navigation() {
               )}
 
               {Auth?.auth && (
-                <li>
-                  <Avatar
-                    src=""
-                    alt={Auth?.auth?.user.email}
-                    fallback={Auth?.auth?.user.email[0]}
-                  />
-                </li>
+                <NavItem
+                  href="/dashboard"
+                  title={
+                    <li>
+                      <Avatar
+                        src=""
+                        alt={Auth?.auth?.user.email}
+                        fallback={Auth?.auth?.user.email[0]}
+                      />
+                    </li>
+                  }
+                >
+                  Dash children
+                </NavItem>
               )}
 
               <Nav.Indicator className="data-[state=visible]:animate-fadeIn data-[state=hidden]:animate-fadeOut top-full z-[1] flex h-[10px] items-end justify-center overflow-hidden transition-[width,transform_250ms_ease]">
@@ -123,9 +126,9 @@ export default function Navigation() {
           </Nav.Root>
 
           <Button
-            icon={<MenuSquareIcon />}
-            variant="hollow"
-            className="md:hidden"
+            icon={<HiMenuAlt3 />}
+            variant="flat"
+            className="m-0 p-0 text-xl md:hidden"
           />
         </header>
       </div>
@@ -152,7 +155,7 @@ function NavItem({ title, href, children }: navLinkProps) {
   return children ? (
     <Nav.Item className="relative">
       <Nav.Trigger asChild>{link}</Nav.Trigger>
-      <Nav.Content className="absolute left-0 top-0 w-full bg-white shadow-xl sm:w-auto">
+      <Nav.Content className="absolute left-0 top-0 z-40 w-full bg-white shadow-xl sm:w-auto">
         {children}
       </Nav.Content>
     </Nav.Item>

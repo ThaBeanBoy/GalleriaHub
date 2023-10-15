@@ -142,10 +142,10 @@ public static class List
                     DB.ListItems.Remove(wishlistItem);
 
                     wishlist.LastUpdate = DateTime.Now;
-
+                    DB.Lists.Update(wishlist);
                     DB.SaveChanges();
 
-                    Response.StatusCode = StatusCodes.Status204NoContent;
+                    Response.StatusCode = StatusCodes.Status200OK;
                     return Response.WriteAsJsonAsync(wishlist.ResponseObj(context));
                 }
                 else
@@ -192,7 +192,6 @@ public static class List
                 return Response.WriteAsync("Something went wrong with the server");
             }
         });
-
 
         //Retrieve a user's wishlist
         group.MapGet("/{ListID}", (HttpContext context) =>
@@ -316,7 +315,6 @@ public static class List
                 var DB = context.RequestServices.GetRequiredService<GalleriaHubDBContext>();
                 int listId = int.Parse(context.GetRouteValue("ListID") as string ?? "0");
 
-                //Getting all lists owned by the specific user
                 Models.List? ListToRemove = DB.Lists.FirstOrDefault(list => list.ListID == listId);
 
                 if (ListToRemove == null)

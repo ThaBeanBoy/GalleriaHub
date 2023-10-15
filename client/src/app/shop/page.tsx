@@ -25,7 +25,7 @@ export default function Shop() {
   }, []);
 
   return (
-    <main>
+    <main className="max-w-none">
       <StackGrid columnWidth={300 - 16} gutterWidth={16} gutterHeight={16}>
         {products.map((product, key) => (
           <ProductCard key={key} {...product} />

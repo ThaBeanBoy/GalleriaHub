@@ -13,6 +13,7 @@ import Button from "@/components/Button";
 import { FormEvent, useContext, useRef } from "react";
 import axios from "axios";
 import { UserContext } from "@/contexts/auth";
+import Link from "next/link";
 
 export default function Login() {
   const searchParams = useSearchParams();
@@ -42,8 +43,8 @@ export default function Login() {
   };
 
   return (
-    <main className="prose flex w-full max-w-[500px] flex-col items-center pt-6 lg:pt-0">
-      <h1 className="pl-4">Login</h1>
+    <main className="ml-0 flex w-full max-w-[500px] flex-col items-center pt-6 lg:pt-0">
+      <h1 className="mb-6 text-3xl font-bold">Login</h1>
 
       <Form className="flex" onSubmit={handleLogin}>
         <Input
@@ -65,11 +66,13 @@ export default function Login() {
         />
 
         <div className="col-span-2 flex flex-col-reverse gap-4 lg:flex-row">
-          <Button
-            label="go to sign up page"
-            variant="hollow"
-            className="flex-1"
-          />
+          <Link href="/authentication/" className="block flex-1">
+            <Button
+              label="go to sign up page"
+              className="w-full"
+              variant="hollow"
+            />
+          </Link>
           <Button label="login" className="flex-1" />
         </div>
       </Form>

@@ -14,7 +14,7 @@ export default function Avatar({
   return (
     <RadixAvatar.Root
       className={cn(
-        "inline-flex h-[36px] w-[36px] select-none items-center justify-center overflow-hidden rounded-xl bg-white align-middle shadow",
+        "inline-flex h-[36px] w-[36px] select-none items-center justify-center overflow-hidden rounded-2xl bg-white align-middle shadow",
         className,
       )}
     >

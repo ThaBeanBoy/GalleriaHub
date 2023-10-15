@@ -81,7 +81,7 @@ export default function DashboardLayout({
   const currentPath = usePathname();
 
   return (
-    <div className="flex gap-4">
+    <div className="max-width flex gap-4">
       <aside
         className={cn("sticky top-4 h-min", {
           "w-[195px] resize-x": navExpanded,

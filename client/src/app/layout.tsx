@@ -8,6 +8,7 @@ import Navigation from "@/components/LayoutNav";
 import AuthProvider from "@/contexts/auth";
 import { TooltipProvider } from "@/components/Tooltip";
 import { Toaster } from "@/components/ui/toaster";
+import Footer from "@/components/Footer";
 
 const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -31,15 +32,11 @@ export default function RootLayout({
           <body className={`${poppins.className} `}>
             <Navigation />
 
-            <div id="page-container" className="max-width min-h-screen py-8">
+            <div id="page-container" className="min-h-screen py-8">
               {children}
             </div>
 
-            <div id="footer-container" className="bg-grey-light py-8">
-              <footer className="max-width ">
-                <h1>Footer</h1>
-              </footer>
-            </div>
+            <Footer />
 
             <Toaster />
           </body>

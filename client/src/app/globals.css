@@ -39,3 +39,7 @@ a,
 #product-description {
   @apply prose;
 }
+
+main {
+  @apply mx-auto max-w-7xl px-4;
+}

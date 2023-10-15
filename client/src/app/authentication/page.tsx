@@ -56,8 +56,8 @@ export default function SignUpPage() {
   };
 
   return (
-    <main className="prose flex flex-col items-center pt-6 lg:pt-0">
-      <h1 className="pl-4">Sign Up</h1>
+    <main className="prose ml-0 flex flex-col items-center pt-6 lg:pt-0">
+      <h1 className="mb-6 text-3xl font-bold">Sign Up</h1>
 
       <Form onSubmit={handleSignUp}>
         <Input
@@ -117,7 +117,6 @@ export default function SignUpPage() {
               label="go to login page"
               variant="hollow"
               className="w-full"
-              disabled
             />
           </Link>
 

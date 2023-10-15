@@ -11,6 +11,7 @@ import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import { FiTrash } from "react-icons/fi";
 import { SlOptionsVertical } from "react-icons/sl";
+import StackGrid from "react-stack-grid";
 
 export default function ListPage({ params }: { params: { id: number } }) {
   const Auth = useContext(UserContext);
@@ -50,23 +51,10 @@ export default function ListPage({ params }: { params: { id: number } }) {
   }
 
   return (
-    <Grid>
-      {list.items.map((list, key) => (
-        <ProductCard
-          key={key}
-          {...list}
-          tooltip={
-            <Button
-              label="delete"
-              icon={<FiTrash />}
-              className="p-0"
-              variant="flat"
-              // onClick={handleDelete}
-              desctructive
-            />
-          }
-        />
+    <StackGrid columnWidth={300 - 16} gutterWidth={16} gutterHeight={16}>
+      {list.items.map((product, key) => (
+        <ProductCard key={key} {...product} />
       ))}
-    </Grid>
+    </StackGrid>
   );
 }
